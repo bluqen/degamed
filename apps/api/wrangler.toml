@@ -1,0 +1,13 @@
+name = "degamed-api"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Public, non-secret settings. Secrets (SUPABASE_SECRET_KEY, ANTHROPIC_API_KEY, PAYSTACK_SECRET_KEY)
+# are added in the Cloudflare dashboard. See docs/SETUP.md step 3.6.
+[vars]
+ALLOWED_ORIGINS = "http://localhost:5173,https://degamed.pages.dev"
+
+# Ping Supabase once a day so the free project never pauses for inactivity.
+[triggers]
+crons = ["17 6 * * *"]

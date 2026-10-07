@@ -1,0 +1,16 @@
+{
+  "name": "degamed",
+  "private": true,
+  "description": "Degamed: an AI-powered 2D game engine in the browser",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @degamed/web --filter @degamed/api dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "format": "prettier --write ."
+  }
+}

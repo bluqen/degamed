@@ -1,0 +1,39 @@
+@import 'tailwindcss';
+
+/* Degamed design tokens. Keep in sync with the mockups. */
+@theme {
+  --color-bg: #0e0f13;
+  --color-panel: #16181f;
+  --color-panel-2: #1c1f28;
+  --color-sunken: #121419;
+  --color-line: #262a35;
+  --color-line-strong: #2e3342;
+  --color-ink: #e8eaf0;
+  --color-ink-2: #c8ccd8;
+  --color-muted: #a3a9b8;
+  --color-brand: #6b4eff;
+  --color-brand-soft: #c9bcff;
+  --color-violet: #7c5cff;
+  --color-cyan: #22d3ee;
+  --color-pink: #ff5ca8;
+  --color-ok: #34d399;
+  --color-warn: #fbbf24;
+  --color-bad: #f87171;
+
+  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-display: 'Space Grotesk', 'IBM Plex Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-cyan);
+  outline-offset: 2px;
+}
