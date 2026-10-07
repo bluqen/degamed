@@ -13,6 +13,9 @@ importers:
       hono:
         specifier: ^4.13.13
         version: 4.13.13
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.5
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^5.20261007.1
@@ -29,6 +32,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@degamed/art':
+        specifier: workspace:*
+        version: link:../../packages/art
       '@degamed/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -73,8 +79,20 @@ importers:
         specifier: ^5.0.3
         version: 5.0.3(vite@8.3.3(esbuild@0.28.1)(jiti@2.7.0))
 
+  packages/art:
+    devDependencies:
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: ^5.0.3
+        version: 5.0.3(vite@8.3.3(esbuild@0.28.1)(jiti@2.7.0))
+
   packages/shared:
     dependencies:
+      '@degamed/art':
+        specifier: workspace:*
+        version: link:../art
       zod:
         specifier: ^4.6.5
         version: 4.6.5

@@ -5,24 +5,18 @@ import { Button } from '../components/Button';
 import { createProject } from '../lib/projects';
 import { isAuthConfigured } from '../lib/env';
 import { titleFromIdea } from '../lib/titles';
+import { StylePicker } from '../components/StylePicker';
+import { StylePreview } from '../components/StylePreview';
 
 const STEPS = ['Idea', 'Style', 'Setup'] as const;
 
-const STYLES: { id: ArtStyle; name: string; bg: string }[] = [
-  { id: 'neon', name: 'Neon Glow', bg: 'linear-gradient(180deg,#140830,#4A1670 60%,#FF5CA8)' },
-  { id: 'pastel', name: 'Pastel Soft', bg: 'linear-gradient(180deg,#FFE3EC,#D7F2E9)' },
-  { id: 'paper', name: 'Paper Cutout', bg: 'linear-gradient(180deg,#F6E7C8,#E3B587)' },
-  { id: 'flat', name: 'Flat Geometric', bg: 'linear-gradient(135deg,#1D3557 50%,#E63946 50%)' },
-  { id: 'ink', name: 'Ink Wash', bg: 'radial-gradient(circle at 70% 35%,#D94F3D 18%,#F3EBDD 19%)' },
-  { id: 'retro', name: 'Retro Vector', bg: 'linear-gradient(180deg,#05060F,#1B1F4B)' },
-];
 
 export function NewGame() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [idea, setIdea] = useState(params.get('idea') ?? '');
-  const [style, setStyle] = useState<ArtStyle>('neon');
+  const [style, setStyle] = useState<ArtStyle>('pixel-16');
   const [language, setLanguage] = useState<ScriptLanguage>('python');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -80,20 +74,9 @@ export function NewGame() {
         {step === 1 && (
           <div className="flex flex-col gap-4">
             <h1 className="font-display text-4xl tracking-tight">Pick an art style</h1>
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-3">
-              {STYLES.map((s) => (
-                <button
-                  key={s.id}
-                  type="button"
-                  aria-pressed={style === s.id}
-                  onClick={() => setStyle(s.id)}
-                  className={`flex flex-col overflow-hidden rounded-[14px] border-2 bg-panel text-left ${style === s.id ? 'border-cyan' : 'border-line'}`}
-                >
-                  <span className="block h-24" style={{ background: s.bg }} />
-                  <span className="px-3 py-2.5">{s.name}</span>
-                </button>
-              ))}
-            </div>
+            <p className="text-muted">AI draws every sprite, tile and background in this style, so the whole game looks consistent.</p>
+            <StylePreview style={style} idea={idea} />
+            <StylePicker value={style} onChange={(id) => setStyle(id as ArtStyle)} />
           </div>
         )}
 

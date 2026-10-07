@@ -1,10 +1,11 @@
 import { z } from 'zod';
+import { ART_STYLE_IDS } from '@degamed/art';
 
 /** Languages a Behaviour script can be written in. */
 export const ScriptLanguage = z.enum(['python', 'javascript']);
 export type ScriptLanguage = z.infer<typeof ScriptLanguage>;
 
-export const ArtStyle = z.enum(['neon', 'pastel', 'paper', 'flat', 'ink', 'retro']);
+export const ArtStyle = z.enum(ART_STYLE_IDS);
 export type ArtStyle = z.infer<typeof ArtStyle>;
 
 const HexColor = z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Expected a #RRGGBB color');

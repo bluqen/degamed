@@ -52,7 +52,8 @@ create table public.projects (
   owner_id uuid not null default auth.uid() references public.profiles (id) on delete cascade,
   title text not null check (char_length(title) between 1 and 80),
   description text check (char_length(description) <= 2000),
-  art_style text not null default 'neon' check (art_style in ('neon', 'pastel', 'paper', 'flat', 'ink', 'retro')),
+  -- Style ids live in packages/art (the catalog grows), so only the shape is checked here.
+  art_style text not null default 'pixel-16' check (art_style ~ '^[a-z0-9-]{2,40}$'),
   language text not null default 'python' check (language in ('python', 'javascript')),
   visibility text not null default 'private' check (visibility in ('private', 'unlisted', 'public')),
   current_version_id uuid,
@@ -122,3 +123,21 @@ create policy "Versions follow their project's visibility"
 create policy "Owners add versions"
   on public.versions for insert
   with check (exists (select 1 from public.projects p where p.id = project_id and p.owner_id = auth.uid()));
+
+-- ─── Usage ─────────────────────────────────────────────────────────────────
+-- Metered actions (hosted image generation, hosted AI messages). Written only by the API with
+-- the service key; users can read their own history.
+create table public.usage_events (
+  id bigint generated always as identity primary key,
+  user_id uuid not null references public.profiles (id) on delete cascade,
+  kind text not null check (kind in ('art', 'ai')),
+  units integer not null default 1 check (units > 0),
+  created_at timestamptz not null default now()
+);
+
+create index usage_events_user_kind_created_idx on public.usage_events (user_id, kind, created_at desc);
+
+alter table public.usage_events enable row level security;
+
+create policy "Users read their own usage"
+  on public.usage_events for select using (user_id = auth.uid());

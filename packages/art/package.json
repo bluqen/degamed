@@ -1,5 +1,5 @@
 {
-  "name": "@degamed/shared",
+  "name": "@degamed/art",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -9,10 +9,6 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run"
-  },
-  "dependencies": {
-    "@degamed/art": "workspace:*",
-    "zod": "^4.6.5"
   },
   "devDependencies": {
     "typescript": "^7.0.2",

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Navigate, NavLink, useLocation } from 'react-router';
-import { Compass, Download, Gamepad2, Home, Music, Settings, Store } from 'lucide-react';
+import { Compass, Download, Gamepad2, Home, Music, Palette, Settings, Store } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 import { isAuthConfigured } from '../lib/env';
 import { LogoMark } from './Logo';
@@ -9,6 +9,7 @@ import { ButtonLink } from './Button';
 const nav = [
   { to: '/dashboard', label: 'Home', icon: Home },
   { to: '/dashboard/games', label: 'My games', icon: Gamepad2 },
+  { to: '/art', label: 'Art Lab', icon: Palette },
   { to: '/dashboard/music', label: 'Music', icon: Music },
   { to: '/dashboard/exports', label: 'Exports', icon: Download },
   { to: '/explore', label: 'Explore', icon: Compass },

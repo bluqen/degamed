@@ -11,6 +11,8 @@ import { Dashboard } from './pages/Dashboard';
 import { NewGame } from './pages/NewGame';
 import { Editor } from './pages/Editor';
 import { ComingSoon, NotFound } from './pages/Placeholder';
+import { ArtLab } from './pages/ArtLab';
+import { Settings } from './pages/Settings';
 
 const guard = (el: React.ReactNode) => <RequireAuth>{el}</RequireAuth>;
 
@@ -21,10 +23,8 @@ const router = createBrowserRouter([
   { path: '/dashboard', element: guard(<Dashboard />) },
   { path: '/new', element: guard(<NewGame />) },
   { path: '/editor/:id', element: guard(<Editor />) },
-  {
-    path: '/settings',
-    element: guard(<ComingSoon title="Settings" body="AI keys, editor preferences and billing arrive with the AI Copilot milestone." />),
-  },
+  { path: '/settings', element: guard(<Settings />) },
+  { path: '/art', element: guard(<ArtLab />) },
   {
     path: '/dashboard/:section',
     element: guard(<ComingSoon title="Coming soon" body="This section arrives in a later milestone." />),
