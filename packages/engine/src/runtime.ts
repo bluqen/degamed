@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser';
-import { ProjectManifest, Scene, type Entity, type ProjectFiles } from '@degamed/shared';
+import { ProjectManifest, Scene, SpriteFrames, type Entity, type ProjectFiles } from '@degamed/shared';
+import { animKey, pickAutoAnimation } from './animation';
 import { InputState, Key } from './input';
 import { compileScripts, DEGAMED_MODULE_SOURCE, ScriptError } from './scripts';
 import { Sfx } from './sfx';
@@ -96,6 +97,59 @@ export class EntityHandle {
   hasTag(tag: string) {
     return this.tags.includes(tag);
   }
+
+  // ── Animation (entities with an AnimatedSprite) ──────────────────────────
+  /** The .frames.json this entity animates from, if any. */
+  framesPath: string | null = null;
+  /** Animation names available to this entity. */
+  animations: ReadonlySet<string> = new Set();
+  /** When true, idle/run/jump/fall are chosen automatically from the body each frame. */
+  autoAnimate = false;
+  /** Set while a one-shot animation started by a script plays, so auto mode doesn't cut it off. */
+  oneShotPlaying = false;
+  private loops = new Map<string, boolean>();
+
+  setupAnimation(framesPath: string, loops: Map<string, boolean>, auto: boolean) {
+    this.framesPath = framesPath;
+    this.loops = loops;
+    this.animations = new Set(loops.keys());
+    this.autoAnimate = auto;
+  }
+
+  /** Name of the animation playing now, or null. */
+  get animation(): string | null {
+    const key = this.go instanceof Phaser.GameObjects.Sprite ? this.go.anims.currentAnim?.key : undefined;
+    return key ? key.slice(key.indexOf('#') + 1) : null;
+  }
+
+  /**
+   * Plays an animation by name. Keeps playing (no restart) if it is already running, unless
+   * `restart` is true. A non-looping animation started here pauses auto mode until it finishes.
+   */
+  play(name: string, opts: { restart?: boolean } = {}): boolean {
+    if (!(this.go instanceof Phaser.GameObjects.Sprite) || !this.framesPath) {
+      this.world.warnOnce(`${this.name} has no AnimatedSprite, so it can't play "${name}"`);
+      return false;
+    }
+    if (!this.animations.has(name)) {
+      this.world.warnOnce(`${this.name} has no animation called "${name}" (has: ${[...this.animations].join(', ')})`);
+      return false;
+    }
+    this.go.play(animKey(this.framesPath, name), !opts.restart);
+    return true;
+  }
+
+  /** Plays a one-shot animation (e.g. "attack") on top of auto mode. */
+  playOnce(name: string): boolean {
+    const ok = this.play(name, { restart: true });
+    if (ok && this.loops.get(name) === false) this.oneShotPlaying = true;
+    return ok;
+  }
+
+  stop() {
+    if (this.go instanceof Phaser.GameObjects.Sprite) this.go.stop();
+  }
+
   destroy() {
     if (this.destroyed) return;
     this.destroyed = true;
@@ -119,11 +173,21 @@ export class Behaviour {
   get onFloor() {
     return this.entity.onFloor;
   }
+  /** Shortcut for this.entity.play(name). */
+  play(name: string, opts?: { restart?: boolean }) {
+    return this.entity.play(name, opts);
+  }
+  /** Plays a non-looping animation once (attack, hurt…) even in auto mode. */
+  playOnce(name: string) {
+    return this.entity.playOnce(name);
+  }
 
   onStart?(): void;
   onUpdate?(dt: number): void;
   onCollide?(other: EntityHandle): void;
   onDestroy?(): void;
+  /** Called when a non-looping animation on this entity finishes. */
+  onAnimationEnd?(name: string): void;
 }
 
 /** Live state of one running scene: entities, behaviours and collision groups. */
@@ -134,8 +198,15 @@ class World {
   readonly sensors: Phaser.GameObjects.GameObject[] = [];
   readonly byObject = new Map<Phaser.GameObjects.GameObject, EntityHandle>();
   private readonly broken = new Set<Behaviour>();
+  private readonly warned = new Set<string>();
 
   constructor(private readonly hooks: RuntimeHooks) {}
+
+  warnOnce(message: string) {
+    if (this.warned.has(message)) return;
+    this.warned.add(message);
+    this.hooks.log('warn', message);
+  }
 
   add(e: EntityHandle) {
     this.entities.push(e);
@@ -151,7 +222,7 @@ class World {
   }
 
   /** Runs a behaviour hook; a script that throws is reported once and then switched off. */
-  call<K extends 'onStart' | 'onUpdate' | 'onCollide' | 'onDestroy'>(b: Behaviour, hook: K, ...args: unknown[]) {
+  call<K extends 'onStart' | 'onUpdate' | 'onCollide' | 'onDestroy' | 'onAnimationEnd'>(b: Behaviour, hook: K, ...args: unknown[]) {
     const fn = b[hook] as ((...a: unknown[]) => void) | undefined;
     if (!fn || this.broken.has(b)) return;
     try {
@@ -184,6 +255,7 @@ export interface GameHandle {
 interface Loaded {
   manifest: ProjectManifest;
   scene: Scene;
+  frames: Map<string, SpriteFrames>;
   behaviours: Map<string, typeof Behaviour>;
 }
 
@@ -224,7 +296,21 @@ function parseProject(files: ProjectFiles): Omit<Loaded, 'behaviours'> & { scrip
   if (pythonScripts.length) {
     throw new ScriptError('Python scripts are coming in the next engine milestone. Use .js for now.', pythonScripts[0]!);
   }
-  return { manifest, scene, scriptPaths };
+  const frames = new Map<string, SpriteFrames>();
+  for (const { e } of flatten(scene.entities)) {
+    const path = e.components.AnimatedSprite?.frames;
+    if (!path || frames.has(path)) continue;
+    const parsed = SpriteFrames.safeParse(parseJson(files, path));
+    if (!parsed.success) {
+      const issue = parsed.error.issues[0];
+      throw new ScriptError(`${path}: ${issue?.path.join('.') ?? ''} ${issue?.message ?? 'invalid frames file'}`.trim(), path);
+    }
+    if (!files[parsed.data.sheet]?.startsWith('data:image/')) {
+      throw new ScriptError(`${path}: sprite sheet ${parsed.data.sheet} is missing`, path);
+    }
+    frames.set(path, parsed.data);
+  }
+  return { manifest, scene, frames, scriptPaths };
 }
 
 /** Imports every Behaviour script. The engine API must already be on globalThis.__degamed. */
@@ -252,7 +338,7 @@ const PARTICLE_KEY = '__degamed_px';
 
 /** Starts a project inside `parent`. Rejects with a ScriptError if the project can't load. */
 export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks: RuntimeHooks): Promise<GameHandle> {
-  const { manifest, scene, scriptPaths } = parseProject(files);
+  const { manifest, scene, frames, scriptPaths } = parseProject(files);
   const input = new InputState(manifest.input);
   input.attach(window);
   const sfx = new Sfx();
@@ -310,6 +396,25 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
         emitter.explode(opts.count ?? 12);
         phaserScene.time.delayedCall(700, () => emitter.destroy());
       },
+      /**
+       * Animates properties over time, like Godot's Tween:
+       * kit.tween(this.entity, { y: 40, alpha: 0 }, { duration: 400, ease: 'Sine.InOut', yoyo: true, repeat: -1 })
+       */
+      tween: (
+        target: EntityHandle | object,
+        props: Record<string, number>,
+        opts: { duration?: number; ease?: string; yoyo?: boolean; repeat?: number; delay?: number; onComplete?: () => void } = {},
+      ) =>
+        phaserScene.tweens.add({
+          targets: target instanceof EntityHandle ? target.go : target,
+          ...props,
+          duration: opts.duration ?? 300,
+          ease: opts.ease ?? 'Sine.InOut',
+          yoyo: opts.yoyo ?? false,
+          repeat: opts.repeat ?? 0,
+          delay: opts.delay ?? 0,
+          onComplete: opts.onComplete,
+        }),
       floatText: (x: number, y: number, text: string, color = '#FFFFFF') => {
         const t = phaserScene.add
           .text(x, y, text, { fontFamily: 'monospace', fontSize: '8px', color, stroke: '#1A1C2C', strokeThickness: 2 })
@@ -338,6 +443,9 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
       for (const [path, content] of Object.entries(files)) {
         if (/\.(png|jpe?g|webp|gif)$/i.test(path) && content.startsWith('data:image/')) this.load.image(path, content);
       }
+      for (const [path, def] of frames) {
+        this.load.spritesheet(path, files[def.sheet]!, { frameWidth: def.frameWidth, frameHeight: def.frameHeight });
+      }
       this.load.on('loaderror', (file: { key: string }) => hooks.error(`Could not load image ${file.key}`, { file: file.key }));
     }
 
@@ -348,6 +456,26 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
       api.Game.score = 0;
       const { width: W, height: H } = manifest.resolution;
       const bounds = scene.bounds ?? { width: W, height: H };
+
+      for (const [path, def] of frames) {
+        // Frames 0…n-1; Phaser also counts a hidden "__BASE" frame.
+        const available = this.textures.exists(path) ? this.textures.get(path).frameTotal - 1 : 0;
+        for (const [name, anim] of Object.entries(def.animations)) {
+          const key = animKey(path, name);
+          if (this.anims.exists(key)) continue;
+          const valid = anim.frames.filter((f) => f < available);
+          if (valid.length < anim.frames.length) {
+            hooks.log('warn', `${path}: "${name}" uses frames that don't exist in the sheet (it has ${available})`, path);
+          }
+          if (!valid.length) continue;
+          this.anims.create({
+            key,
+            frames: this.anims.generateFrameNumbers(path, { frames: valid }),
+            frameRate: anim.fps,
+            repeat: anim.loop ? -1 : 0,
+          });
+        }
+      }
 
       if (!this.textures.exists(PARTICLE_KEY)) {
         const tex = this.textures.createCanvas(PARTICLE_KEY, 2, 2);
@@ -398,7 +526,15 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
       const cameraEntity = flatten(scene.entities).find(({ e }) => e.components.Camera);
       const camera = cameraEntity?.e.components.Camera;
       this.cameras.main.setBounds(0, 0, bounds.width, bounds.height);
-      if (camera?.zoom) this.cameras.main.setZoom(camera.zoom);
+      if (camera?.zoom && camera.zoom !== 1) {
+        this.cameras.main.setZoom(camera.zoom);
+        // Like Godot's CanvasLayer: UI (entities tagged "ui") gets its own unzoomed camera.
+        const uiCamera = this.cameras.add(0, 0, W, H, false, 'ui');
+        const isUi = (go: Phaser.GameObjects.GameObject) => world.byObject.get(go)?.hasTag('ui') ?? false;
+        const route = (go: Phaser.GameObjects.GameObject) => (isUi(go) ? this.cameras.main.ignore(go) : uiCamera.ignore(go));
+        for (const go of this.children.list) route(go);
+        this.events.on(Phaser.Scenes.Events.ADDED_TO_SCENE, route);
+      }
       if (camera?.follow) {
         const target = world.find(camera.follow);
         if (target) this.cameras.main.startFollow(target.go, true, 0.12, 0.12);
@@ -441,6 +577,15 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
         go.setFlipX?.(s.flipX);
         go.setDepth?.(s.depth);
         if (s.tint) (go as Phaser.GameObjects.Image).setTint(hexToInt(s.tint));
+      } else if (c.AnimatedSprite) {
+        const a = c.AnimatedSprite;
+        const def = frames.get(a.frames)!;
+        const names = Object.keys(def.animations);
+        const start = a.animation && def.animations[a.animation] ? a.animation : names[0]!;
+        const sprite = this.add.sprite(x, y, a.frames, def.animations[start]!.frames[0]);
+        sprite.setFlipX(a.flipX).setDepth(a.depth);
+        if (a.playing && this.anims.exists(animKey(a.frames, start))) sprite.play(animKey(a.frames, start));
+        go = sprite;
       } else if (c.Text) {
         go = this.add
           .text(x, y, c.Text.text, { fontFamily: 'monospace', fontSize: `${c.Text.size}px`, color: c.Text.color })
@@ -458,6 +603,16 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
 
       const handle = new EntityHandle(e.id, e.name, e.tags, go, world);
       world.add(handle);
+      if (c.AnimatedSprite && go instanceof Phaser.GameObjects.Sprite) {
+        const def = frames.get(c.AnimatedSprite.frames)!;
+        const loops = new Map(Object.entries(def.animations).map(([n, an]) => [n, an.loop]));
+        handle.setupAnimation(c.AnimatedSprite.frames, loops, c.AnimatedSprite.auto);
+        go.on(Phaser.Animations.Events.ANIMATION_COMPLETE, (anim: Phaser.Animations.Animation) => {
+          handle.oneShotPlaying = false;
+          const name = anim.key.slice(anim.key.indexOf('#') + 1);
+          for (const b of handle.behaviours) world.call(b, 'onAnimationEnd', name);
+        });
+      }
 
       if (c.Body) {
         const b = c.Body;
@@ -482,6 +637,10 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
       for (const e of [...world.entities]) {
         if (e.destroyed) continue;
         for (const b of e.behaviours) world.call(b, 'onUpdate', dt);
+        if (e.autoAnimate && !e.oneShotPlaying && !e.destroyed) {
+          const name = pickAutoAnimation({ onFloor: e.onFloor, vx: e.velocity.x, vy: e.velocity.y }, e.animations);
+          if (name) e.play(name);
+        }
       }
       input.endFrame();
     }

@@ -1,5 +1,6 @@
 import type { ProjectFiles, ProjectManifest, Scene } from '@degamed/shared';
-import { ditheredSky, rasterize, ridgeLayer, SPRITES, SWEETIE16 as P, type Raster } from '../pixel';
+import type { SpriteFrames } from '@degamed/shared';
+import { COIN_FRAMES, ditheredSky, KNIGHT_FRAMES, rasterize, ridgeLayer, sheetOf, SLIME_FRAMES, SPRITES, SWEETIE16 as P, type Raster } from '../pixel';
 
 /** Turns raw pixels into a data URL (the browser uses a canvas; tests pass a fake). */
 export type Encoder = (raster: Raster) => string;
@@ -133,9 +134,9 @@ const id = (prefix: string) => `${prefix}-${++nextId}`;
 export function createPlatformerTemplate(encode: Encoder, title = 'Starter Platformer'): ProjectFiles {
   nextId = 0;
   const assets: Record<string, Raster> = {
-    'assets/sprites/knight.png': rasterize(SPRITES.knight),
-    'assets/sprites/slime.png': rasterize(SPRITES.slime),
-    'assets/sprites/coin.png': rasterize(SPRITES.coin),
+    'assets/sprites/knight-sheet.png': sheetOf(KNIGHT_FRAMES.map(rasterize)),
+    'assets/sprites/slime-sheet.png': sheetOf(SLIME_FRAMES.map(rasterize)),
+    'assets/sprites/coin-sheet.png': sheetOf(COIN_FRAMES.map(rasterize)),
     'assets/sprites/flag.png': rasterize(SPRITES.flag),
     'assets/sprites/cloud.png': rasterize(SPRITES.cloud),
     'assets/tiles/grass.png': rasterize(SPRITES.grass),
@@ -161,6 +162,33 @@ export function createPlatformerTemplate(encode: Encoder, title = 'Starter Platf
       up: ['ArrowUp', 'KeyW'],
       down: ['ArrowDown', 'KeyS'],
       jump: ['Space', 'ArrowUp', 'KeyW', 'KeyZ'],
+    },
+  };
+
+  // Godot-style SpriteFrames: one sheet per character, named animations by frame number.
+  const frames: Record<string, SpriteFrames> = {
+    'assets/anims/knight.frames.json': {
+      sheet: 'assets/sprites/knight-sheet.png',
+      frameWidth: 16,
+      frameHeight: 16,
+      animations: {
+        idle: { frames: [0, 1], fps: 3, loop: true },
+        run: { frames: [2, 3, 4, 3], fps: 10, loop: true },
+        jump: { frames: [5], fps: 1, loop: true },
+        fall: { frames: [6], fps: 1, loop: true },
+      },
+    },
+    'assets/anims/slime.frames.json': {
+      sheet: 'assets/sprites/slime-sheet.png',
+      frameWidth: 16,
+      frameHeight: 16,
+      animations: { wobble: { frames: [0, 1], fps: 4, loop: true } },
+    },
+    'assets/anims/coin.frames.json': {
+      sheet: 'assets/sprites/coin-sheet.png',
+      frameWidth: 10,
+      frameHeight: 10,
+      animations: { spin: { frames: [0, 1, 2, 3], fps: 8, loop: true } },
     },
   };
 
@@ -203,7 +231,7 @@ export function createPlatformerTemplate(encode: Encoder, title = 'Starter Platf
     tags: ['coin'],
     components: {
       Transform: { position: { x, y } },
-      Sprite: { asset: 'assets/sprites/coin.png', depth: 2 },
+      AnimatedSprite: { frames: 'assets/anims/coin.frames.json', depth: 2 },
       Body: { type: 'static' as const, sensor: true },
       Script: { src: 'scripts/coin.js' },
     },
@@ -215,7 +243,7 @@ export function createPlatformerTemplate(encode: Encoder, title = 'Starter Platf
     tags: ['enemy'],
     components: {
       Transform: { position: { x, y: GROUND_Y - 8 } },
-      Sprite: { asset: 'assets/sprites/slime.png', depth: 3 },
+      AnimatedSprite: { frames: 'assets/anims/slime.frames.json', depth: 3 },
       Body: { type: 'dynamic' as const },
       Script: { src: 'scripts/slime.js', props: { range: 40 } },
     },
@@ -274,7 +302,8 @@ export function createPlatformerTemplate(encode: Encoder, title = 'Starter Platf
         tags: ['player'],
         components: {
           Transform: { position: { x: 60, y: GROUND_Y - 40 } },
-          Sprite: { asset: 'assets/sprites/knight.png', depth: 5 },
+          // auto: picks idle / run / jump / fall from the physics body every frame.
+          AnimatedSprite: { frames: 'assets/anims/knight.frames.json', auto: true, depth: 5 },
           Body: { type: 'dynamic' as const },
           Script: { src: 'scripts/player.js' },
         },
@@ -306,6 +335,7 @@ export function createPlatformerTemplate(encode: Encoder, title = 'Starter Platf
     'scripts/coin.js': COIN_JS,
     'scripts/hud.js': HUD_JS,
   };
+  for (const [path, def] of Object.entries(frames)) files[path] = JSON.stringify(def, null, 2);
   for (const [path, raster] of Object.entries(assets)) files[path] = encode(raster);
   return files;
 }

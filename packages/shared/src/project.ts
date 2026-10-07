@@ -52,6 +52,20 @@ export const Components = z
       /** Draw order; higher is in front. */
       depth: z.number().default(0),
     }),
+    /** A sprite that plays animations from a `.frames.json` file (like Godot's AnimatedSprite2D). */
+    AnimatedSprite: z.object({
+      frames: z.string().regex(/\.frames\.json$/, 'Point to a .frames.json file'),
+      /** Animation to start with. Defaults to the first one in the file. */
+      animation: z.string().optional(),
+      playing: z.boolean().default(true),
+      /**
+       * Pick idle / run / jump / fall automatically from the physics body each frame
+       * (like a simple AnimationTree). Scripts can still call entity.play().
+       */
+      auto: z.boolean().default(false),
+      flipX: z.boolean().default(false),
+      depth: z.number().default(0),
+    }),
     Body: z.object({
       type: z.enum(['dynamic', 'static', 'kinematic']),
       gravity: z.boolean().default(true),
@@ -70,6 +84,31 @@ export const Components = z
   .partial()
   .strict();
 export type Components = z.infer<typeof Components>;
+
+const AnimationName = z.string().regex(/^[A-Za-z0-9_-]{1,40}$/, 'Use letters, numbers, - and _');
+
+/**
+ * `*.frames.json`: a sprite sheet cut into equal frames plus named animations
+ * (Godot's SpriteFrames). Frame numbers count left to right, top to bottom, from 0.
+ */
+export const SpriteFrames = z
+  .object({
+    sheet: z.string(),
+    frameWidth: z.number().int().positive(),
+    frameHeight: z.number().int().positive(),
+    animations: z
+      .record(
+        AnimationName,
+        z.object({
+          frames: z.array(z.number().int().min(0)).min(1),
+          fps: z.number().positive().max(60).default(8),
+          loop: z.boolean().default(true),
+        }),
+      )
+      .refine((a) => Object.keys(a).length > 0, 'Add at least one animation'),
+  })
+  .strict();
+export type SpriteFrames = z.infer<typeof SpriteFrames>;
 
 export interface Entity {
   id: string;

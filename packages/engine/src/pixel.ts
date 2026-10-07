@@ -258,3 +258,73 @@ export const SPRITES = {
     ],
   },
 } satisfies Record<string, PixelGrid>;
+
+// ── Frame helpers: build animation frames from a base grid ──────────────────
+
+/** Returns a copy of `grid` with some rows replaced (by row index). */
+export function withRows(grid: PixelGrid, replacements: Record<number, string>): PixelGrid {
+  return { colors: grid.colors, rows: grid.rows.map((row, i) => replacements[i] ?? row) };
+}
+
+/** Moves rows 0…`through` down (dy > 0) or up (dy < 0); rows below `through` stay put. */
+export function bob(grid: PixelGrid, dy: number, through: number): PixelGrid {
+  const blank = '.'.repeat(grid.rows[0]!.length);
+  const rows = grid.rows.map((row, i) => {
+    if (i > through) return row;
+    const src = i - dy;
+    if (src < 0) return blank;
+    return grid.rows[Math.min(src, through)] ?? blank;
+  });
+  return { colors: grid.colors, rows };
+}
+
+/** Drops row `remove` and adds a blank row on top: a squashed version of the sprite. */
+export function squashAt(grid: PixelGrid, remove: number): PixelGrid {
+  const blank = '.'.repeat(grid.rows[0]!.length);
+  return { colors: grid.colors, rows: [blank, ...grid.rows.filter((_, i) => i !== remove)] };
+}
+
+/** Horizontally squeezes a grid to `width` columns (nearest sample), centred in the original width. */
+export function squeezeX(grid: PixelGrid, width: number): PixelGrid {
+  const full = grid.rows[0]!.length;
+  const left = Math.floor((full - width) / 2);
+  const rows = grid.rows.map((row) => {
+    let out = '';
+    for (let x = 0; x < full; x++) {
+      const local = x - left;
+      out += local >= 0 && local < width ? row[Math.floor(((local + 0.5) * full) / width)]! : '.';
+    }
+    return out;
+  });
+  return { colors: grid.colors, rows };
+}
+
+/** Lays equally sized frames out left to right in one sprite sheet. */
+export function sheetOf(frames: Raster[]): Raster {
+  const fw = frames[0]!.width;
+  const fh = frames[0]!.height;
+  if (frames.some((f) => f.width !== fw || f.height !== fh)) throw new Error('All frames must be the same size');
+  const width = fw * frames.length;
+  const data = new Uint8ClampedArray(width * fh * 4);
+  frames.forEach((f, i) => {
+    for (let y = 0; y < fh; y++) data.set(f.data.subarray(y * fw * 4, (y + 1) * fw * 4), (y * width + i * fw) * 4);
+  });
+  return { width, height: fh, data };
+}
+
+const KNIGHT = SPRITES.knight;
+
+/** Starter animation frames, in sheet order. */
+export const KNIGHT_FRAMES: PixelGrid[] = [
+  KNIGHT, // 0 idle
+  bob(KNIGHT, 1, 12), // 1 idle (breath)
+  withRows(KNIGHT, { 14: '...oBo....oBo...', 15: '..ooo.....ooo...' }), // 2 run: stride
+  bob(withRows(KNIGHT, { 13: '.....oBBBBo.....', 14: '.....oBooBo.....', 15: '.....oo..oo.....' }), -1, 12), // 3 run: passing
+  withRows(KNIGHT, { 14: '....oBo...oBo...', 15: '...ooo....ooo...' }), // 4 run: other stride
+  withRows(KNIGHT, { 13: '....oBBBBBBo....', 14: '....oBBooBBo....', 15: '.....oo..oo.....' }), // 5 jump: tucked
+  withRows(KNIGHT, { 13: '...oBBo..oBBo...', 14: '..oBo......oBo..', 15: '..oo........oo..' }), // 6 fall: legs apart
+];
+
+export const SLIME_FRAMES: PixelGrid[] = [SPRITES.slime, squashAt(SPRITES.slime, 4)];
+
+export const COIN_FRAMES: PixelGrid[] = [SPRITES.coin, squeezeX(SPRITES.coin, 6), squeezeX(SPRITES.coin, 2), squeezeX(SPRITES.coin, 6)];

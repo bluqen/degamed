@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { Link, useParams } from 'react-router';
-import { Code2, FileImage, FileJson, Maximize2, Pause, Play, RotateCcw, Sparkles, Trash2 } from 'lucide-react';
+import { Clapperboard, Code2, FileImage, FileJson, Maximize2, Pause, Play, RotateCcw, Sparkles, Trash2 } from 'lucide-react';
+import { AnimationEditor } from '../components/AnimationEditor';
 import { Scene, type ProjectFiles } from '@degamed/shared';
 import { LogoMark } from '../components/Logo';
 import { getProject, type ProjectRow } from '../lib/projects';
@@ -45,6 +46,7 @@ export function Editor() {
   const [mode, setMode] = useState<Mode>('simple');
   const [openFile, setOpenFile] = useState('scripts/player.js');
   const [paused, setPaused] = useState(false);
+  const [asJson, setAsJson] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const play = usePlayFrame(files);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -91,15 +93,31 @@ export function Editor() {
   const quickTimer = useRef<number>(undefined);
   const setQuick = (prop: string, value: number) => {
     if (!files) return;
-    const next = withScriptProp(files, scenePath, 'scripts/player.js', prop, value);
+    updateAndRunSoon(withScriptProp(files, scenePath, 'scripts/player.js', prop, value));
+  };
+
+  /** Saves a change and re-runs the game shortly after (for sliders and the animation editor). */
+  const updateAndRunSoon = (next: ProjectFiles) => {
     update(next);
     window.clearTimeout(quickTimer.current);
-    quickTimer.current = window.setTimeout(() => play.run(next), 350);
+    quickTimer.current = window.setTimeout(() => play.run(next), 400);
+  };
+
+  const openAnimations = (path: string) => {
+    setOpenFile(path);
+    setAsJson(false);
+    setMode('pro');
   };
 
   const fullscreen = () => void stageRef.current?.requestFullscreen?.();
   const title = isDemo ? 'Demo: Starter Platformer' : (project?.title ?? 'Loading…');
   const textFiles = files ? Object.keys(files).filter(isTextFile).sort() : [];
+  const animationFiles = textFiles.filter((p) => p.endsWith('.frames.json'));
+  const isAnimFile = openFile.endsWith('.frames.json');
+  const images = useMemo(
+    () => Object.fromEntries(Object.entries(files ?? {}).filter(([, v]) => v.startsWith('data:image/'))),
+    [files],
+  );
   const assetFiles = files ? Object.keys(files).filter((p) => !isTextFile(p)).sort() : [];
 
   const onCodeKey = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -260,6 +278,28 @@ export function Editor() {
                 Reset to the starter template
               </button>
             </div>
+            {animationFiles.length > 0 && (
+              <div className="flex flex-col gap-2 rounded-xl border border-line bg-panel p-4">
+                <strong>Animations</strong>
+                {animationFiles.map((p) => {
+                  let names = '';
+                  try {
+                    names = Object.keys((JSON.parse(files![p]!) as { animations: object }).animations).join(', ');
+                  } catch {
+                    names = 'needs fixing';
+                  }
+                  return (
+                    <button key={p} type="button" onClick={() => openAnimations(p)} className="flex flex-col items-start rounded-lg px-2 py-1.5 text-left hover:bg-panel-2">
+                      <span className="flex items-center gap-2">
+                        <Clapperboard size={14} className="text-cyan" aria-hidden="true" />
+                        {p.split('/').pop()!.replace('.frames.json', '')}
+                      </span>
+                      <span className="text-[12px] text-muted">{names}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
             <div className="flex flex-col gap-2 rounded-xl border border-line bg-panel p-4">
               <strong>Art</strong>
               <p className="text-muted">The starter art is placeholder pixel art. Generate your own sprites in the Art Lab.</p>
@@ -275,10 +315,19 @@ export function Editor() {
               <button
                 key={p}
                 type="button"
-                onClick={() => setOpenFile(p)}
+                onClick={() => {
+                  setOpenFile(p);
+                  setAsJson(false);
+                }}
                 className={`flex items-center gap-2 px-3 py-1.5 text-left font-mono text-xs ${openFile === p ? 'bg-[#2B2550] text-white' : 'text-ink-2 hover:text-white'}`}
               >
-                {p.endsWith('.json') ? <FileJson size={13} aria-hidden="true" /> : <Code2 size={13} aria-hidden="true" />}
+                {p.endsWith('.frames.json') ? (
+                  <Clapperboard size={13} aria-hidden="true" />
+                ) : p.endsWith('.json') ? (
+                  <FileJson size={13} aria-hidden="true" />
+                ) : (
+                  <Code2 size={13} aria-hidden="true" />
+                )}
                 {p}
               </button>
             ))}
@@ -301,22 +350,39 @@ export function Editor() {
             <div className="flex min-h-[220px] flex-1 flex-col border-b border-[#1F222B]">
               <div className="flex items-center gap-3 border-b border-[#1F222B] bg-sunken px-3 py-1.5 text-[13px]">
                 <span className="font-mono">{openFile}</span>
-                <span className="text-muted">Ctrl+S to save and run</span>
+                {isAnimFile ? (
+                  <button type="button" onClick={() => setAsJson(!asJson)} className="text-brand-soft underline">
+                    {asJson ? 'Animation view' : 'Edit as JSON'}
+                  </button>
+                ) : (
+                  <span className="text-muted">Ctrl+S to save and run</span>
+                )}
                 <button type="button" onClick={() => play.run()} className="ml-auto rounded-md bg-[#1E3B30] px-2.5 py-1 font-semibold text-ok">
                   Save &amp; run
                 </button>
               </div>
-              <label htmlFor="code" className="sr-only">
-                {openFile}
-              </label>
-              <textarea
-                id="code"
-                spellCheck={false}
-                value={files[openFile] ?? ''}
-                onChange={(e) => update({ ...files, [openFile]: e.target.value })}
-                onKeyDown={onCodeKey}
-                className="min-h-0 flex-1 resize-none bg-[#0B0C10] p-4 font-mono text-[13px] leading-relaxed text-ink outline-none"
-              />
+              {isAnimFile && !asJson ? (
+                <AnimationEditor
+                  path={openFile}
+                  json={files[openFile] ?? ''}
+                  images={images}
+                  onChange={(json) => updateAndRunSoon({ ...files, [openFile]: json })}
+                />
+              ) : (
+                <>
+                  <label htmlFor="code" className="sr-only">
+                    {openFile}
+                  </label>
+                  <textarea
+                    id="code"
+                    spellCheck={false}
+                    value={files[openFile] ?? ''}
+                    onChange={(e) => update({ ...files, [openFile]: e.target.value })}
+                    onKeyDown={onCodeKey}
+                    className="min-h-0 flex-1 resize-none bg-[#0B0C10] p-4 font-mono text-[13px] leading-relaxed text-ink outline-none"
+                  />
+                </>
+              )}
             </div>
           )}
           {stage}

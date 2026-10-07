@@ -46,6 +46,8 @@ Every push to `main` runs CI. Once the Cloudflare secrets from `docs/SETUP.md` s
 1. ✅ Foundation: app shell, design system, Google sign-in, database, API, CI/deploy
 2. 🚧 Engine core: ✅ entity/component runtime, sandboxed player, JavaScript `degamed` API, starter platformer, editor with live preview; ⏳ web export
    - ✅ AI art pipeline and Art Lab (pixel art and 12 other styles)
+   - ✅ Animation: SpriteFrames files, AnimatedSprite with automatic idle/run/jump/fall, `play()` / `playOnce()` / `onAnimationEnd`, `kit.tween()`, Animation panel in the editor
+   - ⏳ Keyframe timeline (AnimationPlayer-style) and AI-generated animation frames
 3. Python scripting through Pyodide
 4. Pro editor: hierarchy, inspector, scene view, script editor
 5. AI Copilot (bring your own key, or Degamed credits)

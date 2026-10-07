@@ -14,7 +14,8 @@ export function starterProject(title?: string): ProjectFiles {
   return createPlatformerTemplate(rasterToDataUrl, title);
 }
 
-const draftKey = (projectId: string) => `degamed.draft.${projectId}`;
+// Bump the version when the starter template changes shape, so old demo drafts don't stick around.
+const draftKey = (projectId: string) => `degamed.draft.v2.${projectId}`;
 
 /**
  * Local autosave of a project's files. Cloud saving (versions in R2) replaces this once
