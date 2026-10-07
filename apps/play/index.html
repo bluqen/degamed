@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Degamed player</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #0b0c10; overflow: hidden; }
+      #game { position: absolute; inset: 0; }
+      #game canvas { image-rendering: pixelated; }
+      #status { position: absolute; inset: 0; display: grid; place-items: center; color: #a3a9b8;
+        font: 14px/1.4 ui-monospace, monospace; text-align: center; padding: 24px; pointer-events: none; }
+    </style>
+  </head>
+  <body>
+    <div id="game" tabindex="0" aria-label="Game"></div>
+    <div id="status">Waiting for a game…</div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

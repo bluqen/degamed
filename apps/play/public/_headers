@@ -1,6 +1,7 @@
 # Play sandbox: runs untrusted game code. It lives on its own origin and may only be framed by Degamed.
 /*
-  Content-Security-Policy: default-src 'none'; script-src 'self' 'unsafe-eval' blob: https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' blob: data: https://cdn.jsdelivr.net; worker-src blob:; frame-ancestors http://localhost:5173 https://degamed.pages.dev
+  Content-Security-Policy: default-src 'none'; script-src 'self' https://degamed-play.pages.dev 'unsafe-eval' blob: https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' https://degamed-play.pages.dev data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://degamed-play.pages.dev blob: data: https://cdn.jsdelivr.net; worker-src blob:; frame-ancestors http://localhost:5173 https://degamed.pages.dev
+  Access-Control-Allow-Origin: *
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()

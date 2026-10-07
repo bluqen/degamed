@@ -7,7 +7,7 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "pnpm --parallel --filter @degamed/web --filter @degamed/api dev",
+    "dev": "pnpm --parallel --filter @degamed/web --filter @degamed/play --filter @degamed/api dev",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",

@@ -22,6 +22,7 @@ const router = createBrowserRouter([
   { path: '/login', element: <Login /> },
   { path: '/dashboard', element: guard(<Dashboard />) },
   { path: '/new', element: guard(<NewGame />) },
+  { path: '/editor/demo', element: <Editor /> },
   { path: '/editor/:id', element: guard(<Editor />) },
   { path: '/settings', element: guard(<Settings />) },
   { path: '/art', element: guard(<ArtLab />) },

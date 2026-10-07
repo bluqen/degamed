@@ -122,6 +122,14 @@ BYOK users bring their own key, so this is only for selling Degamed credits.
 2. 🔴 Add it as the Worker secret `ANTHROPIC_API_KEY`.
 3. Set a **monthly spend limit** in **Settings → Limits** so a bug can't run up a bill.
 
+## Bonus: a free Gemini key (recommended, 2 minutes)
+This lets you try AI art straight away, without any server setup.
+1. Go to <https://aistudio.google.com/apikey>, then **Create API key**.
+2. In Degamed, open **Settings**, paste it next to **Google Gemini** and click **Save**. The key stays in your browser.
+3. Open **Art Lab** and generate a sprite.
+
+Hosted image generation (the "Degamed" option, for users without a key) runs on **Cloudflare Workers AI**. It needs no extra setup beyond step 3: `apps/api/wrangler.toml` already binds it, and the free tier covers about 10,000 neurons a day. Each user gets `ART_DAILY_LIMIT` (25) free images a day.
+
 ## 9. Domain (whenever you like)
 1. Buy one, for example on **Cloudflare Registrar** (sold at cost, no markup) or Namecheap.
 2. In **Workers & Pages → degamed → Custom domains**, add `degamed.yourdomain`. Do the same for `play.` and `api.`.

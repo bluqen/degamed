@@ -41,11 +41,23 @@ export const Components = z
       rotation: z.number().default(0),
       scale: Vec2.default({ x: 1, y: 1 }),
     }),
-    Sprite: z.object({ asset: z.string(), tint: HexColor.optional() }),
+    Sprite: z.object({
+      asset: z.string(),
+      tint: HexColor.optional(),
+      /** Repeat the texture to fill width × height (platforms, ground, walls). */
+      tiled: z.boolean().default(false),
+      width: z.number().positive().optional(),
+      height: z.number().positive().optional(),
+      flipX: z.boolean().default(false),
+      /** Draw order; higher is in front. */
+      depth: z.number().default(0),
+    }),
     Body: z.object({
       type: z.enum(['dynamic', 'static', 'kinematic']),
       gravity: z.boolean().default(true),
       bounce: z.number().min(0).max(1).default(0),
+      /** Overlap-only: reports collisions to scripts but doesn't push things apart (coins, triggers). */
+      sensor: z.boolean().default(false),
     }),
     Script: z.object({
       src: z.string().regex(/\.(py|js)$/, 'Scripts must be .py or .js files'),
@@ -83,6 +95,12 @@ export const Entity: z.ZodType<Entity> = z.object({
 export const Scene = z.object({
   name: z.string().min(1),
   background: HexColor.optional(),
+  /** World size; the camera is kept inside it. Defaults to the game resolution. */
+  bounds: z.object({ width: z.number().positive(), height: z.number().positive() }).optional(),
+  /** Background layers drawn behind entities. factor 0 = fixed, 1 = moves with the world. */
+  parallax: z
+    .array(z.object({ asset: z.string(), factor: z.number().min(0).max(1), y: z.number().default(0), tiled: z.boolean().default(true) }))
+    .default([]),
   entities: z.array(Entity),
 });
 export type Scene = z.infer<typeof Scene>;

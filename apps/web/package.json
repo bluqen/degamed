@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@degamed/art": "workspace:*",
+    "@degamed/engine": "workspace:*",
     "@degamed/shared": "workspace:*",
     "@supabase/supabase-js": "^2.117.3",
     "lucide-react": "^1.52.0",

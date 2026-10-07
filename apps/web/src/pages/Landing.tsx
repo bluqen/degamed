@@ -10,7 +10,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { SiteFooter, SiteHeader } from '../components/SiteHeader';
-import { NeonCityScene } from '../components/GameArt';
+import { LiveDemo } from '../components/LiveDemo';
 import { ButtonLink } from '../components/Button';
 import { SpaceBackdrop } from '../components/SpaceBackdrop';
 
@@ -179,8 +179,8 @@ export function Landing() {
               <span className="text-warn">● Play-testing…</span>
             </div>
           </div>
-          <div className="min-w-0 flex-[999_1_560px] bg-[#0B0618]">
-            <NeonCityScene />
+          <div className="min-w-0 flex-[999_1_560px]">
+            <LiveDemo />
           </div>
         </div>
       </section>

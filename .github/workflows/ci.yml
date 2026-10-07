@@ -30,10 +30,16 @@ jobs:
           VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID }}
           VITE_API_URL: ${{ vars.VITE_API_URL }}
           VITE_PLAY_ORIGIN: https://degamed-play.pages.dev
+      - name: Build play sandbox
+        run: pnpm --filter @degamed/play build
       - uses: actions/upload-artifact@v4
         with:
           name: web-dist
           path: apps/web/dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: play-dist
+          path: apps/play/dist
 
   deploy:
     # Deploys to Cloudflare's free tier on every push to main, once the secrets from docs/SETUP.md step 4 exist.
@@ -68,6 +74,11 @@ jobs:
         with:
           name: web-dist
           path: apps/web/dist
+      - uses: actions/download-artifact@v4
+        if: steps.secrets.outputs.ready == 'true'
+        with:
+          name: play-dist
+          path: apps/play/dist
       - name: Deploy API worker
         if: steps.secrets.outputs.ready == 'true'
         run: pnpm --filter @degamed/api exec wrangler deploy
@@ -82,4 +93,4 @@ jobs:
         working-directory: apps/api
         run: |
           pnpm exec wrangler pages project create degamed-play --production-branch main || true
-          pnpm exec wrangler pages deploy ../play/public --project-name degamed-play --branch main
+          pnpm exec wrangler pages deploy ../play/dist --project-name degamed-play --branch main
