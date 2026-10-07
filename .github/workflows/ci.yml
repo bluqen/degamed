@@ -48,15 +48,19 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      # The account ID isn't a password, so it may be a repository secret or a variable.
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || vars.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - name: Check Cloudflare secrets
         id: secrets
         run: |
-          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "::notice::Skipping deploy: add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID (docs/SETUP.md step 4)."
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::notice::Skipping deploy: add the CLOUDFLARE_API_TOKEN secret (docs/SETUP.md step 4)."
+            exit 0
+          fi
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+          if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::warning::CLOUDFLARE_ACCOUNT_ID is not set; wrangler will look the account up from the token."
           fi
       - uses: actions/checkout@v4
         if: steps.secrets.outputs.ready == 'true'
@@ -83,12 +87,14 @@ jobs:
         if: steps.secrets.outputs.ready == 'true'
         working-directory: apps/api
         run: |
+          [ -n "$CLOUDFLARE_ACCOUNT_ID" ] || unset CLOUDFLARE_ACCOUNT_ID
           pnpm exec wrangler pages project create degamed --production-branch main || true
           pnpm exec wrangler pages deploy ../web/dist --project-name degamed --branch main
       - name: Deploy play sandbox
         if: steps.secrets.outputs.ready == 'true'
         working-directory: apps/api
         run: |
+          [ -n "$CLOUDFLARE_ACCOUNT_ID" ] || unset CLOUDFLARE_ACCOUNT_ID
           pnpm exec wrangler pages project create degamed-play --production-branch main || true
           pnpm exec wrangler pages deploy ../play/dist --project-name degamed-play --branch main
       # Last, and allowed to fail on its own: a brand-new account must pick a workers.dev
@@ -96,4 +102,6 @@ jobs:
       - name: Deploy API worker
         if: steps.secrets.outputs.ready == 'true'
         continue-on-error: true
-        run: pnpm --filter @degamed/api exec wrangler deploy
+        run: |
+          [ -n "$CLOUDFLARE_ACCOUNT_ID" ] || unset CLOUDFLARE_ACCOUNT_ID
+          pnpm --filter @degamed/api exec wrangler deploy
