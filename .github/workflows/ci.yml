@@ -79,9 +79,6 @@ jobs:
         with:
           name: play-dist
           path: apps/play/dist
-      - name: Deploy API worker
-        if: steps.secrets.outputs.ready == 'true'
-        run: pnpm --filter @degamed/api exec wrangler deploy
       - name: Deploy web app
         if: steps.secrets.outputs.ready == 'true'
         working-directory: apps/api
@@ -94,3 +91,9 @@ jobs:
         run: |
           pnpm exec wrangler pages project create degamed-play --production-branch main || true
           pnpm exec wrangler pages deploy ../play/dist --project-name degamed-play --branch main
+      # Last, and allowed to fail on its own: a brand-new account must pick a workers.dev
+      # subdomain once in the dashboard before the first Worker deploy works.
+      - name: Deploy API worker
+        if: steps.secrets.outputs.ready == 'true'
+        continue-on-error: true
+        run: pnpm --filter @degamed/api exec wrangler deploy
