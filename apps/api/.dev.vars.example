@@ -1,3 +1,7 @@
 # Copy to .dev.vars for `pnpm dev`. These are SECRETS: never commit .dev.vars.
 SUPABASE_URL=
 SUPABASE_SECRET_KEY=
+
+# Local testing only: lets /art/generate run Workers AI without Supabase sign-in or quotas.
+# Ignored whenever SUPABASE_URL is set. Never set this in Cloudflare.
+DEV_ANON_ART=true

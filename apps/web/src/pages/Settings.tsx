@@ -7,7 +7,7 @@ const PROVIDERS: { id: KeyProvider; name: string; use: string; link: string; pla
   {
     id: 'gemini',
     name: 'Google Gemini',
-    use: 'Images (free tier available) and chat',
+    use: 'Chat (free tier); images need billing on the key',
     link: 'https://aistudio.google.com/apikey',
     placeholder: 'AIza…',
   },

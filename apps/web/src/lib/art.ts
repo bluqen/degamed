@@ -27,6 +27,12 @@ export function availableImageProviders(): ImageProvider[] {
         getToken: async () => (await supabase?.auth.getSession())?.data.session?.access_token ?? null,
       }),
     );
+  } else if (import.meta.env.DEV) {
+    // Local development without Supabase: the local API (DEV_ANON_ART) runs Workers AI for free.
+    list.push({
+      ...degamedProvider({ apiUrl: env.apiUrl, getToken: async () => 'local-dev' }),
+      label: 'Cloudflare Workers AI (local dev, free)',
+    });
   }
   return list;
 }

@@ -6,6 +6,8 @@ import { z } from 'zod';
 export interface Env {
   ALLOWED_ORIGINS: string;
   ART_DAILY_LIMIT?: string;
+  /** Local dev only (.dev.vars): generate art without sign-in. Ignored once Supabase is configured. */
+  DEV_ANON_ART?: string;
   SUPABASE_URL?: string;
   SUPABASE_SECRET_KEY?: string;
   AI?: { run(model: string, input: Record<string, unknown>): Promise<unknown> };
@@ -85,15 +87,27 @@ const GenerateArt = z.object({
   seed: z.number().int().min(0).max(2 ** 31).optional(),
 });
 
+/** True only in local development with DEV_ANON_ART=true and no Supabase configured. */
+export const isDevAnon = (env: Env) => env.DEV_ANON_ART === 'true' && !env.SUPABASE_URL;
+
+const DEV_USER: SupabaseUser = { id: 'local-dev' };
+
+const userOrDevAnon = createMiddleware<AppEnv>(async (c, next) => {
+  if (!isDevAnon(c.env)) return requireUser(c, next);
+  c.set('user', DEV_USER);
+  await next();
+});
+
 /** Hosted image generation with Cloudflare Workers AI. Metered per user per day. */
-app.post('/art/generate', requireUser, async (c) => {
+app.post('/art/generate', userOrDevAnon, async (c) => {
   if (!c.env.AI) return c.json({ error: 'Image generation is not enabled on this server' }, 503);
   const parsed = GenerateArt.safeParse(await c.req.json().catch(() => null));
   if (!parsed.success) return c.json({ error: 'Send a prompt between 3 and 2000 characters' }, 400);
 
   const user = c.get('user');
+  const devAnon = isDevAnon(c.env);
   const limit = Number(c.env.ART_DAILY_LIMIT ?? 25);
-  const used = await usageToday(c.env, user.id, 'art');
+  const used = devAnon ? 0 : await usageToday(c.env, user.id, 'art');
   if (used >= limit) {
     return c.json({ error: `You've used all ${limit} free images for today. Add your own Gemini key in Settings for more.` }, 429);
   }
@@ -105,11 +119,13 @@ app.post('/art/generate', requireUser, async (c) => {
   })) as { image?: string };
   if (!result.image) return c.json({ error: 'The image model returned nothing. Try again.' }, 502);
 
-  await supabaseRest(c.env, 'usage_events', {
-    method: 'POST',
-    headers: { Prefer: 'return=minimal' },
-    body: JSON.stringify({ user_id: user.id, kind: 'art' }),
-  });
+  if (!devAnon) {
+    await supabaseRest(c.env, 'usage_events', {
+      method: 'POST',
+      headers: { Prefer: 'return=minimal' },
+      body: JSON.stringify({ user_id: user.id, kind: 'art' }),
+    });
+  }
 
   const bytes = Uint8Array.from(atob(result.image), (ch) => ch.charCodeAt(0));
   return new Response(bytes, {

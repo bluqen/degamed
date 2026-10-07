@@ -117,4 +117,14 @@ describe('/art/generate', () => {
     fakeSupabase(0);
     expect((await post({ ...configured }, { prompt: 'a knight' })).status).toBe(503);
   });
+
+  it('local dev mode generates without sign-in, but never once Supabase is configured', async () => {
+    const calls = fakeSupabase(0);
+    const devEnv: Env = { ...env, DEV_ANON_ART: 'true', AI: { run: vi.fn(async () => ({ image: jpeg })) } };
+    const res = await app.request('/art/generate', { method: 'POST', body: JSON.stringify({ prompt: 'a knight' }) }, devEnv);
+    expect(res.status).toBe(200);
+    expect(calls).toHaveLength(0);
+    const prod = await app.request('/art/generate', { method: 'POST', body: JSON.stringify({ prompt: 'a knight' }) }, { ...configured, DEV_ANON_ART: 'true', AI: devEnv.AI });
+    expect(prod.status).toBe(401);
+  });
 });

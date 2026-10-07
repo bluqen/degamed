@@ -2,8 +2,8 @@
  * Image generation providers.
  *
  * - `degamed`: hosted, through our API (Cloudflare Workers AI, FLUX.1 schnell). Free daily quota.
- * - `gemini`: the user's own Google AI key (has a free tier). Supports reference images, which
- *   keeps characters consistent across animation frames.
+ * - `gemini`: the user's own Google AI key. Image models need billing enabled on the key (the free
+ *   tier covers text only). Supports reference images, which keeps characters consistent.
  * - `openai`: the user's own OpenAI key. Can return transparent backgrounds natively.
  *
  * BYOK providers are called straight from the browser; keys never touch Degamed's servers.
@@ -63,7 +63,15 @@ async function failure(res: Response, provider: string): Promise<ProviderError> 
     // Non-JSON error body; the status code is enough.
   }
   if (res.status === 401 || res.status === 403) return new ProviderError(`${provider} rejected the API key.`, res.status);
-  if (res.status === 429) return new ProviderError(`${provider} rate limit reached. Try again shortly.`, res.status);
+  if (res.status === 429) {
+    if (/limit:\s*0\b/.test(detail)) {
+      return new ProviderError(
+        `Your ${provider} key has no quota for this model (free keys can't generate images). Enable billing for the key, or use another generator.`,
+        res.status,
+      );
+    }
+    return new ProviderError(`${provider} rate limit reached. Try again shortly.`, res.status);
+  }
   return new ProviderError(`${provider} failed (${res.status})${detail ? `: ${detail}` : ''}`, res.status);
 }
 

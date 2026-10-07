@@ -122,13 +122,16 @@ BYOK users bring their own key, so this is only for selling Degamed credits.
 2. 🔴 Add it as the Worker secret `ANTHROPIC_API_KEY`.
 3. Set a **monthly spend limit** in **Settings → Limits** so a bug can't run up a bill.
 
-## Bonus: a free Gemini key (recommended, 2 minutes)
-This lets you try AI art straight away, without any server setup.
-1. Go to <https://aistudio.google.com/apikey>, then **Create API key**.
-2. In Degamed, open **Settings**, paste it next to **Google Gemini** and click **Save**. The key stays in your browser.
-3. Open **Art Lab** and generate a sprite.
+## Bonus: free AI art while developing
+**Gemini keys can't generate images for free** (Google's free tier covers text models only; image models return "limit: 0"). The free option for images is **Cloudflare Workers AI** (FLUX.1 schnell): about 10,000 "neurons" a day for free, which is roughly 1,000 or more images.
 
-Hosted image generation (the "Degamed" option, for users without a key) runs on **Cloudflare Workers AI**. It needs no extra setup beyond step 3: `apps/api/wrangler.toml` already binds it, and the free tier covers about 10,000 neurons a day. Each user gets `ART_DAILY_LIMIT` (25) free images a day.
+To use it locally:
+1. Create a free Cloudflare account (step 3).
+2. In a terminal, from the repo, run `pnpm --filter @degamed/api exec wrangler login` and approve it in the browser.
+3. Copy `apps/api/.dev.vars.example` to `apps/api/.dev.vars`. It already contains `DEV_ANON_ART=true`, which lets the local API generate images without Supabase sign-in. This only works in local dev.
+4. Run `pnpm dev` in one terminal and `pnpm dev:api` in another. Open **Art Lab**, choose **Cloudflare Workers AI (local dev, free)** and generate.
+
+In production, signed-in users get `ART_DAILY_LIMIT` (25) free hosted images a day through the deployed API. Users with an OpenAI key, or a Gemini key with billing, can bring their own.
 
 ## 9. Domain (whenever you like)
 1. Buy one, for example on **Cloudflare Registrar** (sold at cost, no markup) or Namecheap.

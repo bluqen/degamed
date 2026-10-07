@@ -27,7 +27,8 @@ Degamed is an AI-powered 2D game engine that runs in the browser. Describe a gam
 pnpm install
 cp apps/web/.env.example apps/web/.env.local      # fill in public values from docs/SETUP.md
 cp apps/api/.dev.vars.example apps/api/.dev.vars  # secrets, never committed
-pnpm dev                                          # web :5173, player :5174, API :8787
+pnpm dev                                          # web :5173 + game player :5174
+pnpm dev:api                                      # optional, 2nd terminal: API :8787 (needs `wrangler login`)
 ```
 
 The app runs without any keys. Sign-in and saving projects show a "setup needed" notice until Supabase is connected.

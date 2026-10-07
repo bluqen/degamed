@@ -238,6 +238,12 @@ describe('providers', () => {
     await expect(limited.generate({ prompt: 'x' })).rejects.toBeInstanceOf(ProviderError);
   });
 
+  it('explains keys that have no image quota at all', async () => {
+    const body = { error: { message: 'Quota exceeded for metric: generate_content_free_tier_requests, limit: 0, model: x' } };
+    const p = geminiProvider({ apiKey: 'k', fetchImpl: async () => Response.json(body, { status: 429 }) });
+    await expect(p.generate({ prompt: 'x' })).rejects.toThrow('no quota for this model');
+  });
+
   it('degamed provider requires sign-in and posts to the API', async () => {
     const signedOut = degamedProvider({ apiUrl: 'https://api.test', getToken: async () => null });
     await expect(signedOut.generate({ prompt: 'x' })).rejects.toThrow('Sign in');
