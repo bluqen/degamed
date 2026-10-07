@@ -35,7 +35,11 @@ Everything here is **free**. Do the steps marked **Now** first; the rest can wai
 4. Open **Authentication → URL Configuration**:
    - Site URL: `https://degamed.pages.dev`
    - Redirect URLs: add `http://localhost:5173/**` and `https://degamed.pages.dev/**`
-5. Leave **Authentication → Providers → Google** for now; you finish it in step 2.6.
+5. **Create the tables:** open **SQL Editor → New query**, paste the whole of
+   [`supabase/migrations/20261007000000_init.sql`](https://raw.githubusercontent.com/bluqen/degamed/main/supabase/migrations/20261007000000_init.sql)
+   and click **Run**. It should say *Success. No rows returned*. Check **Table Editor**: you should see
+   `profiles`, `projects`, `versions` and `usage_events`, each marked RLS enabled.
+6. Leave **Authentication → Providers → Google** for now; you finish it in step 2.6.
 
 ## 2. Google Cloud: Sign in with Google (Now, about 10 minutes)
 This is the Kavedi trick. Degamed shows Google's own popup with **your** app name, then hands the result to Supabase (`signInWithIdToken`). Users never see `supabase.co`.
@@ -78,9 +82,9 @@ This is the Kavedi trick. Degamed shows Google's own popup with **your** app nam
    - API: `https://degamed-api.<your-subdomain>.workers.dev`
 
    If the name `degamed` is taken on Pages, we'll pick another one and you'll update the Google origins from step 2.4.
-6. **Worker secrets** (after the first deploy): go to **Workers & Pages → degamed-api → Settings → Variables and Secrets → Add**, choose type **Secret**, and add:
+6. **Worker secrets** (after the first deploy): go to **Workers & Pages → degamed-api → Settings → Variables and Secrets → Add**, choose type **Secret** for both, and add:
    - 🔴 `SUPABASE_SECRET_KEY`: from step 1.3
-   - 🟢 `SUPABASE_URL`: from step 1.3 (type *Text*)
+   - 🟢 `SUPABASE_URL`: from step 1.3. It isn't secret, but use type *Secret* anyway: every deploy resets *Text* variables to what's in `wrangler.toml`, while secrets stay.
 
 ## 4. GitHub secrets: automatic deploys (Now, about 2 minutes)
 1. Open <https://github.com/bluqen/degamed>, then **Settings → Secrets and variables → Actions**.
