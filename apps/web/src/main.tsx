@@ -1,4 +1,4 @@
-import { StrictMode } from 'react';
+import { lazy, StrictMode, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 import './app.css';
@@ -9,12 +9,19 @@ import { Pricing } from './pages/Pricing';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { NewGame } from './pages/NewGame';
-import { Editor } from './pages/Editor';
 import { ComingSoon, NotFound } from './pages/Placeholder';
 import { ArtLab } from './pages/ArtLab';
 import { Settings } from './pages/Settings';
 
 const guard = (el: React.ReactNode) => <RequireAuth>{el}</RequireAuth>;
+
+// The editor (code editor, scene tools, engine templates) is big; load it only when it's opened.
+const LazyEditor = lazy(() => import('./pages/Editor').then((m) => ({ default: m.Editor })));
+const Editor = () => (
+  <Suspense fallback={<div className="flex h-screen items-center justify-center bg-bg text-muted">Opening the editor…</div>}>
+    <LazyEditor />
+  </Suspense>
+);
 
 const router = createBrowserRouter([
   { path: '/', element: <Landing /> },

@@ -49,7 +49,8 @@ Every push to `main` runs CI. Once the Cloudflare secrets from `docs/SETUP.md` s
    - ✅ Animation: SpriteFrames files, AnimatedSprite with automatic idle/run/jump/fall, `play()` / `playOnce()` / `onAnimationEnd`, `kit.tween()`, Animation panel in the editor
    - ⏳ Keyframe timeline (AnimationPlayer-style) and AI-generated animation frames
 3. Python scripting through Pyodide
-4. Pro editor: hierarchy, inspector, scene view, script editor
+4. ✅ Pro editor ([guide](docs/EDITOR.md)): menu bar, Scene / Game / Code / Art workspaces, visual scene editor (select, move, rotate, scale, measure, grid snap, rulers), Hierarchy, Files, Properties, History, Console, Problems, Add Entity dialog, Game Settings with a controls map, command palette, undo/redo, resizable panels
+   - ⏳ Tilemap painting, prefabs, multi-scene instancing
 5. AI Copilot (bring your own key, or Degamed credits)
 6. Composer and sound effects
 7. Publishing, the play page and Explore
