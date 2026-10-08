@@ -49,6 +49,14 @@ async function load(files: Record<string, string>) {
   }
 }
 
+// Run/pause/stop shortcuts belong to the editor, even while the game has the keyboard.
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'F5' || e.key === 'F6' || e.key === 'F7' || e.key === 'F8') {
+    e.preventDefault();
+    send({ type: 'hotkey', key: e.key });
+  }
+});
+
 window.addEventListener('message', (event) => {
   if (event.source !== parent) return;
   const msg = parseHostMessage(event.data);

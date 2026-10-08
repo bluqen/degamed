@@ -95,7 +95,8 @@ export function useEditorState(projectId: string, initial: ProjectFiles) {
   /** Bumped to ask the scene view to frame something ("all" or the selection). */
   const [frameRequest, setFrameRequest] = useState<{ what: 'all' | 'selection'; n: number }>({ what: 'all', n: 0 });
 
-  const play = usePlayFrame(files, { autoLoad: false });
+  const hotkeys = useRef<(key: 'F5' | 'F6' | 'F7' | 'F8') => void>(() => {});
+  const play = usePlayFrame(files, { autoLoad: false, onHotkey: (k) => hotkeys.current(k) });
   /** World point at the middle of the scene view, kept current by the view (for placing new things). */
   const viewCenter = useRef({ x: 240, y: 135 });
 
@@ -239,6 +240,13 @@ export function useEditorState(projectId: string, initial: ProjectFiles) {
       setRunning('running');
     }
   }, [running, play]);
+
+  hotkeys.current = (k) => {
+    if (k === 'F5') run('project');
+    else if (k === 'F6') run('scene');
+    else if (k === 'F7') togglePause();
+    else stop();
+  };
 
   return {
     projectId,

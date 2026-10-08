@@ -35,6 +35,8 @@ export const PlayToHost = z.discriminatedUnion('type', [
     line: z.number().int().optional(),
   }),
   z.object({ ...base, type: z.literal('fps'), fps: z.number() }),
+  /** Editor shortcuts pressed while the game has focus (keys inside the iframe never reach the editor). */
+  z.object({ ...base, type: z.literal('hotkey'), key: z.enum(['F5', 'F6', 'F7', 'F8']) }),
   z.object({
     ...base,
     type: z.literal('screenshot'),

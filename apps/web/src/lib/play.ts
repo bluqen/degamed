@@ -16,7 +16,12 @@ type Command = HostToPlay extends infer M ? (M extends unknown ? Omit<M, 'channe
  * Drives the sandboxed player iframe: sends the project when the player is ready,
  * collects logs/errors/fps, and exposes play controls.
  */
-export function usePlayFrame(files: ProjectFiles | null, { autoLoad = true }: { autoLoad?: boolean } = {}) {
+export function usePlayFrame(
+  files: ProjectFiles | null,
+  { autoLoad = true, onHotkey }: { autoLoad?: boolean; onHotkey?: (key: 'F5' | 'F6' | 'F7' | 'F8') => void } = {},
+) {
+  const hotkey = useRef(onHotkey);
+  hotkey.current = onHotkey;
   const frameEl = useRef<HTMLIFrameElement | null>(null);
   const [ready, setReady] = useState(false);
   /** The last run. Sent again when a (new) player says it's ready, so runs survive reloads and early clicks. */
@@ -56,6 +61,9 @@ export function usePlayFrame(files: ProjectFiles | null, { autoLoad = true }: { 
           break;
         case 'fps':
           setFps(msg.fps);
+          break;
+        case 'hotkey':
+          hotkey.current?.(msg.key);
           break;
         case 'log':
           push({ level: msg.level, message: msg.message, file: msg.source });
