@@ -216,10 +216,19 @@ export function caveLevel(layout: Layout, rand: () => number): { level: Level; r
           level.set(x0 + 2 + i, y0 + 2 + j, c);
         });
       });
-      if (isStart) level.set(x0 + 4, y0 + 13, 'P');
+      // Clear standing room around the start and the exit (no rock overhead, nothing in the way).
+      const clear = (a: number, b: number, top: number) => {
+        for (let y = y0 + top; y <= y0 + 13; y++) for (let x = x0 + a; x <= x0 + b; x++) level.set(x, y, '.');
+      };
+      if (isStart) {
+        clear(2, 8, 9);
+        level.set(x0 + 4, y0 + 13, 'P');
+      }
       if (isExit) {
-        for (let i = 18; i < 24; i++) level.set(x0 + i, y0 + 13, '.');
+        clear(17, 25, 8);
         level.set(x0 + 21, y0 + 13, 'G');
+        level.set(x0 + 18, y0 + 13, 'L');
+        level.set(x0 + 24, y0 + 13, 'L');
       }
       // Tunnels to the right.
       if (rx + 1 < layout.cols && layout.right[ry]![rx]) {

@@ -260,8 +260,9 @@ function cobbles(seed: number, lift = 0, count = 9): Canvas {
     for (let x = 0; x < TILE; x++) {
       const k = cell(x, y);
       const tone = (k.id * 37) % 4 === 0 ? 0 : 1;
-      let i = 1 + tone + lift;
-      if (k.gap < 1) i = lift;
+      const lf = y < 9 || (y < 12 && bayer(x, y) > 0.5) ? lift : 0;
+      let i = 2 + tone + lf;
+      if (k.gap < 1) i = 1 + lf;
       else if (k.gap < 2 && k.dy < -0.5) i += 1; // lit upper rim of each stone
       if (n(x, y) > 0.7 && bayer(x, y) > 0.5) i += 1;
       c.set(x, y, S[Math.max(0, Math.min(S.length - 1, i))]!);
