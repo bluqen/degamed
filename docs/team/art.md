@@ -1,90 +1,115 @@
 # Art Director log
 
-## Round 1
+## Round 2
 
 ### Done
 
-**Four complete procedural themes**, all implementing the `ArtTheme` contract in `packages/engine/src/art/index.ts` (`ART_THEMES`, `getTheme`, plus `THEME_IDS` and `renderPreview`). Everything is pure TypeScript with no DOM, so it runs in Node and the browser. Themes build lazily on first access (about 0.2–0.5 s each) and are cached. Their metadata (`id`, `name`, `description`, `keywords`, `palette`, `background`) is free to read without generating any pixels.
+**1. An original cast** (critic's must-fix). Every character, enemy, pickup and icon is now our own design. The themes keep their moods but describe them in our own words. Game names are gone from code, descriptions, keywords and the AI style prompts, and tests enforce it.
 
-| Theme | Mood | Hero | Enemy | Pickup | Goal |
+| Theme | Hero | Enemy | Pickup | Goal | Landmark |
 |---|---|---|---|---|---|
-| `rain-ruins` | Rain World: teal fog, colossal towers, rusted pipes, moss, rain | pale eared creature, rust scarf, tail, spear | lizard (pink head, sprawling legs, opening jaw) | glowing pearl | shelter gate with glyph |
-| `hollow-caverns` | Hollow Knight: blue-black caves, lit distant spires, glow fungus, spores | horned bone mask, dark cloak, cape tail, nail | amber shell crawler | spinning crystal shard | stone arch with shimmering veil |
-| `sunlit-meadow` | Celeste / Stardew: sunny, puffy clouds, snowy peaks, round trees | red-haired climber with bouncing braid | hopping jelly slime | strawberry | summit flag |
-| `ember-forge` | Dead Cells / Blasphemous: plum stone, molten glow, gears, banners, embers | crested helm, glowing visor, flame plume | magma slug | soul flame | molten forge gate |
+| `rain-ruins` | **Pip**, a lantern robot: yellow dome, one big glowing eye, springy antenna with a bulb, patched tarp cape | rust crawler drone with a scanning red lens | battery cell | home hatch with a warm porthole | colossal radio mast with a **blinking red beacon** |
+| `hollow-caverns` | **Lumen**, a moth: feathery antennae, huge glowing eyes, mantle of folded wings with an eyespot, lantern swinging on a rope | puffcap mushroom that waddles and puffs spores | crystal shard | stone arch with a shimmering veil | giant statue of a winged moth keeper with a lit lantern staff |
+| `sunlit-meadow` | **Fen**, a fox kid: big ears, white muzzle, green tunic, huge bushy tail | jelly slime | golden acorn | bell arch with a swinging bell | windmill on the hills, turreted castle on the foothills |
+| `ember-forge` | **Ash**, a forge warden: crested helm, glowing visor, flame plume, light verdigris cloak | magma slug with eye stalks | soul flame | molten forge gate | two colossal forge chimneys with furnace mouths and smoke |
 
-**What each theme contains:**
+**Related fixes:**
 
-- **7 parallax layers**: sky/backdrop, far, mid-far, a mist/light-shaft layer, mid, near, and a `foreground` layer with `factor > 1` that the engine already draws in front. All layers wrap seamlessly. Far layers are hazed into the fog colour; silhouettes get rim light and dithered texture; seeded, periodic noise makes the organic shapes.
-- **13 autotiles plus a spike strip**: `ground` ×3 variants, `groundLeft`, `groundRight`, `fill` ×2, `fillLeft`, `fillRight`, `ceiling`, `platform`, `platformLeft`, `platformRight`, `spike`. All are 16×16 and seamless (tested). Each has a lit top edge (moss, crust, grass or ledge) and a darker interior.
-- **Hero sheet, 26 frames.** The rig is a puppet: hand-drawn head grids per costume, plus a posed cloak, legs, a scarf/hair/plume chain and a weapon. Shading uses hue-shifted ramps with rim, shade and selective-outline passes. Animations:
-  - `idle`: breathing plus a blink
-  - `run`: 8 frames with bob and leg arcs
-  - `jump`: stretch on take-off
-  - `fall`: cloak billows up
-  - `land`: squash
-  - `attack`: wind-up, slash arc, follow-through, recover
-  - `hurt`: flash, then recoil
-  - `crouch` and `wall`
-  - Each sheet also carries `hitbox` and `anchor`.
-- **Other sprites**: `enemy` (`walk`, `idle`, `hurt`, plus `attack` on the lizard), `pickup`, `goal`, `flyer` (`fly`, `hurt`) and `checkpoint` (`idle` unlit, `lit` flickering).
-- **8–10 props** with `propInfo` (anchor, light with its offset, weight). Lamps, torches, lanterns, braziers, glow fungus and crystals all emit lights.
-- **An `environment` preset**, `lights` for hero, pickup, goal and enemy, and `tileSize`.
+- Keywords are now places and moods only. A test bans genre, verb and character words (boss, sword, robot, knight…) and any franchise names.
+- The forge hero's cloak is much lighter, with a warm rim. A test now requires every hero to be at least 30% brighter or darker than the backdrop behind it.
+- New additive `heroes[]` gives every theme the whole cast, with its own hero first, so the AI can honour "a robot in a cave".
 
-**Tooling and tests:**
+**2. Bigger, hand-keyed heroes** (`packages/engine/src/art/hero2.ts`):
 
-- **`renderPreview(theme, opts)`**: a software compositor. It renders a level screenshot with lighting, fog, particles, bloom, grade and vignette, mirroring the engine's `atmosphere.ts` semantics. It works for tests, previews and theme thumbnails.
-- **Tests** in `packages/engine/src/art/art.test.ts` (47) check:
-  - every theme meets the contract and every raster is rectangular;
-  - the required animations exist, frame indices are in range, and run frames differ;
-  - tiles and tiled layers wrap seamlessly, and ground flows into fill;
-  - prop info and environment ranges are valid, and a preview renders;
-  - hue-shifted ramps behave as intended.
-- **AI style presets** (`packages/art/src/styles.ts`): `pixel-rain-ruins`, `pixel-hollow-caverns`, `pixel-sunlit-meadow` and `pixel-ember-forge`, linked to the procedural themes by a new optional `theme` field and covered by a test.
-- **Web thumbnails**: `apps/web/public/art/themes/<id>.png` (480×270), for a theme picker.
+- Heroes are 48×48 frames with a body about 34–38 px tall (was about 22 px).
+- Every body pose is a **hand-drawn grid**: 9 cloaks and 13 leg poses, including the run keys contact, down, passing and up. Each of the 31 frames is keyed by hand from those parts: body bob, head lag, scarf angle.
+- New animations: **dash** (stretch plus speed lines) and **turn** (skid, then straighten up).
+- The chain system now covers scarves, tails, antennas and lanterns. It can root at the scarf, head, hand or hip; trail, hang or spring up; use a width profile (the fox's bushy tail); take a tip colour (white tail tip); and carry a tip sprite (antenna bulb, lantern).
+- An emblem layer adds the robot's cape patch and the moth's wing eyespot.
 
-**Screenshots** (everything in `docs/team/shots/art/`):
+**3. Enemies with personality.** All have 8-frame walks and a white hurt flash, which a test checks:
 
-- `overview.png`: all four themes, 2×2
-- `<id>-screenshot.png` and `<id>-screenshot-2.png`: 480×270 at 3×; the second has the camera scrolled to show parallax
-- `<id>-detail.png`: an in-game crop at 5×
-- `<id>-hero.png`, `-enemy.png`, `-flyer.png`, `-pickup.png`, `-goal.png`, `-checkpoint.png`: sprite sheets at 6×
-- `<id>-tiles.png`: each tile, plus a 6×6 tiled block and a platform run
-- `<id>-props.png`
-- `engine-<id>.png` and `engine-<id>-run.png`: the themes running in the **real engine** in the Studio, via Playwright
+- **drone:** skitters on jointed legs; its lens sweeps while idle and flares when it attacks.
+- **puffcap:** waddles and bounces its cap; puffs spores while idle.
+- **slime:** squash-and-stretch hop through anticipation, launch, peak, fall, splat and rebound; squints on impact and blinks.
+- **slug:** an inching compression wave runs along its body; eye stalks sway; it drips lava.
 
-**Honest self-assessment against Rain World and Hollow Knight: 6.5/10.**
+**4. Tile variation and back walls:**
 
-- **What works.** In screenshots the themes read as four different indie games. The layering, atmosphere, fog depth, rim light, readable silhouettes and colour moods are right. Meadow and Rain Ruins are the strongest. Ember Forge has a lot of mood.
-- **What gives it away:**
-  - The heroes are charming but small and simple (about 22 px tall). Their run cycles are procedural rather than hand-keyed per frame, so they lack the snap of Celeste or Dead Cells.
-  - Tiles still repeat visibly over large areas.
-  - Far layers are made of rectangles, not hand-painted shapes.
-  - Enemies have only 4–6 frames.
-  - Hollow Knight's painterly softness is out of reach with hard pixels; mine is a pixel-art cousin of it.
+- `fill3` variant.
+- Darker back-wall tiles with bevelled edges (`back`, `backTop/Bottom/Left/Right`), so a back-wall area reads as a recessed alcove.
+- 4–5 large **decals** per theme, for the engine to scatter over solid interiors: cracks, embedded pipes, vents, roots, fossils, bones, crystal and lava veins, buried stones, skulls, grates. They are drawn in `decals.ts`.
+
+**5. Far-layer landmarks,** one per theme (see the table). The new `ParallaxLayer.glows` lets the engine animate the beacon, the furnace mouths and the statue's lantern.
+
+**6. Animated overlays.** New additive `ambientSprites`, drawn in `overlays.ts`:
+
+- drips, puddle ripples and swaying grass (rain);
+- glow-worms, drips and grass (caverns);
+- grass and two butterflies (meadow);
+- lava shimmer and torch flames (forge).
+
+**Also:**
+
+- The preview level now has a ruined gatehouse with a back-wall alcove, decals and ambient sprites.
+- Half-size landing thumbnails: `apps/web/public/art/themes/<id>-small.png`, 15–24 kB, as the critic asked.
+- Tests: 67 art tests (51 before), covering the cast, keywords, contrast, decals, ambient sprites, back walls, dash/turn, hero height ≥ 32 px, and 6+ enemy walk frames. Engine 118 and art 26 pass; both typechecks are clean.
+
+**Screenshots** (`docs/team/shots/art/`):
+
+- `overview.png`: all four themes.
+- **In the real engine:** `engine-<id>.png` and `engine-<id>-run.png`. All four themes render in the Studio with the new cast.
+- Per theme:
+  - `<id>-screenshot.png` and `-screenshot-2.png`
+  - `-detail.png`
+  - `-hero.png` (31 frames), `-enemy.png`
+  - `-pickup.png`, `-goal.png`, `-flyer.png`, `-checkpoint.png`
+  - `-tiles.png`, `-props.png`
+  - `-decals.png`, `-ambient-*.png`
+
+**Honest score: 7/10** against the quality bar (moody layered pixel art, readable silhouettes, crisp expressive sprites).
+
+- **Better than round 1:**
+  - The cast has its own identity and reads at a glance.
+  - The heroes are big enough to act, with a legible run.
+  - Every enemy has character.
+  - Landmarks give each world a memorable skyline.
+- **Still below a shipped game:**
+  - Heroes share one body rig, so their silhouettes differ mainly in head, colour and chain.
+  - Fill still repeats where the engine doesn't scatter decals.
+  - The moth's lantern is tiny.
+  - The forge chimneys compete with the gear layer.
+  - Far layers outside the landmarks are still built from rectangles.
 
 ### Next
 
-1. **Hero polish.** Hand-keyed overrides for key poses (contact, passing, take-off). A 2-frame turn and a dash/roll. Larger 40 px variants for close-up kits. Per-hero idle flourishes (ears twitch, plume flicker).
-2. **Tile variety.** 32×32 macro variation (big cracks, roots, moss patches drawn across 2×2 tiles), slopes, wall-slide edges, inner corners and background-wall tiles (darker, unlit) for caves.
-3. **Hand-shaped far silhouettes.** Bespoke landmark set-pieces per theme (a giant Rain World chimney, the Hollow Knight-style city dome, a forge furnace face) instead of only generated rectangles.
-4. **More enemies per theme** (a second walker, a turret or plant) and boss-sized art.
-5. **Animated tile overlays**: dripping water, lava shimmer, swaying grass, as small sprite sheets.
-6. **More themes**: neon-city (synthwave rain), frost-peaks (snow) and deep-sea. With the toolkit in place, each takes about an hour.
+1. **Per-character bodies.** A boxier robot chassis, a moth with visible wing flaps when jumping or falling, and a fox with a digitigrade run. Then a bigger moth lantern that lights the scene.
+2. **2×2 macro tiles** (cross-tile cracks and roots), slopes and inner corners.
+3. More landmarks per theme (two or three set pieces spaced along the level), and broken silhouettes instead of rectangles in the mid layers.
+4. **More themes:** neon city (rain and signage), frost peaks (snow) and deep sea, each with its own cast member.
+5. **Ambient life:** birds and fish for the meadow, rats for the ruins, and an extra flyer per theme.
 
 ### Needs from others
 
-- **engine**:
-  - Please keep parallax layers out of the lightmap. My layers are pre-lit, so multiplying them by ambient darkens them twice; this is very visible with the cave kit at `dim` or `dark`.
-  - The kit's big black foreground pipe in the middle of the platformer view is heavy. Prefer my `foreground` layer, or keep such silhouettes near the screen edges.
+- **engine:**
+  - Scatter `decals` over solid interiors and use the back-wall bevel tiles and `fill3`.
+  - Spawn `ambientSprites` by anchor.
+  - Animate `ParallaxLayer.glows` (blink and flicker).
+  - Play `turn` on direction flips and `dash` when the kit has one.
+  - Confirm the 48×48 hero framing and hitbox, especially in cave-kit gaps.
   - Details are on the BOARD.
-- **design**: the theme thumbnails are at `/art/themes/<id>.png`. `renderPreview` can also make live thumbnails in the browser.
-- **critic**: please judge the themes in-engine (the `engine-*.png` shots) as well as in the previews.
+- **ai:** pick a hero from `theme.heroes[].keywords` when the prompt names one ("robot", "moth", "fox", "knight"), and use the cast names in stories.
+- **design:** use the `-small.png` thumbnails on the landing; use cast names in Look.
 
 ### Known issues
 
-- My preview mirrors the engine's fog and lighting maths, but particles and bloom are approximations. The engine is the source of truth.
-- The cave kit's darkness setting plus the lightmap on parallax make Hollow Caverns very dark in-engine. I lifted the cave fill tiles a step, but the real fix is on the engine side (above).
-- Repeating fill tiles are noticeable on large solid areas, especially the meadow soil.
-- Theme generation costs 0.2–0.5 s per theme on first use (main thread). It is fine for now; it could move to a worker or be cached as PNGs if needed.
-- The hero puppet's scarf/hair chain is driven by keyframed angles, not physics, so it does not react to sudden direction changes.
+- Ambient sprites and decals appear in my preview, but not in-engine until the engine places them.
+- The meadow castle and windmill can be hidden behind the gatehouse in the preview level. They show in-engine (`engine-sunlit-meadow-run.png`).
+- The hero rigs share proportions; a fox and a robot run the same way.
+- Theme build time is still 0.2–0.5 s per theme on first use; hero sheets are now shared across themes.
+
+## Round 1 (summary)
+
+- Shipped four procedural themes with seven parallax layers each, 13 seamless autotiles plus spikes, animated sprites, props with lights, and environment presets.
+- Added `renderPreview` (a pure software compositor that mirrors the engine's atmosphere maths), 47 tests, AI style presets, and web thumbnails.
+- The critic flagged that three of the round-1 heroes, enemies and icons resembled famous characters. Round 2 replaced all of them with the original cast above.
