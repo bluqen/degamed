@@ -10,6 +10,7 @@ import { cable, crane, mast, elbow, hangingChain, lightShafts, mistBand, overgro
 import { crack, derive, pickRamp, px01, tileNoise, TILE } from '../tiles';
 import { backEdges, backWall } from '../tiles';
 import { crackDecal, grateDecal, pipeDecal, rootsDecal } from '../decals';
+import { dripSheet, grassSwaySheet, rippleSheet } from '../overlays';
 import { sheetOf, type Raster } from '../../pixel';
 import type { ArtTheme, ParallaxLayer, PropInfo, SpriteSheet } from '../types';
 import { checkpointSheet, flyerSheet, spikeStrip } from '../extras';
@@ -778,6 +779,11 @@ export function rainRuins(): ArtTheme {
     propInfo: info,
     heroes: castFor('robot'),
     decals: decals(),
+    ambientSprites: {
+      drip: { sheet: dripSheet('#7f9a96', '#d6efe8'), anchor: 'ceiling', weight: 3 },
+      ripple: { sheet: rippleSheet('#3a5250', '#b8d0ca'), anchor: 'ground', weight: 2 },
+      grass: { sheet: grassSwaySheet(C.moss.slice(1)), anchor: 'ground', weight: 3 },
+    },
     tileSize: TILE,
     lights: {
       hero: { color: '#cfe8df', radius: 46, intensity: 0.35 },

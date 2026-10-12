@@ -207,7 +207,7 @@ export function emberBig(): BigCostume {
   const pal = new Palette();
   const [outline, outlineLit] = pal.ramp(['#0a0508', '#a0521e']);
   // a light verdigris cloak so the hero stays well above the hot, dark brick in value
-  const cloak = pal.ramp(['#1f5a5a', '#3a8a82', '#62b8a4', '#a8ecd2']);
+  const cloak = pal.ramp(['#1f5a5a', '#3a8a82', '#5aae9a', '#8ed8c0']);
   const [l0, l1] = pal.ramp(['#4a3a36', '#7a6458']);
   const [b0, b1] = pal.ramp(['#6e5a54', '#a48c7c']);
   const [hand] = pal.ramp(['#a48c7c']);

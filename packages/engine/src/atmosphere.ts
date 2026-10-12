@@ -11,6 +11,8 @@ import type { Environment, Light, ParticleType } from '@degamed/shared';
 import {
   ambientColor,
   applyMatrix,
+  normalizeRgb,
+  type Rgb,
   flickerAt,
   fogVeilAlphas,
   gradeMatrix,
@@ -83,10 +85,12 @@ function bakeLayer(
   fog: { color: string; amount: number; height: number } | null,
   grade: number[] | null,
   screenH: number,
+  dim: Rgb | null = null,
 ) {
-  if ((!fog || fog.amount <= 0.01) && !grade) return;
+  if ((!fog || fog.amount <= 0.01) && !grade && !dim) return;
+  if (dim && !grade) grade = gradeMatrix({});
   const key = layer.texture.key;
-  const baked = `${key}__bake_${fog ? `${fog.color}_${fog.amount.toFixed(3)}_${fog.height}` : ''}_${grade ? grade.map((v) => v.toFixed(3)).join(',') : ''}`;
+  const baked = `${key}__bake_${fog ? `${fog.color}_${fog.amount.toFixed(3)}_${fog.height}` : ''}_${grade ? grade.map((v) => v.toFixed(3)).join(',') : ''}_${dim ? dim.map((v) => v.toFixed(3)).join(',') : ''}`;
   if (!scene.textures.exists(baked)) {
     const src = scene.textures.get(key).getSourceImage() as HTMLImageElement | HTMLCanvasElement;
     const tex = scene.textures.createCanvas(baked, src.width, src.height);
@@ -113,9 +117,9 @@ function bakeLayer(
       for (let i = 0; i < d.length; i += 4) {
         if (!d[i + 3]) continue;
         const [r, g, b] = applyMatrix(grade, [d[i]! / 255, d[i + 1]! / 255, d[i + 2]! / 255]);
-        d[i] = r * 255;
-        d[i + 1] = g * 255;
-        d[i + 2] = b * 255;
+        d[i] = r * 255 * (dim ? dim[0] : 1);
+        d[i + 1] = g * 255 * (dim ? dim[1] : 1);
+        d[i + 2] = b * 255 * (dim ? dim[2] : 1);
       }
       ctx.putImageData(img, 0, 0);
     }
@@ -285,8 +289,10 @@ export class Atmosphere {
     if (!env) return;
     this.buildFog(env);
     const grade = env.grade && (env.grade.contrast !== undefined || env.grade.saturation !== undefined || env.grade.tint) ? gradeMatrix(env.grade) : null;
+    const bg = env.ambient?.background;
+    const dim: Rgb | null = env.ambient && bg !== undefined && bg < 1 ? (normalizeRgb(hexToRgb01(env.ambient.color)).map((c) => bg * (0.6 + 0.4 * c)) as Rgb) : null;
     opts.parallax.forEach((layer, i) =>
-      bakeLayer(scene, layer as unknown as Phaser.GameObjects.Image, this.fogAmounts[i] ?? null, grade, opts.height),
+      bakeLayer(scene, layer as unknown as Phaser.GameObjects.Image, this.fogAmounts[i] ?? null, grade, opts.height, dim),
     );
     if (needsLightmap(env)) {
       // The lightmap is half resolution: light is soft anyway, and it's 4× cheaper.

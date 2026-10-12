@@ -10,6 +10,7 @@ import { arcade, gear, hangingChain, lightShafts, mistBand, overgrow, pipe, towe
 import { derive, px01, tileNoise, TILE } from '../tiles';
 import { backEdges, backWall } from '../tiles';
 import { bonesDecal, crackDecal, grateDecal, veinDecal } from '../decals';
+import { flameSheet, lavaSheet } from '../overlays';
 import { sheetOf, type Raster } from '../../pixel';
 import type { ArtTheme, ParallaxLayer, PropInfo, SpriteSheet } from '../types';
 import { checkpointSheet, flyerSheet, spikeStrip } from '../extras';
@@ -72,8 +73,13 @@ function farHalls(): Canvas {
     L.rect(cx - w / 2 - 3, top, w + 6, 10, 6);
     L.rect(cx - w / 2 - 1, top + 10, w + 2, 2, 7);
     for (let y = top + 34; y < H - 50; y += 28) L.rect(cx - w / 2 - 1, y, w + 2 + Math.round(((y - top) / (H - top)) * 10), 3, 7);
-    // furnace mouth: an arched opening blazing at the base
-    const my = H - 44;
+    // the lava-lit right face
+    for (let y = top + 12; y < H; y++) {
+      const half = w / 2 + ((y - top) / (H - top)) * 6;
+      for (let x = Math.round(cx + half * 0.35); x < Math.round(cx + half); x++) if (L.get(x, y) === 6) L.set(x, y, 8);
+    }
+    // furnace mouth: an arched opening blazing halfway up
+    const my = Math.round(top + (H - top) * 0.45);
     L.rect(cx - 9, my, 18, 26, 3);
     L.ellipse(cx, my, 9, 7, 3);
     L.rect(cx - 6, my + 6, 12, 20, 5);
@@ -87,6 +93,7 @@ function farHalls(): Canvas {
     5: { base: '#ffd070' },
     6: { base: '#1c0d13', dark: '#190b11', light: '#21101a', rim: '#8a3a22', rimDir: [1, 0], grain: 24, dither: true },
     7: { base: '#3a1c1c', rim: '#a04a2a' },
+    8: { base: '#3e1a1a', dark: '#38171a', rim: '#d0602a', rimDir: [1, 0], grain: 24, dither: true },
   };
   const c = L.paint(mats, 3);
   // smoke plumes rising from the chimney mouths, lit warm from below
@@ -105,8 +112,8 @@ function farHalls(): Canvas {
 
 /** The forge chimneys in the far halls layer: [centre x, width, top y]. */
 const CHIMNEYS: [number, number, number][] = [
-  [128, 34, 26],
-  [360, 26, 54],
+  [236, 34, 22],
+  [398, 26, 50],
 ];
 
 function gears(): Canvas {
@@ -227,7 +234,7 @@ function foreground(): Canvas {
 function layers(): ParallaxLayer[] {
   return [
     { name: 'furnace', raster: backdrop().toRaster(), factor: 0, tiled: true },
-    { name: 'far halls', raster: farHalls().toRaster(), factor: 0.1, tiled: true, glows: CHIMNEYS.map(([x]) => ({ x, y: H - 30, color: '#ff8a2a', radius: 12, intensity: 0.9, flicker: 0.35 })) },
+    { name: 'far halls', raster: farHalls().toRaster(), factor: 0.1, tiled: true, glows: CHIMNEYS.map(([x, , top]) => ({ x, y: Math.round(top + (H - top) * 0.45) + 12, color: '#ff8a2a', radius: 12, intensity: 0.9, flicker: 0.35 })) },
     { name: 'gears', raster: gears().toRaster(), factor: 0.22, tiled: true },
     { name: 'smoke', raster: smoke().toRaster(), factor: 0.3, tiled: true },
     { name: 'walls', raster: midWalls().toRaster(), factor: 0.45, tiled: true },
@@ -602,6 +609,10 @@ export function emberForge(): ArtTheme {
     propInfo: info,
     heroes: castFor('warden'),
     decals: decals(),
+    ambientSprites: {
+      lava: { sheet: lavaSheet([C.lava[0]!, C.lava[1]!, C.lava[2]!, C.lava[3]!]), anchor: 'free', weight: 1, light: { color: C.lava[2]!, radius: 40, intensity: 0.6, flicker: 0.2, x: 8, y: 2 } },
+      flame: { sheet: flameSheet([C.lava[1]!, C.lava[2]!, C.lava[3]!, C.lava[4]!]), anchor: 'wall', weight: 2, light: { color: '#ff9a40', radius: 70, intensity: 0.9, flicker: 0.3, x: 5, y: 8 } },
+    },
     tileSize: TILE,
     lights: {
       hero: { color: '#ffb070', radius: 54, intensity: 0.45, flicker: 0.1 },

@@ -79,7 +79,17 @@ export type ParticleType = z.infer<typeof ParticleType>;
  * - `particles`: weather and ambient life. `density` 0..1.
  */
 export const Environment = z.object({
-  ambient: z.object({ color: HexColor, intensity: z.number().min(0).max(1).default(1) }).optional(),
+  ambient: z
+    .object({
+      color: HexColor,
+      intensity: z.number().min(0).max(1).default(1),
+      /**
+       * Brightness of the parallax background, 0..1 (default 1). Backgrounds are pre-lit art, so
+       * the lightmap leaves them alone; this dims them (in the ambient hue) for night scenes.
+       */
+      background: z.number().min(0).max(1).optional(),
+    })
+    .optional(),
   fog: z
     .object({ color: HexColor, density: z.number().min(0).max(1).default(0.3), height: z.number().min(0).max(1).optional() })
     .optional(),

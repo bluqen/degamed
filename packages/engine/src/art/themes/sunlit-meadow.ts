@@ -10,6 +10,7 @@ import { mistBand, overgrow, shadedBlob } from '../scenery';
 import { derive, px01, tileNoise, TILE } from '../tiles';
 import { backEdges, backWall } from '../tiles';
 import { bonesDecal, fossilDecal, rootsDecal, stonesDecal } from '../decals';
+import { butterflySheet, grassSwaySheet } from '../overlays';
 import { sheetOf, type Raster } from '../../pixel';
 import type { ArtTheme, ParallaxLayer, PropInfo, SpriteSheet } from '../types';
 import { checkpointSheet, flyerSheet, spikeStrip } from '../extras';
@@ -803,6 +804,11 @@ export function sunlitMeadow(): ArtTheme {
     propInfo: info,
     heroes: castFor('fox'),
     decals: decals(),
+    ambientSprites: {
+      grass: { sheet: grassSwaySheet([C.grass[2]!, C.grass[3]!, C.grass[4]!, C.grass[5]!]), anchor: 'ground', weight: 5, front: true },
+      butterfly: { sheet: butterflySheet('#fff1a8', '#e0a040', '#3a2228'), anchor: 'free', weight: 2 },
+      butterfly2: { sheet: butterflySheet('#9fd0ff', '#4a86d8', '#2a1a2e'), anchor: 'free', weight: 1 },
+    },
     tileSize: TILE,
     lights: {
       pickup: { color: '#ffe08a', radius: 24, intensity: 0.25 },

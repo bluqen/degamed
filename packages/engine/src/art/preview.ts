@@ -30,13 +30,13 @@ export const PREVIEW_LEVEL = [
   '..............................',
   '..............................',
   '..............................',
-  '..............................',
-  '................++++++........',
-  '................+====+........',
-  '.....====.......++++++........',
-  '..............................',
-  '.......................#######',
-  '.......................#######',
+  '...............########.......',
+  '...............#++++++#.......',
+  '...............#+====+#.......',
+  '.....====......#++++++#.......',
+  '...............#++++++#.......',
+  '...............#++++++########',
+  '...............#++++++########',
   '##########.....###############',
   '##########.....###############',
   '##########.....###############',
@@ -229,6 +229,28 @@ export function renderPreview(theme: ArtTheme, o: PreviewOptions = {}): Raster {
     placeLight(n, x, 0);
   }
 
+  // ambient animations: grass on ground tops, drips and glow-worms under the platforms
+  const amb = theme.ambientSprites ?? {};
+  let ai = 0;
+  for (const a of Object.values(amb)) {
+    const sh = a.sheet;
+    const fr = (ai * 3) % sh.animations.idle!.frames.length;
+    if (a.anchor === 'ground') {
+      for (const [cx, cy] of tops.filter((_, i) => (i + ai * 5) % 9 === 0)) {
+        const x = cx * T - camX + 2;
+        const y = cy * T - sh.frameHeight + 2;
+        drawFrame(world, sh, fr, x, y);
+      }
+    } else if (a.anchor === 'ceiling') {
+      for (const [x0, y0] of [[6.3 * T, 10 * T], [18.4 * T, 8 * T]] as const) drawFrame(world, sh, fr, x0 - camX + ai * 9, y0);
+    } else if (a.anchor === 'free') {
+      drawFrame(world, sh, fr, 60 + ai * 140 - camX, 150 + ai * 10);
+    } else if (a.anchor === 'wall') {
+      drawFrame(world, sh, fr, 23 * T - camX, 9 * T);
+    }
+    ai++;
+  }
+
   // actors
   const S = theme.sprites;
   const hero = S.hero;
@@ -247,8 +269,8 @@ export function renderPreview(theme: ArtTheme, o: PreviewOptions = {}): Raster {
     [6.5 * T, 8 * T],
     [7.8 * T, 7.3 * T],
     [12.5 * T, 10.5 * T],
-    [19.5 * T, 6.3 * T],
-    [20.7 * T, 6.6 * T],
+    [18.2 * T, 9.7 * T],
+    [19.6 * T, 9.7 * T],
   ];
   pickups.forEach(([x, y], i) => {
     const px = x - camX - pk.frameWidth / 2;

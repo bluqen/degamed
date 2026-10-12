@@ -423,14 +423,14 @@ function lampPost(b: KitBuilder, height: number, lampWidth: number): Raster {
 export function moodEnvironment(base: Environment, time: string, weather: string): Environment {
   const env: Environment = JSON.parse(JSON.stringify(base ?? {}));
   if (time === 'day') {
-    env.ambient = { color: '#FFFFFF', intensity: 1 };
+    env.ambient = { color: '#FFFFFF', intensity: 1, background: 1 };
     if (env.bloom) env.bloom.strength = Math.min(env.bloom.strength, 0.3);
     env.vignette = Math.min(env.vignette ?? 0.2, 0.25);
   } else if (time === 'dusk') {
-    env.ambient = { color: '#C8A0B8', intensity: 0.85 };
+    env.ambient = { color: '#C8A0B8', intensity: 0.85, background: 0.85 };
     env.grade = { ...(env.grade ?? {}), tint: '#FFE0D0' };
   } else if (time === 'night') {
-    env.ambient = { color: env.ambient?.color ?? '#506080', intensity: Math.min(0.42, (env.ambient?.intensity ?? 1) * 0.6) };
+    env.ambient = { color: '#6070A8', intensity: Math.min(0.42, (env.ambient?.intensity ?? 1) * 0.6), background: 0.45 };
     env.bloom = { strength: Math.max(0.6, env.bloom?.strength ?? 0), threshold: env.bloom?.threshold ?? 0.65 };
     env.vignette = Math.max(env.vignette ?? 0, 0.5);
   }

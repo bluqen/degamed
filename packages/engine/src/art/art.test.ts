@@ -262,6 +262,30 @@ describe.each(THEME_IDS)('theme %s', (id) => {
     expect(Math.abs(hero - back) / Math.max(hero, back)).toBeGreaterThanOrEqual(0.3);
   });
 
+  it('ships back walls, decals and ambient animations', () => {
+    for (const k of ['back', 'backTop', 'backBottom', 'backLeft', 'backRight', 'fill3']) expect(t.tiles[k], k).toBeDefined();
+    const decals = Object.entries(t.decals ?? {});
+    expect(decals.length).toBeGreaterThanOrEqual(3);
+    // decals are details, not blocks: most of them are mostly transparent (a grate may be solid)
+    let airy = 0;
+    for (const [k, r] of decals) {
+      expect(rectangular(r), k).toBe(true);
+      let solid = 0;
+      for (let i = 3; i < r.data.length; i += 4) if (r.data[i]) solid++;
+      if (solid / (r.width * r.height) < 0.85) airy++;
+    }
+    expect(airy / decals.length).toBeGreaterThan(0.6);
+    const amb = Object.entries(t.ambientSprites ?? {});
+    expect(amb.length).toBeGreaterThanOrEqual(2);
+    for (const [k, a] of amb) {
+      expect(['ground', 'ceiling', 'wall', 'free'], k).toContain(a.anchor);
+      expect(a.sheet.animations.idle!.frames.length, k).toBeGreaterThanOrEqual(4);
+      expect(a.sheet.raster.width % a.sheet.frameWidth).toBe(0);
+    }
+    // at least one far layer carries an animated landmark light, or a landmark is drawn
+    expect(t.layers.some((l) => (l.glows ?? []).length > 0) || id === 'sunlit-meadow').toBe(true);
+  });
+
   it('has props with valid placement info', () => {
     const names = Object.keys(t.props);
     expect(names.length).toBeGreaterThanOrEqual(6);

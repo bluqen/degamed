@@ -10,6 +10,7 @@ import { hangingChain, lightShafts, mistBand, speckle } from '../scenery';
 import { derive, px01, tileCells, tileNoise, TILE } from '../tiles';
 import { backEdges, backWall } from '../tiles';
 import { bonesDecal, crackDecal, fossilDecal, rootsDecal, veinDecal } from '../decals';
+import { dripSheet, glowwormSheet, grassSwaySheet } from '../overlays';
 import { sheetOf, type Raster } from '../../pixel';
 import type { ArtTheme, ParallaxLayer, PropInfo, SpriteSheet } from '../types';
 import { checkpointSheet, flyerSheet, spikeStrip } from '../extras';
@@ -161,9 +162,6 @@ function statue(L: MatLayer, cx: number, base: number): void {
     }
     pts.push([cx, base - 40]);
     L.poly(pts, 2);
-    // the wing's eyespot, carved deep
-    L.ellipse(cx + dir * 34, base - 96, 7, 6, 3);
-    L.ellipse(cx + dir * 34, base - 96, 3, 2.5, 2);
   }
   // robed body
   L.poly([[cx - 14, base - 104], [cx + 14, base - 104], [cx + 26, base - 16], [cx - 26, base - 16]], 2);
@@ -758,6 +756,11 @@ export function hollowCaverns(): ArtTheme {
     propInfo: info,
     heroes: castFor('moth'),
     decals: decals(),
+    ambientSprites: {
+      glowworm: { sheet: glowwormSheet('#5a7090', C.blue[2]!, C.blue[3]!), anchor: 'ceiling', weight: 3, light: { color: C.blue[2]!, radius: 24, intensity: 0.5, x: 4, y: 20 } },
+      drip: { sheet: dripSheet('#3a5a8a', '#9fd0ff'), anchor: 'ceiling', weight: 2 },
+      grass: { sheet: grassSwaySheet(C.teal.slice(1)), anchor: 'ground', weight: 2 },
+    },
     tileSize: TILE,
     lights: {
       hero: { color: '#cfe0ff', radius: 64, intensity: 0.55 },
