@@ -66,16 +66,48 @@ function farHalls(): Canvas {
     }
     L.rect(x - 2, y0 - 2, w + 4, 3, 1);
   }
+  // the landmark: two colossal forge chimneys with glowing furnace mouths
+  for (const [cx, w, top] of CHIMNEYS) {
+    L.poly([[cx - w / 2 - 6, H], [cx - w / 2, top + 10], [cx + w / 2, top + 10], [cx + w / 2 + 6, H]], 6);
+    L.rect(cx - w / 2 - 3, top, w + 6, 10, 6);
+    L.rect(cx - w / 2 - 1, top + 10, w + 2, 2, 7);
+    for (let y = top + 34; y < H - 50; y += 28) L.rect(cx - w / 2 - 1, y, w + 2 + Math.round(((y - top) / (H - top)) * 10), 3, 7);
+    // furnace mouth: an arched opening blazing at the base
+    const my = H - 44;
+    L.rect(cx - 9, my, 18, 26, 3);
+    L.ellipse(cx, my, 9, 7, 3);
+    L.rect(cx - 6, my + 6, 12, 20, 5);
+  }
   const fade = { fadeTo: '#5a2018', fadeFrom: 0.55, fadeAmt: 0.85 };
   const mats: Record<number, Material> = {
     1: { base: '#2e1820', dark: '#2a161d', rim: '#5a2e2a', grain: 20, dither: true, ...fade },
     2: { base: '#28141b', ...fade },
     3: { base: '#ff9a3a' },
     4: { base: '#d8501a' },
-    5: { base: '#ffb040' },
+    5: { base: '#ffd070' },
+    6: { base: '#1c0d13', dark: '#190b11', light: '#21101a', rim: '#8a3a22', rimDir: [1, 0], grain: 24, dither: true },
+    7: { base: '#3a1c1c', rim: '#a04a2a' },
   };
-  return L.paint(mats, 3);
+  const c = L.paint(mats, 3);
+  // smoke plumes rising from the chimney mouths, lit warm from below
+  const r2 = rng(13);
+  for (const [cx, w, top] of CHIMNEYS) {
+    for (let i = 0; i < 26; i++) {
+      const t = i / 26;
+      const px = cx + Math.sin(t * 5) * 8 + t * 40 + r2.range(-6, 6);
+      const py = top - 4 - t * 70;
+      const rad = (w / 2) * (0.6 + t * 1.4) * r2.range(0.7, 1.1);
+      c.disc(px, py, rad, t < 0.2 ? '#4a2420' : '#2e1a1e', 0.35 * (1 - t * 0.7));
+    }
+  }
+  return c;
 }
+
+/** The forge chimneys in the far halls layer: [centre x, width, top y]. */
+const CHIMNEYS: [number, number, number][] = [
+  [128, 34, 26],
+  [360, 26, 54],
+];
 
 function gears(): Canvas {
   const r = rng(21);
@@ -195,7 +227,7 @@ function foreground(): Canvas {
 function layers(): ParallaxLayer[] {
   return [
     { name: 'furnace', raster: backdrop().toRaster(), factor: 0, tiled: true },
-    { name: 'far halls', raster: farHalls().toRaster(), factor: 0.1, tiled: true },
+    { name: 'far halls', raster: farHalls().toRaster(), factor: 0.1, tiled: true, glows: CHIMNEYS.map(([x]) => ({ x, y: H - 30, color: '#ff8a2a', radius: 12, intensity: 0.9, flicker: 0.35 })) },
     { name: 'gears', raster: gears().toRaster(), factor: 0.22, tiled: true },
     { name: 'smoke', raster: smoke().toRaster(), factor: 0.3, tiled: true },
     { name: 'walls', raster: midWalls().toRaster(), factor: 0.45, tiled: true },
