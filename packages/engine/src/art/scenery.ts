@@ -14,7 +14,7 @@ export function tower(
   w: number,
   h: number,
   id: number,
-  o: { win?: number; winGap?: number; winSkip?: number; ribs?: number; broken?: boolean; antenna?: boolean; ledges?: number; litWin?: number; litChance?: number } = {},
+  o: { win?: number; winGap?: number; winSkip?: number; ribs?: number; greeble?: number; broken?: boolean; antenna?: boolean; ledges?: number; litWin?: number; litChance?: number } = {},
 ): void {
   const top = base - h;
   L.rect(x, top, w, h, id);
@@ -51,6 +51,36 @@ export function tower(
   for (let i = 0; i < (o.ledges ?? 0); i++) {
     const ly = top + r.int(8, Math.max(9, h - 10));
     L.rect(x - 2, ly, w + 4, r.int(1, 2), id);
+  }
+  if (o.greeble !== undefined) {
+    const g = o.greeble;
+    // pipes running up the face
+    for (let k = 0; k < r.int(1, 3); k++) {
+      const px = x + r.int(1, Math.max(1, w - 2));
+      const py = top + r.int(0, Math.floor(h / 3));
+      for (let y = py; y < base; y++) if (L.get(px, y) === id) L.set(px, y, g);
+      if (r.chance(0.5)) for (let xx = px; xx < px + r.int(3, 8); xx++) if (L.get(xx, py)) L.set(xx, py, g);
+    }
+    // a ladder
+    if (r.chance(0.5) && w > 8) {
+      const lx = x + r.int(2, w - 5);
+      const ly = top + r.int(5, Math.max(6, Math.floor(h / 2)));
+      for (let y = ly; y < Math.min(base, ly + r.int(15, 50)); y++) {
+        L.set(lx, y, g);
+        L.set(lx + 2, y, g);
+        if (y % 3 === 0) L.set(lx + 1, y, g);
+      }
+    }
+    // boxes and vents bolted to the sides, catwalk stubs
+    for (let k = 0; k < r.int(1, 4); k++) {
+      const side = r.chance(0.5) ? x - 2 : x + w;
+      L.rect(side, top + r.int(4, Math.max(5, h - 10)), 2, r.int(2, 5), id);
+    }
+    if (r.chance(0.5)) {
+      const cy = top + r.int(10, Math.max(11, h - 20));
+      const left = r.chance(0.5);
+      L.rect(left ? x - r.int(6, 14) : x + w, cy, r.int(6, 14), 1, id);
+    }
   }
   if (o.ribs !== undefined) {
     for (let rx = x + 3; rx < x + w - 2; rx += r.int(5, 9)) for (let y = top + 2; y < base; y++) if (L.get(rx, y) === id) L.set(rx, y, o.ribs);
@@ -218,7 +248,7 @@ export function mistBand(c: Canvas, o: { y: number; h: number; color: string; al
       const v = 1 - Math.abs(y - o.y) / o.h;
       const n = fbm(x, y, { w: c.w, h: c.h, cells: o.cells ?? 6, octaves: 4, seed: o.seed, wrapX: true, aspect: 0.35 });
       const a = Math.max(0, v * v * (n * 1.6 - 0.35)) * o.alpha;
-      const q = Math.floor(a * 10 + bayer(x, y) * 0.95) / 10;
+      const q = Math.floor(a * 20 + bayer(x, y) * 0.95) / 20;
       if (q > 0) c.set(x, y, o.color, Math.min(1, q));
     }
 }
@@ -247,4 +277,42 @@ export function shadedBlob(L: MatLayer, cx: number, cy: number, r: number, base:
       else if (m === light && h > 0.92) m = base;
       L.set(x, y, m);
     }
+}
+
+/** A row of round arches on pillars (an arcade), from x0 to x1. */
+export function arcade(L: MatLayer, x0: number, x1: number, base: number, h: number, span: number, pillar: number, id: number): void {
+  const top = base - h;
+  L.rect(x0, top - 6, x1 - x0, 6, id);
+  for (let x = x0; x < x1; x += span) {
+    L.rect(x, top, pillar, h, id);
+    // capital
+    L.rect(x - 1, top + Math.round(span / 2) - 1, pillar + 2, 2, id);
+    // spandrel: fill above the arch curve
+    const r = (span - pillar) / 2;
+    const cx = x + pillar + r;
+    for (let xx = x + pillar; xx < x + span; xx++) {
+      const dy = Math.sqrt(Math.max(0, r * r - (xx + 0.5 - cx) ** 2));
+      for (let y = top; y < top + r - dy + 1; y++) L.set(xx, y, id);
+    }
+  }
+}
+
+/** A cog wheel silhouette. */
+export function gear(L: MatLayer, cx: number, cy: number, r: number, teeth: number, id: number, hole = 0): void {
+  L.disc(cx, cy, r, id);
+  for (let k = 0; k < teeth; k++) {
+    const a = (k / teeth) * Math.PI * 2;
+    const tx = cx + Math.cos(a) * (r + 1.5);
+    const ty = cy + Math.sin(a) * (r + 1.5);
+    L.disc(tx, ty, Math.max(1.5, r * 0.18), id);
+  }
+  if (hole > 0) {
+    for (let y = Math.floor(cy - hole); y <= cy + hole; y++)
+      for (let x = Math.floor(cx - hole); x <= cx + hole; x++) if ((x + 0.5 - cx) ** 2 + (y + 0.5 - cy) ** 2 <= hole * hole) L.set(x, y, 0);
+    L.disc(cx, cy, Math.max(1, hole * 0.35), id);
+    for (let k = 0; k < 4; k++) {
+      const a = (k / 4) * Math.PI * 2 + 0.3;
+      L.line(cx, cy, cx + Math.cos(a) * hole, cy + Math.sin(a) * hole, id, Math.max(1, Math.round(r * 0.12)));
+    }
+  }
 }

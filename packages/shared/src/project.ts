@@ -66,15 +66,16 @@ export type ParticleType = z.infer<typeof ParticleType>;
 
 /**
  * Scene atmosphere, rendered by the engine on top of everything else:
- * - `ambient`: the light level of unlit areas. Unlit pixels are multiplied by `color` × `intensity`
- *   (intensity 1 with a white colour = no darkness; `{ color: '#3A4466', intensity: 0.5 }` = a dark,
- *   blue night). Light components brighten it back up.
+ * - `ambient`: the light in unlit areas. `color` is the hue of the shadows (only its hue counts,
+ *   not its brightness) and `intensity` how bright they are: 1 = fully lit, 0 = pitch black.
+ *   `{ color: '#3A4466', intensity: 0.5 }` is a blue night at half brightness. Light components
+ *   brighten it back up.
  * - `fog`: haze tinted into the parallax layers (far layers get more) plus a low drifting mist.
  *   `density` 0..1; `height` 0..1 is how far up the screen the fog reaches (default 0.6).
  * - `bloom`: bright pixels glow. `strength` 0..2, `threshold` 0..1 (default 0.7).
  * - `vignette`: darkened screen edges, 0..1.
- * - `grade`: colour grade. `contrast` and `saturation` are multipliers (1 = unchanged), `tint`
- *   multiplies the final image (white = unchanged).
+ * - `grade`: colour grade. `contrast` and `saturation` are multipliers (1 = unchanged); `tint`
+ *   shifts the final image towards a hue without darkening it (white = unchanged).
  * - `particles`: weather and ambient life. `density` 0..1.
  */
 export const Environment = z.object({
@@ -241,9 +242,12 @@ export const Scene = z.object({
   background: HexColor.optional(),
   /** World size; the camera is kept inside it. Defaults to the game resolution. */
   bounds: z.object({ width: z.number().positive(), height: z.number().positive() }).optional(),
-  /** Background layers drawn behind entities. factor 0 = fixed, 1 = moves with the world. */
+  /**
+   * Parallax layers. factor 0 = fixed, 1 = moves with the world; layers above 1 are foreground
+   * layers drawn in front of the world, rushing past faster than it.
+   */
   parallax: z
-    .array(z.object({ asset: z.string(), factor: z.number().min(0).max(1), y: z.number().default(0), tiled: z.boolean().default(true) }))
+    .array(z.object({ asset: z.string(), factor: z.number().min(0).max(3), y: z.number().default(0), tiled: z.boolean().default(true) }))
     .default([]),
   /** Lighting, fog, bloom, vignette, colour grade and weather (see Environment). */
   environment: Environment.optional(),

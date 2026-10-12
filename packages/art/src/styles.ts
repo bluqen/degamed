@@ -27,6 +27,8 @@ export interface ArtStyleDef {
   /** Representative colours, used for previews and as palette hints. */
   swatch: [string, string, string, string];
   pixel?: PixelSettings;
+  /** The procedural art theme (engine `art/`) this style is tuned to match, if any. */
+  theme?: string;
 }
 
 export const ART_STYLES = [
@@ -61,6 +63,54 @@ export const ART_STYLES = [
     avoid: 'blurry, photorealistic, 3d render, text, watermark',
     swatch: ['#16132B', '#5B3F9C', '#4DD0E1', '#FFB86B'],
     pixel: { sprite: 96, tile: 32, colors: 40, outline: false },
+  },
+  {
+    id: 'pixel-rain-ruins',
+    name: 'Rain Ruins Pixel',
+    family: 'pixel',
+    blurb: 'Moody rain-soaked ruins in teal fog, like Rain World.',
+    prompt:
+      'atmospheric pixel art in the style of Rain World, rusted industrial ruins, colossal towers fading into teal-grey fog, pipes, girders, moss and hanging vines, heavy rain, desaturated teal and grey-green palette with rust accents, hue-shifted shading, dark readable foreground silhouettes, soft top rim light, crisp pixels',
+    avoid: 'bright saturated colours, cartoon, clean shiny surfaces, blurry, anti-aliasing, gradients, photorealistic, 3d render, text, watermark',
+    swatch: ['#1F2D31', '#4A625F', '#7C958D', '#B8673A'],
+    pixel: { sprite: 32, tile: 16, colors: 24, outline: true },
+    theme: 'rain-ruins',
+  },
+  {
+    id: 'pixel-hollow-caverns',
+    name: 'Hollow Caverns Pixel',
+    family: 'pixel',
+    blurb: 'Blue-black caverns with glowing fungus, like Hollow Knight.',
+    prompt:
+      'dark atmospheric pixel art inspired by Hollow Knight, blue-black caverns, layered stalactites rimmed with cold blue light, glowing cyan fungus and amber lanterns, drifting spores, bone-white masks, strong readable silhouettes, deep parallax depth, crisp pixels',
+    avoid: 'daylight, warm saturated palette, cute pastel, blurry, anti-aliasing, photorealistic, 3d render, text, watermark',
+    swatch: ['#0A1122', '#26375A', '#8FDCFF', '#F0A040'],
+    pixel: { sprite: 32, tile: 16, colors: 24, outline: true },
+    theme: 'hollow-caverns',
+  },
+  {
+    id: 'pixel-sunlit-meadow',
+    name: 'Sunlit Meadow Pixel',
+    family: 'pixel',
+    blurb: 'Bright, warm and cheerful, like Celeste or Stardew Valley.',
+    prompt:
+      'bright cheerful pixel art like Celeste and Stardew Valley, sunny summer meadow, puffy cel-shaded clouds, snow-capped mountains in blue haze, round trees, lush grass over warm soil, flowers, warm highlights and cool shadows, clean dark outlines on characters, crisp pixels',
+    avoid: 'dark, gritty, desaturated, blurry, anti-aliasing, photorealistic, 3d render, text, watermark',
+    swatch: ['#3B78D8', '#71C653', '#A0603F', '#FFD25E'],
+    pixel: { sprite: 32, tile: 16, colors: 24, outline: true },
+    theme: 'sunlit-meadow',
+  },
+  {
+    id: 'pixel-ember-forge',
+    name: 'Ember Forge Pixel',
+    family: 'pixel',
+    blurb: 'Burning castle halls and molten light, like Dead Cells.',
+    prompt:
+      'dark fantasy pixel art like Dead Cells and Blasphemous, burning castle forge, plum-black stone bricks, molten orange light from below, giant gears, chains and torn crimson banners, drifting embers, strong warm rim light, high contrast, crisp pixels',
+    avoid: 'daylight, pastel, cute, blurry, anti-aliasing, photorealistic, 3d render, text, watermark',
+    swatch: ['#120910', '#4A282E', '#F06A1A', '#FFD06A'],
+    pixel: { sprite: 32, tile: 16, colors: 24, outline: true },
+    theme: 'ember-forge',
   },
   {
     id: 'hand-painted',

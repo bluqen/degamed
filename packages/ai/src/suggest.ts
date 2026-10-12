@@ -32,7 +32,7 @@ export function suggestions(files: ProjectFiles, opts: { ai?: boolean } = {}): s
     first('Floatier jumps', 'Snappier jumps'),
     first('Add more enemies', 'Fewer enemies'),
     first(...rotated.map((t) => `Set it in the ${t.name}`)),
-    first('Make it faster', 'Make the level longer', 'Add more coins', 'Add a double jump'),
+    first('Add a double jump', 'Make it rain', 'Make it faster', 'Make the level longer', 'Add more coins'),
   ].filter((c): c is string => !!c);
 
   if (opts.ai) picks.splice(Math.min(4, picks.length), 0, AI_CHIPS[seed % AI_CHIPS.length]!);

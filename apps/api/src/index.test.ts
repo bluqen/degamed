@@ -237,7 +237,7 @@ describe('/ai/generate', () => {
     expect((await post(env, { prompt: 'write me an essay about cats' })).status).toBe(400);
     expect((await post(env, { task: 'chat', messages: [{ role: 'user', content: 'hi' }] })).status).toBe(400);
     expect((await post(env, { ...createTask, prompt: 'x'.repeat(601) })).status).toBe(400);
-    expect((await post(env, { task: 'repair', errors: ['e'], files: { 'a.js': 'x'.repeat(9000) } })).status).toBe(400);
+    expect((await post(env, { task: 'repair', errors: ['e'], files: { 'a.js': 'x'.repeat(15000) } })).status).toBe(400);
     expect(env.AI!.run).not.toHaveBeenCalled();
   });
 

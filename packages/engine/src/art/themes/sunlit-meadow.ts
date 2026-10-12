@@ -52,8 +52,10 @@ function cloud(c: Canvas, r: Rng, cx: number, cy: number, w: number, s: { lit: s
   const n = Math.max(3, Math.round(w / 9));
   for (let i = 0; i < n; i++) {
     const t = i / (n - 1);
-    const rad = (Math.sin(t * Math.PI) * 0.6 + 0.4) * w * 0.22 * r.range(0.8, 1.2);
+    const rad = (Math.sin(t * Math.PI) * 0.6 + 0.4) * w * 0.2 * r.range(0.75, 1.25);
     mask.disc(cx - w / 2 + t * w, cy - rad * 0.5, rad, 1);
+    // cauliflower billows on top
+    if (t > 0.15 && t < 0.85 && r.chance(0.7)) mask.disc(cx - w / 2 + t * w + r.range(-4, 4), cy - rad * 1.3, rad * r.range(0.45, 0.7), 1);
   }
   mask.rect(cx - w / 2, cy - 2, w, 4, 1);
   for (let y = 0; y < c.h; y++)
@@ -185,7 +187,7 @@ function foreground(): Canvas {
   for (let x = 0; x < FW; x++) {
     const n = fbm(x, 0, { w: FW, h: H, cells: 14, octaves: 3, seed: 72, wrapX: true });
     const h = Math.max(0, Math.round((n - 0.52) * 60));
-    for (let k = 0; k < h; k++) L.set(x + (k > h * 0.6 ? Math.round(Math.sin(x) * 1) : 0), H - 1 - k, 1);
+    for (let k = 0; k < h; k++) L.set(x, H - 1 - k, 1);
   }
   void r;
   return L.paint({ 1: { base: '#1f5a3a', dark: '#1b5235', rim: '#2f7d3f', grain: 30 } }, 73);
@@ -269,11 +271,11 @@ function soil(seed: number): Canvas {
       c.set(x, y, v < 0.36 ? D[1]! : v < 0.7 ? D[2]! : D[3]!);
     }
   // short root / strata strokes and a pebble
-  for (let k = 0; k < 2; k++) {
+  for (let k = 0; k < r.int(0, 1); k++) {
     const x = r.int(0, 15);
     const y = r.int(1, 14);
-    const len = r.int(2, 4);
-    for (let i = 0; i < len; i++) c.set((x + i) % TILE, y, D[1]!), c.set((x + i) % TILE, y + 1, D[3]!);
+    const len = r.int(2, 3);
+    for (let i = 0; i < len; i++) c.set((x + i) % TILE, y, D[1]!);
   }
   if (r.chance(0.6)) {
     const x = r.int(1, 13);
@@ -337,12 +339,12 @@ function meadowTiles(): ArtTheme['tiles'] {
   const plat = new Canvas(TILE, TILE);
   const Wd = C.wood;
   for (let x = 0; x < TILE; x++) {
-    const seam = x % 8 === 7;
+    const seam = x % 8 === 3;
     plat.set(x, 0, seam ? Wd[2]! : Wd[3]!);
     for (let y = 1; y < 5; y++) plat.set(x, y, seam ? Wd[0]! : y === 1 ? Wd[3]! : px01(x, y, 4) > 0.8 ? Wd[1]! : Wd[2]!);
     plat.set(x, 5, Wd[1]!);
     plat.set(x, 6, Wd[0]!);
-    if (x % 8 === 2) plat.set(x, 2, '#e8d0a0');
+    if (x % 8 === 5) plat.set(x, 2, '#e8d0a0');
   }
   // rope hanging under the planks
   for (let x = 0; x < TILE; x++) plat.set(x, 8 + Math.round(Math.sin((x / TILE) * Math.PI) * 2), '#c9a26a');
@@ -646,15 +648,19 @@ function props(): { props: Record<string, Raster>; info: Record<string, PropInfo
   return { props: out, info };
 }
 
+export const SUNLIT_MEADOW_META = {
+  id: 'sunlit-meadow',
+  name: 'Sunlit Meadow',
+  description: 'A bright, warm summer meadow: puffy clouds, snowy peaks, round trees, flowers and a red-haired climber. Cheerful and cosy.',
+  keywords: ['happy', 'cheerful', 'bright', 'cute', 'cozy', 'cosy', 'meadow', 'grass', 'forest', 'nature', 'summer', 'day', 'sunny', 'farm', 'kids', 'family', 'adventure', 'mountain', 'climb', 'flowers', 'spring', 'relaxing', 'colorful', 'colourful'],
+  palette: [C.skyTop, C.skyMid, C.horizon, C.warm, ...C.grass, ...C.dirt, ...C.stone, ...C.wood, ...C.flower],
+  background: C.skyMid,
+};
+
 export function sunlitMeadow(): ArtTheme {
   const { props: p, info } = props();
   return {
-    id: 'sunlit-meadow',
-    name: 'Sunlit Meadow',
-    description: 'A bright, warm summer meadow: puffy clouds, snowy peaks, round trees, flowers and a red-haired climber. Cheerful and cosy.',
-    keywords: ['happy', 'cheerful', 'bright', 'cute', 'cozy', 'cosy', 'meadow', 'grass', 'forest', 'nature', 'summer', 'day', 'sunny', 'farm', 'kids', 'family', 'adventure', 'mountain', 'climb', 'flowers', 'spring', 'relaxing', 'colorful', 'colourful'],
-    palette: [C.skyTop, C.skyMid, C.horizon, C.warm, ...C.grass, ...C.dirt, ...C.stone, ...C.wood, ...C.flower],
-    background: C.skyMid,
+    ...SUNLIT_MEADOW_META,
     layers: layers(),
     tiles: meadowTiles(),
     sprites: {

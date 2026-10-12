@@ -7,7 +7,7 @@ export function rainHeroCostume(): HeroCostume {
   const cloak = pal.ramp(['#4a585b', '#848f8b', '#c3c6b8', '#eceadd']);
   const legs = pal.ramp(['#2c3638', '#4a5655']);
   const scarf = pal.ramp(['#561c19', '#99331f', '#d4603a']);
-  const weapon = pal.ramp(['#2b2622', '#7d7360', '#d9d0b4']);
+  const weapon = pal.ramp(['#3a3128', '#b5a888', '#f2ead2']);
   const slash = pal.ramp(['#5f9d93', '#bdefe3', '#ffffff']);
   const [eye, glint] = pal.ramp(['#0b1315', '#ffffff']);
   const [flash] = pal.ramp(['#ffffff']);

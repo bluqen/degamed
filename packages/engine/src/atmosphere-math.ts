@@ -16,6 +16,12 @@ export function rgb01ToInt([r, g, b]: Rgb): number {
   return (c(r) << 16) | (c(g) << 8) | c(b);
 }
 
+/** Scales a colour so its brightest channel is 1 (black stays black). */
+export function normalizeRgb(c: Rgb): Rgb {
+  const m = Math.max(c[0], c[1], c[2]);
+  return m > 0 ? [c[0] / m, c[1] / m, c[2] / m] : [0, 0, 0];
+}
+
 export function mixRgb(a: Rgb, b: Rgb, t: number): Rgb {
   return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
 }
@@ -29,7 +35,8 @@ const LUMA: Rgb = [0.2126, 0.7152, 0.0722];
 export function gradeMatrix(grade: { contrast?: number; saturation?: number; tint?: string } = {}): number[] {
   const s = grade.saturation ?? 1;
   const c = grade.contrast ?? 1;
-  const tint = grade.tint ? hexToRgb01(grade.tint) : ([1, 1, 1] as Rgb);
+  // The tint shifts hue without darkening: its brightest channel is treated as 1.
+  const tint = grade.tint ? normalizeRgb(hexToRgb01(grade.tint)) : ([1, 1, 1] as Rgb);
   const m: number[] = [];
   for (let row = 0; row < 3; row++) {
     for (let col = 0; col < 3; col++) {
@@ -74,7 +81,8 @@ export function flickerAt(time: number, flicker: number, seed = 0): number {
 export function ambientColor(env: Environment | undefined): Rgb {
   const a = env?.ambient;
   if (!a) return [1, 1, 1];
-  const c = hexToRgb01(a.color);
+  // The colour gives the hue of the shadows; intensity alone sets how bright they are.
+  const c = normalizeRgb(hexToRgb01(a.color));
   const k = a.intensity ?? 1;
   return [c[0] * k, c[1] * k, c[2] * k];
 }

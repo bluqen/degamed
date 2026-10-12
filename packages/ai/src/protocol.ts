@@ -41,10 +41,10 @@ export const LIMITS = {
   promptChars: 600,
   historyTurns: 6,
   historyChars: 400,
-  /** Script context sent with an edit or repair (sum of all files). */
-  contextChars: 12_000,
+  /** Script context sent with an edit or repair (sum of all files). The kits' player script is ~10.5k chars. */
+  contextChars: 20_000,
   contextFiles: 6,
-  fileChars: 8_000,
+  fileChars: 14_000,
   paths: 80,
   errors: 8,
   errorChars: 500,

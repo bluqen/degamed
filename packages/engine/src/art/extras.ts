@@ -90,26 +90,35 @@ export function flyerSheet(o: { body: string[]; wing: string[]; eye: string; out
   const [stripe] = pal.ramp([o.stripes ?? o.body[0]!]);
   const [flash] = pal.ramp([o.flash ?? '#ffffff']);
   const frames: Raster[] = [];
-  // wing tip offsets per frame: up, mid, down, mid
-  const tips: [number, number][] = [
-    [-2, -7],
-    [-5, -3],
-    [-4, 3],
-    [-5, -2],
-  ];
+  // wing sweep per frame (radians, 0 = pointing right): up, back, down, back
+  const sweep = [-1.95, -2.75, 2.55, -2.85];
+  const wingPoly = (rx: number, ry: number, ang: number, len: number, w: number): [number, number][] => {
+    const tx = rx + Math.cos(ang) * len;
+    const ty = ry + Math.sin(ang) * len;
+    const nx = -Math.sin(ang);
+    const ny = Math.cos(ang);
+    const mx = rx + Math.cos(ang) * len * 0.55;
+    const my = ry + Math.sin(ang) * len * 0.55;
+    return [
+      [rx - 1.5, ry],
+      [mx + nx * w, my + ny * w],
+      [tx, ty],
+      [mx - nx * w * 0.6, my - ny * w * 0.6],
+      [rx + 1.5, ry],
+    ];
+  };
   const draw = (f: number, hurt = false) => {
     const c = new Ix(20, 16, pal);
-    const bob = [0, 1, 1, 0][f % 4]!;
+    const bob = [1, 0, -1, 0][f % 4]!;
     const cx = 10;
     const cy = 9 + bob;
-    const [tx, ty] = tips[f % 4]!;
-    // far wing (darker), then body, then near wing
-    c.poly([[cx - 1, cy - 1], [cx + 2 + tx * 0.6, cy + ty * 0.9], [cx + 4 + tx * 0.4, cy + ty * 0.6 + 2]], wing[0]!);
-    c.ellipse(cx, cy, 4.5, 3, (x, y, nx, ny) => (ny < -0.3 ? body[2]! : ny > 0.4 ? body[0]! : body[1]!));
+    const a = sweep[f % 4]!;
+    c.poly(wingPoly(cx + 1, cy - 1, a + 0.35, 6, 2), wing[0]!);
+    c.ellipse(cx, cy, 4.5, 2.8, (x, y, nx, ny) => (ny < -0.3 ? body[2]! : ny > 0.4 ? body[0]! : body[1]!));
     if (o.stripes) for (const sx of [cx - 2, cx]) for (let y = cy - 3; y <= cy + 3; y++) if (c.get(sx, y)) c.set(sx, y, stripe!);
     c.set(cx + 3, cy - 1, eye!);
     if (o.glowEye) c.set(cx + 4, cy - 1, eye!);
-    c.poly([[cx - 1, cy - 1], [cx + tx - 1, cy + ty], [cx + tx + 5, cy + ty + 1], [cx + 2, cy]], wing[1]!);
+    c.poly(wingPoly(cx, cy - 1, a, 8, 2.6), wing[1]!);
     c.rim(0, -1, new Set(wing));
     c.outline(ol!, olLit!);
     if (hurt) for (let i = 0; i < c.px.length; i++) if (c.px[i] && c.px[i] !== ol) c.px[i] = flash!;

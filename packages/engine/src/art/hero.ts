@@ -43,6 +43,8 @@ export interface HeroCostume {
   ragged: number;
   legLen?: number;
   tail?: { ramp: number[]; len: number };
+  /** Head colours that also catch the rim light (metal helms). */
+  headRim?: number[];
 }
 
 interface Leg {
@@ -132,8 +134,8 @@ export function heroPoses(): HeroPose[] {
   P.push(pose({ sq: 2, bob: 2, back: { x: -4, y: GROUND - BASE_HIP - 2 }, front: { x: 4, y: GROUND - BASE_HIP - 2 }, flare: 1, lift: -1, scarf: { ang: Math.PI * 0.6, wave: 0.3, ph: 1 } }));
   // 18..21 attack: wind-up, strike, follow-through, recover
   P.push(pose({ lean: -1, sq: 1, bob: 1, back: { x: -4, y: GROUND - BASE_HIP - 1 }, front: { x: 3, y: GROUND - BASE_HIP - 1 }, weapon: { ang: -Math.PI * 0.85, len: 7 }, scarf: { ang: Math.PI * 0.7, wave: 0.3, ph: 0 } }));
-  P.push(pose({ lean: 2, sq: -1, back: { x: -4, y: GROUND - BASE_HIP }, front: { x: 5, y: GROUND - BASE_HIP }, weapon: { ang: 0, len: 9 }, slash: 1, flare: 2, scarf: { ang: Math.PI * 0.95, wave: 0.5, ph: 1 } }));
-  P.push(pose({ lean: 2, sq: 0, back: { x: -4, y: GROUND - BASE_HIP }, front: { x: 5, y: GROUND - BASE_HIP }, weapon: { ang: Math.PI * 0.2, len: 8 }, slash: 2, flare: 2, scarf: { ang: Math.PI * 0.9, wave: 0.5, ph: 2.2 } }));
+  P.push(pose({ lean: 2, sq: -1, back: { x: -4, y: GROUND - BASE_HIP }, front: { x: 5, y: GROUND - BASE_HIP }, weapon: { ang: 0, len: 11 }, slash: 1, flare: 2, scarf: { ang: Math.PI * 0.95, wave: 0.5, ph: 1 } }));
+  P.push(pose({ lean: 2, sq: 0, back: { x: -4, y: GROUND - BASE_HIP }, front: { x: 5, y: GROUND - BASE_HIP }, weapon: { ang: Math.PI * 0.2, len: 10 }, slash: 2, flare: 2, scarf: { ang: Math.PI * 0.9, wave: 0.5, ph: 2.2 } }));
   P.push(pose({ lean: 1, sq: 0, back: { x: -3, y: GROUND - BASE_HIP }, front: { x: 3, y: GROUND - BASE_HIP }, weapon: { ang: Math.PI * 0.35, len: 7 }, flare: 1, scarf: { ang: Math.PI * 0.85, wave: 0.4, ph: 3.3 } }));
   // 22..23 hurt: recoil with a flash, then the pained pose
   P.push(pose({ lean: -2, sq: -1, bob: -1, back: { x: -4, y: 6 }, front: { x: 0, y: 7 }, flare: -1, lift: 1, flash: true, hurt: true, scarf: { ang: Math.PI * 0.2, wave: 0.6, ph: 0 } }));
@@ -208,8 +210,16 @@ export function drawHero(cos: HeroCostume, p: HeroPose): Ix {
   sp.forEach(([x, y], i) => {
     const t = i / sp.length;
     const w = t < 0.6 ? cos.scarfWidth : t < 0.85 ? Math.max(1, cos.scarfWidth - 1) : 1;
-    for (let k = 0; k < w; k++) c.set(x, y + k, k === 0 ? cos.scarf[2]! : k === w - 1 && w > 1 ? cos.scarf[0]! : cos.scarf[1]!);
+    const [px, py] = sp[Math.max(0, i - 1)]!;
+    for (let k = 0; k < w; k++) {
+      const col = k === 0 ? cos.scarf[2]! : k === w - 1 && w > 1 ? cos.scarf[0]! : cos.scarf[1]!;
+      c.line(Math.round(px), Math.round(py) + k, Math.round(x), Math.round(y) + k, col);
+    }
   });
+  // a forked, frayed tip
+  const [ex, ey] = sp[sp.length - 1]!;
+  const [qx, qy] = sp[sp.length - 2]!;
+  c.set(Math.round(ex + (ex - qx)), Math.round(ey + (ey - qy)) + 1, cos.scarf[1]!);
 
   // legs
   drawLeg(c, hipX - 2, hipY, p.back, legLen, cos.legs[0]!, cos.legs[0]!);
@@ -280,13 +290,15 @@ export function drawHero(cos: HeroCostume, p: HeroPose): Ix {
     const ay = neckY + 4;
     const ex = ax + Math.cos(p.weapon.ang) * p.weapon.len;
     const ey = ay + Math.sin(p.weapon.ang) * p.weapon.len;
+    // shaft: bright top edge over a darker underside so it reads at 1x
+    c.line(ax, ay + 1, Math.round(ex), Math.round(ey) + 1, cos.weapon[0]!);
     c.line(ax, ay, Math.round(ex), Math.round(ey), cos.weapon[1]!);
     c.set(Math.round(ex), Math.round(ey), cos.weapon[2]!);
-    c.set(ax, ay, cos.weapon[0]!);
+    c.set(Math.round((ax + ex) / 2), Math.round((ay + ey) / 2), cos.weapon[2]!);
   }
 
   // shading passes on cloak + scarf: light from upper right, shadow lower left
-  const soft = new Set([c1, c2, c3, ...cos.scarf]);
+  const soft = new Set([c1, c2, c3, ...cos.scarf, ...(cos.headRim ?? [])]);
   c.rim(1, -1, soft);
   c.shade(-1, 1, new Set([c2, c3]));
 

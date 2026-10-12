@@ -1,4 +1,4 @@
-export { startGame, Behaviour, EntityHandle, type GameHandle, type RuntimeHooks } from './runtime';
+export { startGame, Behaviour, EntityHandle, type GameHandle, type RuntimeHooks, type StartOptions } from './runtime';
 export { compileScripts, rewriteImports, resolvePath, listImports, ScriptError } from './scripts';
 export { InputState, Key, DEFAULT_ACTIONS } from './input';
 export { Sfx, SFX_NAMES } from './sfx';

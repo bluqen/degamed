@@ -629,15 +629,19 @@ function props(): { props: Record<string, Raster>; info: Record<string, PropInfo
   return { props: out, info };
 }
 
+export const HOLLOW_CAVERNS_META = {
+  id: 'hollow-caverns',
+  name: 'Hollow Caverns',
+  description: 'Dark blue caverns under a fallen kingdom: glowing fungus, drifting spores, distant lit spires and a small horned hero with a white mask.',
+  keywords: ['cave', 'cavern', 'underground', 'dark', 'knight', 'bug', 'insect', 'mask', 'kingdom', 'fungus', 'mushroom', 'glow', 'spores', 'crystal', 'metroidvania', 'souls', 'gothic', 'mysterious', 'deep', 'night', 'ancient'],
+  palette: [C.top, C.mid, C.glowSky, C.fog, ...C.stone, ...C.blue, ...C.amber, ...C.teal, '#f4f6fb'],
+  background: C.top,
+};
+
 export function hollowCaverns(): ArtTheme {
   const { props: p, info } = props();
   return {
-    id: 'hollow-caverns',
-    name: 'Hollow Caverns',
-    description: 'Dark blue caverns under a fallen kingdom: glowing fungus, drifting spores, distant lit spires and a small horned hero with a white mask.',
-    keywords: ['cave', 'cavern', 'underground', 'dark', 'knight', 'bug', 'insect', 'mask', 'kingdom', 'fungus', 'mushroom', 'glow', 'spores', 'crystal', 'metroidvania', 'souls', 'gothic', 'mysterious', 'deep', 'night', 'ancient'],
-    palette: [C.top, C.mid, C.glowSky, C.fog, ...C.stone, ...C.blue, ...C.amber, ...C.teal, '#f4f6fb'],
-    background: C.top,
+    ...HOLLOW_CAVERNS_META,
     layers: layers(),
     tiles: caveTiles(),
     sprites: {
@@ -658,8 +662,8 @@ export function hollowCaverns(): ArtTheme {
       enemy: { color: C.amber[2]!, radius: 22, intensity: 0.25 },
     },
     environment: {
-      ambient: { color: '#c4d2ff', intensity: 0.74 },
-      fog: { color: C.fog, density: 0.35, height: 0.4 },
+      ambient: { color: '#d4dfff', intensity: 0.88 },
+      fog: { color: C.fog, density: 0.28, height: 0.4 },
       bloom: { strength: 0.7, threshold: 0.6 },
       vignette: 0.6,
       grade: { contrast: 1.1, saturation: 0.95, tint: '#e8eeff' },

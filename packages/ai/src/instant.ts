@@ -41,6 +41,15 @@ const CONCEPTS: Record<string, string[]> = {
 /** Best theme id for a mood when it exists in the catalogue (the art team's named themes). */
 const MOOD_THEME: Record<string, string> = { dark: 'hollow-caverns', rain: 'rain-ruins', sunny: 'sunlit-meadow' };
 
+/** Words that name a kit's genre outright. */
+const GENRE_NAMES: Record<string, string[]> = {
+  platformer: ['platformer', 'platforming', 'side-scroller', 'sidescroller'],
+  runner: ['runner', 'endless', 'auto-runner', 'autorunner'],
+  cave: ['metroidvania', 'spelunking', 'spelunker'],
+  topdown: ['top-down', 'topdown'],
+  shooter: ['shooter', 'shmup'],
+};
+
 /** Genre words per kit id (adds to each kit's own keywords). */
 const KIT_WORDS: Record<string, string[]> = {
   platformer: ['platformer', 'platforming', 'platform', 'platforms', 'jump', 'jumping', 'mario', 'celeste', 'side-scroller', 'sidescroller', 'scroller', 'metroidvania', 'hop', 'precision'],
@@ -91,6 +100,8 @@ export function scoreKits(kits: KitInfo[], ws: string[]): { kit: KitInfo; score:
   return kits.map((kit) => {
     let score = 0;
     for (const w of new Set(kitWords(kit))) if (joined.has(w)) score += 3;
+    // Naming the genre outright beats setting words ("a spooky cave platformer" is a platformer).
+    for (const w of GENRE_NAMES[kit.id] ?? [kit.id]) if (joined.has(w)) score += 8;
     return { kit, score };
   });
 }
@@ -98,19 +109,35 @@ export function scoreKits(kits: KitInfo[], ws: string[]): { kit: KitInfo; score:
 // ---------------------------------------------------------------------------------------------
 // Knobs: generic intents mapped onto whatever params a kit has
 
-export type Knob = 'difficulty' | 'enemies' | 'length' | 'jump' | 'gravity' | 'speed' | 'night' | 'pickups' | 'lives' | 'doubleJump';
+export type Knob =
+  | 'difficulty'
+  | 'enemies'
+  | 'length'
+  | 'jump'
+  | 'gravity'
+  | 'speed'
+  | 'night'
+  | 'pickups'
+  | 'lives'
+  | 'doubleJump'
+  | 'weather'
+  | 'decoration'
+  | 'checkpoints';
 
 const KNOB_PATTERNS: Record<Knob, RegExp> = {
   difficulty: /difficult|challenge/i,
   enemies: /enem|monster|foe|baddie/i,
-  length: /length|level ?size|screens|distance|rooms|levels/i,
+  length: /length|size|screens|distance|rooms|levels/i,
   jump: /^(?!.*double).*jump/i,
   gravity: /gravity|weight/i,
   speed: /speed|pace/i,
   night: /night|time of day|darkness/i,
-  pickups: /coin|gem|pickup|collectible|star|orb/i,
+  pickups: /coin|gem|pickup|collectible|star|orb|crystal/i,
   lives: /lives|health|hearts|hp\b/i,
   doubleJump: /double.?jump|air.?jump/i,
+  weather: /weather|in the air|particles/i,
+  decoration: /decorat|clutter|greenery|detail/i,
+  checkpoints: /checkpoint/i,
 };
 
 export function paramsFor(kit: KitInfo, knob: Knob): KitParam[] {
@@ -148,11 +175,27 @@ const valueAt = (p: KitParam, level: number): number | boolean | string => {
 
 type Params = Record<string, number | boolean | string>;
 
-/** Sets a knob to an absolute level (0..1) or moves it by a delta. Returns true if anything changed. */
-function turn(kit: KitInfo, params: Params, knob: Knob, change: { to: number } | { by: number }): boolean {
+/**
+ * How to turn a knob: to an absolute level (0..1), by a delta, or to a named choice (`pick`, e.g.
+ * time of day → 'night'), falling back to `to` for params that don't have that choice.
+ */
+type Change = { to: number } | { by: number } | { pick: string; to?: number };
+
+/** Turns a knob. Returns true if anything changed. */
+function turn(kit: KitInfo, params: Params, knob: Knob, change: Change): boolean {
   let changed = false;
   for (const p of paramsFor(kit, knob)) {
     const before = params[p.key] ?? p.default;
+    if ('pick' in change) {
+      const choice = p.type === 'choice' ? p.choices?.find((c) => c === change.pick) : undefined;
+      if (choice === undefined && change.to === undefined) continue;
+      const next = choice ?? valueAt(p, change.to!);
+      if (next !== before) {
+        params[p.key] = next;
+        changed = true;
+      }
+      continue;
+    }
     let level = 'to' in change ? change.to : currentLevel(p, before) + change.by;
     // A choice must move at least one step when nudged.
     if (p.type === 'choice' && 'by' in change && (p.choices?.length ?? 0) > 1) {
@@ -182,7 +225,7 @@ const NOUN_KNOB: [RegExp, Knob][] = [
 
 interface Rule {
   re: RegExp;
-  knobs: [Knob, { to: number } | { by: number }][];
+  knobs: [Knob, Change][];
   say?: string;
 }
 
@@ -193,13 +236,19 @@ const CREATE_RULES: Rule[] = [
   { re: /\b(easy|relaxing|relaxed|chill|casual|cozy|cosy|gentle|kids?|beginners?|wholesome)\b/, knobs: [['difficulty', { to: 0.2 }], ['enemies', { to: 0.2 }]] },
   { re: /\b(no|without)\s+(enemies|monsters|foes)\b|\bpacifist\b|\bpeaceful\b/, knobs: [['enemies', { to: 0 }]] },
   { re: /\b(lots of|loads of|many|tons of|swarms? of|hordes? of|full of|packed with)\s+(enemies|monsters|foes|baddies)\b/, knobs: [['enemies', { to: 0.9 }]] },
-  { re: /\b(short|quick|tiny|bite-sized|mini)\b/, knobs: [['length', { to: 0 }]] },
+  { re: /\b(short|quick|tiny|bite-sized|mini)\b|\bsmall\s+(?:\w+\s+)?(level|cave|map|world|game|dungeon|metroidvania|platformer)\b/, knobs: [['length', { to: 0 }]] },
+  { re: /\b(big|large)\s+(?:\w+\s+)?(level|cave|map|world|dungeon|metroidvania)\b/, knobs: [['length', { to: 0.9 }]] },
   { re: /\b(long|epic|huge|massive|sprawling|endless)\b/, knobs: [['length', { to: 0.9 }]] },
   { re: /\b(floaty|floating|low[- ]gravity|moon|feather|bouncy)\b/, knobs: [['gravity', { to: 0.15 }], ['jump', { to: 0.65 }]] },
   { re: /\b(heavy|weighty|high[- ]gravity)\b/, knobs: [['gravity', { to: 0.8 }]] },
   { re: /\b(fast|speedy|frantic|zippy|zoomy|fast-paced|speedrun)\b/, knobs: [['speed', { to: 0.8 }]] },
   { re: /\b(slow|sluggish|slow-paced)\b/, knobs: [['speed', { to: 0.2 }]] },
-  { re: /\b(night|midnight|nighttime|night-time|moonlit|starry)\b/, knobs: [['night', { to: 1 }]] },
+  { re: /\b(night|midnight|nighttime|night-time|moonlit|starry)\b/, knobs: [['night', { pick: 'night', to: 1 }]] },
+  { re: /\b(dusk|sunset|twilight|evening|golden hour)\b/, knobs: [['night', { pick: 'dusk', to: 0.7 }]] },
+  { re: /\b(no|without)\s+(coins|collectibles|pickups)\b/, knobs: [['pickups', { to: 0 }]] },
+  { re: /\b(no|without)\s+checkpoints\b/, knobs: [['checkpoints', { to: 0 }]] },
+  { re: /\b(lush|overgrown|detailed|busy|cluttered)\b/, knobs: [['decoration', { to: 0.9 }]] },
+  { re: /\b(minimal|minimalist|clean|sparse|bare)\b/, knobs: [['decoration', { to: 0.2 }]] },
   { re: /\bdouble[- ]?jumps?\b/, knobs: [['doubleJump', { to: 1 }]] },
   { re: /\b(lots of|loads of|many|tons of|full of)\s+(coins|gems|stars|treasure|loot)\b/, knobs: [['pickups', { to: 0.9 }]] },
 ];
@@ -210,8 +259,29 @@ function applyCounts(kit: KitInfo, params: Params, text: string): void {
     const n = /^\d+$/.test(m[1]!) ? Number(m[1]) : NUMBER_WORDS[m[1]!]!;
     const knob = NOUN_KNOB.find(([r]) => r.test(m[2]!))?.[1];
     if (!knob) continue;
-    for (const p of paramsFor(kit, knob)) if (p.type === 'number') params[p.key] = sanitizeParams({ [p.key]: n }, [p]).params[p.key]!;
+    for (const p of paramsFor(kit, knob)) {
+      if (p.type === 'number') params[p.key] = sanitizeParams({ [p.key]: n }, [p]).params[p.key]!;
+      else if (p.type === 'choice' && p.choices?.length) {
+        // "3 enemies" on a none/few/some/lots choice: 0 → none, 1-3 → few, 4-7 → some, 8+ → lots.
+        const named = n === 0 ? 'none' : n <= 3 ? 'few' : n <= 7 ? 'some' : 'lots';
+        params[p.key] = p.choices.includes(named) ? named : valueAt(p, Math.min(1, n / 10));
+      } else if (p.type === 'boolean') params[p.key] = n > 0;
+    }
   }
+}
+
+const WEATHER_WORDS: [RegExp, string][] = [
+  [/\b(rain|rainy|raining|storm|stormy|downpour|drizzle)\b/, 'rain'],
+  [/\b(snow|snowy|snowing|blizzard|snowfall)\b/, 'snow'],
+  [/\bfireflies\b/, 'fireflies'],
+  [/\b(embers|ash|ashes|sparks)\b/, 'embers'],
+  [/\bspores\b/, 'spores'],
+  [/\b(dust|dusty|sandstorm)\b/, 'dust'],
+];
+
+/** The weather a text asks for, if any. */
+export function weatherIn(text: string): string | undefined {
+  return WEATHER_WORDS.find(([re]) => re.test(text))?.[1];
 }
 
 /** Small deterministic hash so the same prompt always gives the same game. */
@@ -282,7 +352,10 @@ export function instantTitle(prompt: string, theme: ThemeInfo, seed: number): st
 }
 
 export function instantStory(prompt: string, theme: ThemeInfo): string {
-  const clause = /\b(?:where|about|in which|starring|following)\s+(.{6,140}?)(?:[.!?]|$)/i.exec(prompt)?.[1];
+  const clause = /\b(?:where|about|in which|starring|following)\s+(.{6,140}?)(?:[.!?]|$)/i
+    .exec(prompt)?.[1]
+    // Settings aren't story: "a bunny with 2 enemies" → "a bunny".
+    ?.split(/\s+(?:with|and|but)\s+(?:\d+|no|lots|loads|tons|many|some|few|more|less|very|super|a lot)\b|\s*,/i)[0];
   if (clause && clause.trim().split(/\s+/).length >= 3) {
     const s = clause
       .trim()
@@ -315,7 +388,11 @@ export function instantSpec(prompt: string, backend: Pick<GameBackend, 'kits' | 
   const themes = scoreThemes(backend.themes, ws).sort((a, b) => b.score - a.score);
   const top = themes[0]!.score;
   // No signal: pick a theme from the prompt's hash, so vague prompts still get variety.
-  const theme = top > 0 ? themes.filter((t) => t.score === top)[seed % themes.filter((t) => t.score === top).length]!.theme : backend.themes[seed % backend.themes.length]!;
+  const best = themes.filter((t) => t.score === top);
+  // The engine's plain 'starter' theme is only for people who ask for it.
+  const pool = backend.themes.filter((t) => t.id !== 'starter');
+  const fallback = pool.length ? pool : backend.themes;
+  const theme = top > 0 ? best[seed % best.length]!.theme : fallback[seed % fallback.length]!;
   notes.push(`theme:${theme.id}`);
 
   const params: Params = {};
@@ -328,6 +405,9 @@ export function instantSpec(prompt: string, backend: Pick<GameBackend, 'kits' | 
     }
   }
   applyCounts(kit, params, text);
+  // Weather the theme doesn't already have ("a snowy meadow"): the theme's own weather stays default.
+  const weather = weatherIn(text);
+  if (weather && !theme.keywords.some((w) => w.toLowerCase().startsWith(weather.slice(0, 4)))) turn(kit, params, 'weather', { pick: weather });
   const changed = Object.fromEntries(Object.entries(params).filter(([k, v]) => kit.params.find((p) => p.key === k)?.default !== v));
 
   const spec: GameSpec = { kit: kit.id, theme: theme.id, title: instantTitle(prompt, theme, seed), story: instantStory(prompt, theme), seed: seed % 100000 };
@@ -346,8 +426,8 @@ const EDIT_RULES: Rule[] = [
   { re: /\b(no|remove( all)?( the)?|get rid of( the)?)\s+(enemies|monsters|foes|baddies)\b/, knobs: [['enemies', { to: 0 }]], say: 'Removed the enemies' },
   { re: /\b(more|extra|add( more)?)\s+(enemies|monsters|foes|baddies|slimes)\b/, knobs: [['enemies', { by: 0.25 }]], say: 'Added more enemies' },
   { re: /\b(fewer|less)\s+(enemies|monsters|foes|baddies|slimes)\b/, knobs: [['enemies', { by: -0.25 }]], say: 'Removed some enemies' },
-  { re: /\b(more|extra|add( more)?)\s+(coins|gems|stars|pickups|treasure|loot)\b/, knobs: [['pickups', { by: 0.3 }]], say: 'Added more coins' },
-  { re: /\b(fewer|less)\s+(coins|gems|stars|pickups)\b/, knobs: [['pickups', { by: -0.3 }]], say: 'Removed some coins' },
+  { re: /\b(more|extra|add( more)?)\s+(coins|gems|stars|pickups|treasure|loot|crystals|collectibles)\b/, knobs: [['pickups', { by: 0.3 }]], say: 'Added more to collect' },
+  { re: /\b(fewer|less)\s+(coins|gems|stars|pickups|crystals)\b/, knobs: [['pickups', { by: -0.3 }]], say: 'Made fewer things to collect' },
   { re: /\b(float(y|ier)|low(er)? gravity|less gravity|moon gravity|slower fall)\b/, knobs: [['gravity', { by: -0.2 }]], say: 'Made the jumps floatier' },
   { re: /\b(heavier|more gravity|high(er)? gravity|snappier jumps?|less floaty)\b/, knobs: [['gravity', { by: 0.2 }]], say: 'Made the jumps snappier' },
   { re: /\b(higher|bigger)\s+jumps?\b|\bjump\s+higher\b/, knobs: [['jump', { by: 0.2 }]], say: 'Made the jumps higher' },
@@ -356,8 +436,19 @@ const EDIT_RULES: Rule[] = [
   { re: /\b(slower|slow (it )?down)\b/, knobs: [['speed', { by: -0.2 }]], say: 'Slowed things down' },
   { re: /\b(longer|bigger level|more levels?|extend)\b/, knobs: [['length', { by: 0.25 }]], say: 'Made the level longer' },
   { re: /\b(shorter|smaller level|fewer levels?)\b/, knobs: [['length', { by: -0.25 }]], say: 'Made the level shorter' },
-  { re: /\b(night|midnight|nighttime|dark(er)?)\b/, knobs: [['night', { to: 1 }]], say: 'Turned it to night' },
-  { re: /\b(day|daytime|daylight|morning|brighter)\b/, knobs: [['night', { to: 0 }]], say: 'Turned it to day' },
+  { re: /\b(night|midnight|nighttime|dark(er)?)\b/, knobs: [['night', { pick: 'night', to: 1 }]], say: 'Turned it to night' },
+  { re: /\b(dusk|sunset|twilight|evening)\b/, knobs: [['night', { pick: 'dusk', to: 0.7 }]], say: 'Set it at dusk' },
+  { re: /\b(day|daytime|daylight|morning|brighter|lighter)\b/, knobs: [['night', { pick: 'day', to: 0 }]], say: 'Turned it to day' },
+  { re: /\b(stop|no|without|remove)( the)? (rain|snow|weather)\b|\bclear (skies|sky|weather)\b/, knobs: [['weather', { pick: 'clear' }]], say: 'Cleared the weather' },
+  { re: /\b(rain|rainy|raining|storm|stormy)\b/, knobs: [['weather', { pick: 'rain' }]], say: 'Made it rain' },
+  { re: /\b(snow|snowy|snowing|blizzard)\b/, knobs: [['weather', { pick: 'snow' }]], say: 'Made it snow' },
+  { re: /\bfireflies\b/, knobs: [['weather', { pick: 'fireflies' }]], say: 'Added fireflies' },
+  { re: /\b(embers|sparks)\b/, knobs: [['weather', { pick: 'embers' }]], say: 'Added drifting embers' },
+  { re: /\bspores\b/, knobs: [['weather', { pick: 'spores' }]], say: 'Added floating spores' },
+  { re: /\b(more|extra)\s+(decoration|details?|plants|greenery|clutter)\b|\b(lusher|busier|more lush|more detailed)\b/, knobs: [['decoration', { by: 0.3 }]], say: 'Added more decoration' },
+  { re: /\b(less|fewer)\s+(decoration|details?|plants|greenery|clutter)\b|\b(cleaner|simpler look|more minimal)\b/, knobs: [['decoration', { by: -0.3 }]], say: 'Cleaned up the decoration' },
+  { re: /\b(no|remove( the)?)\s+checkpoints\b/, knobs: [['checkpoints', { to: 0 }]], say: 'Removed the checkpoints' },
+  { re: /\b(add|more)\s+checkpoints\b/, knobs: [['checkpoints', { to: 1 }]], say: 'Added checkpoints' },
   { re: /\bdouble[- ]?jumps?\b/, knobs: [['doubleJump', { to: 1 }]], say: 'Added a double jump' },
   { re: /\b(more|extra)\s+(lives|hearts|health)\b/, knobs: [['lives', { by: 0.25 }]], say: 'Added more lives' },
 ];
@@ -418,7 +509,7 @@ export function instantEdit(request: string, spec: GameSpec, backend: Pick<GameB
 
   // World switch: "make it snowy", "set it in a spooky cave" (night handled by a param above).
   // If the kit has no night setting, "make it night" falls through to a darker theme.
-  if (!rename && !touched.has('night')) {
+  if (!rename && !touched.has('night') && !touched.has('weather')) {
     const theme = themeSwitch(request, next, backend.themes);
     if (theme) {
       next.theme = theme.id;

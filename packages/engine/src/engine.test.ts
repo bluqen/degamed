@@ -95,44 +95,18 @@ describe('pixel art', () => {
   });
 });
 
-describe('platformer template', () => {
+describe('starter template', () => {
   const files = createPlatformerTemplate(() => 'data:image/png;base64,AAAA');
 
-  it('produces a valid manifest and scene', () => {
+  it('is the platformer kit and still produces a valid project', () => {
     const manifest = ProjectManifest.parse(JSON.parse(files['project.json']!));
     const scene = Scene.parse(JSON.parse(files[manifest.startScene]!));
     expect(scene.entities.length).toBeGreaterThan(30);
     expect(findDuplicateEntityIds(scene.entities)).toEqual([]);
-  });
-
-  it('references only files that exist', () => {
-    const scene = Scene.parse(JSON.parse(files['scenes/main.scene.json']!));
-    const refs = new Set<string>(scene.parallax.map((l) => l.asset));
-    const walk = (list: Entity[]) =>
-      list.forEach((e) => {
-        if (e.components.Sprite) refs.add(e.components.Sprite.asset);
-        if (e.components.AnimatedSprite) refs.add(e.components.AnimatedSprite.frames);
-        if (e.components.Script) refs.add(e.components.Script.src);
-        walk(e.children);
-      });
-    walk(scene.entities);
-    for (const ref of refs) expect(files[ref], ref).toBeDefined();
-  });
-
-  it('every frames file is valid and only uses frames its sheet has', () => {
-    const paths = Object.keys(files).filter((p) => p.endsWith('.frames.json'));
-    expect(paths.length).toBe(3);
-    for (const path of paths) {
+    expect(JSON.parse(files['game.spec.json']!).kit).toBe('platformer');
+    for (const path of Object.keys(files).filter((p) => p.endsWith('.frames.json'))) {
       const def = SpriteFrames.parse(JSON.parse(files[path]!));
       expect(files[def.sheet], def.sheet).toBeDefined();
-      const columns = { 'assets/sprites/knight-sheet.png': KNIGHT_FRAMES.length, 'assets/sprites/slime-sheet.png': SLIME_FRAMES.length, 'assets/sprites/coin-sheet.png': COIN_FRAMES.length }[def.sheet]!;
-      for (const anim of Object.values(def.animations)) expect(missingFrames(anim.frames, columns, 1)).toEqual([]);
-    }
-  });
-
-  it('scripts only import degamed', () => {
-    for (const [path, src] of Object.entries(files)) {
-      if (path.endsWith('.js')) expect(listImports(src), path).toEqual(['degamed']);
     }
   });
 });

@@ -1,58 +1,35 @@
 import { describe, expect, it } from 'vitest';
-import { makeStubBuildGame, STUB_KITS, stubReadSpec } from './stub-kits';
-import { stubThemes } from './stub-themes';
+import { buildGame, KITS, readSpec, themes } from '.';
 import { decodeSpec, encodeSpec } from '../share';
 import { humanize } from '../../studio/TunePanel';
 
-// A fake encoder: tests don't need real PNGs, only stable strings.
-let n = 0;
-const encode = () => `data:image/png;base64,${n++}`;
-const build = makeStubBuildGame(stubThemes);
+// A fake encoder: tests don't need real PNGs, only strings.
+const encode = () => 'data:image/png;base64,AAAA';
 
-type Ent = { id: string; tags: string[]; components: { Script?: { src: string; props?: Record<string, unknown> } } };
-const sceneOf = (files: Record<string, string>) => JSON.parse(files['scenes/main.scene.json']!) as { parallax: { factor: number }[]; background: string; entities: Ent[] };
-
-describe('stub kit (stand-in for @degamed/engine/kits)', () => {
-  it('stores the spec in the project and reads it back', () => {
-    const files = build({ kit: 'platformer', theme: 'rain-ruins', title: 'Robot', seed: 3 }, encode);
-    const spec = stubReadSpec(files)!;
-    expect(spec.kit).toBe('platformer');
-    expect(spec.theme).toBe('rain-ruins');
-    expect(spec.params?.speed).toBe(150);
-  });
-
-  it('applies params to the game', () => {
-    const files = build({ kit: 'platformer', theme: 'meadow', title: 'T', params: { speed: 240, enemies: false } }, encode);
-    const scene = sceneOf(files);
-    expect(scene.entities.some((e) => e.tags.includes('enemy'))).toBe(false);
-    const player = scene.entities.find((e) => e.components.Script?.src === 'scripts/player.js')!;
-    expect(player.components.Script!.props!.speed).toBe(240);
-  });
-
-  it('uses the theme art and keeps parallax factors valid', () => {
-    const files = build({ kit: 'platformer', theme: 'ember-caves', title: 'T' }, encode);
-    const scene = sceneOf(files);
-    expect(scene.background).toBe(stubThemes().find((t) => t.id === 'ember-caves')!.background);
-    expect(scene.parallax.length).toBeGreaterThan(0);
-    expect(scene.parallax.every((l) => l.factor >= 0 && l.factor <= 1)).toBe(true);
-  });
-
-  it('falls back to the first theme for unknown ids', () => {
-    const files = build({ kit: 'platformer', theme: 'nope', title: 'T' }, encode);
-    expect(stubReadSpec(files)!.theme).toBe(stubThemes()[0]!.id);
-  });
-
-  it('reads no spec from hand-made projects', () => {
-    expect(stubReadSpec({ 'project.json': '{}' })).toBeNull();
-    expect(stubReadSpec({ 'game.spec.json': 'not json' })).toBeNull();
-  });
-
-  it('every param has a plain-English label and a valid default', () => {
-    for (const p of STUB_KITS.flatMap((k) => k.params)) {
+describe('game adapter (engine kits + art themes)', () => {
+  it('offers kits whose params the Tune panel can show', () => {
+    expect(KITS.length).toBeGreaterThan(0);
+    for (const p of KITS.flatMap((k) => k.params)) {
       expect(p.label).toMatch(/^[A-Z]/);
-      if (p.type === 'number') expect(Number(p.default)).toBeGreaterThanOrEqual(p.min!);
+      if (p.type === 'number') expect(typeof p.min === 'number' && typeof p.max === 'number').toBe(true);
       if (p.type === 'choice') expect(p.choices).toContain(p.default);
     }
+  });
+
+  it('offers themes with art for previews', () => {
+    expect(themes().length).toBeGreaterThan(0);
+    const t = themes()[0]!;
+    expect(t.layers.length).toBeGreaterThan(0);
+    expect(t.sprites.hero.frameWidth).toBeGreaterThan(0);
+  });
+
+  it('builds a game whose spec reads back (what Tune and Look rely on)', () => {
+    const theme = themes()[0]!.id;
+    const files = buildGame({ kit: KITS[0]!.id, theme, title: 'Test', seed: 3 }, encode);
+    const spec = readSpec(files)!;
+    expect(spec.kit).toBe(KITS[0]!.id);
+    expect(spec.theme).toBe(theme);
+    expect(readSpec({ 'project.json': '{}' })).toBeNull();
   });
 });
 

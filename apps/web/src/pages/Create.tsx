@@ -56,6 +56,7 @@ export function Create() {
     abort.current = ctrl;
     setPhase({ kind: 'working', progress: [] });
     window.scrollTo({ top: 0 });
+    const t0 = Date.now();
     try {
       const result = await createGame({
         prompt: idea,
@@ -64,6 +65,13 @@ export function Create() {
         signal: ctrl.signal,
         onProgress: (p) => setPhase((ph) => (ph.kind === 'working' ? { kind: 'working', progress: [...ph.progress, p] } : ph)),
       });
+      // Instant mode can finish in a blink; let the steps land so the moment registers.
+      const rest = 1600 - (Date.now() - t0);
+      if (rest > 0) {
+        setPhase((ph) => (ph.kind === 'working' ? { kind: 'working', progress: [...ph.progress, { stage: 'done', message: 'Ready to play' }] } : ph));
+        await new Promise((r) => window.setTimeout(r, rest));
+      }
+      if (ctrl.signal.aborted) return;
       const id = newGameId();
       const ok = saveGame({ id, title: result.title, prompt: idea, kit: result.spec.kit, theme: result.spec.theme }, result.files);
       if (result.notice) toast({ tone: 'info', title: 'Made with free instant mode', body: result.notice, duration: 7000 });

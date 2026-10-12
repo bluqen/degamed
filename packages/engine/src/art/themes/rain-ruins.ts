@@ -59,7 +59,7 @@ function superstructure(): Canvas {
   for (const x0 of xs) {
     const x = x0 + r.int(-10, 20);
     const w = r.int(30, 58);
-    tower(L, r, x, H, w, r.int(200, 300), 1, { win: 2, winGap: 7, winSkip: 0.7, antenna: true, ledges: 3, ribs: 2 });
+    tower(L, r, x, H, w, r.int(200, 300), 1, { win: 2, winGap: 7, winSkip: 0.7, antenna: true, ledges: 3, ribs: 2, greeble: 2 });
     if (r.chance(0.6)) pylon(L, x + w + r.int(4, 12), H, 5, r.int(140, 220), 1);
   }
   // colossal bridges between the stacks
@@ -68,7 +68,7 @@ function superstructure(): Canvas {
   for (let x = 0; x < W; x += 64) cable(L, x, 121, x + 64, 121, 9, 1);
   const mats: Record<number, Material> = {
     1: { base: '#6b867f', dark: '#66817a', light: '#718b84', rim: '#83a097', grain: 12, dither: true, fadeTo: C.horizon, fadeFrom: 0.5, fadeAmt: 0.8 },
-    2: { base: '#647e78', fadeTo: C.horizon, fadeFrom: 0.5, fadeAmt: 0.8 },
+    2: { base: '#5d7771', fadeTo: C.horizon, fadeFrom: 0.5, fadeAmt: 0.8 },
   };
   return L.paint(mats, 7);
 }
@@ -82,7 +82,7 @@ function farRuins(): Canvas {
     const base = H - r.int(0, 10);
     if (kind < 0.45) {
       const w = r.int(12, 34);
-      tower(L, r, x, base, w, r.int(50, 120), 1, { win: 2, winGap: 4, broken: r.chance(0.5), antenna: true, litWin: 3, litChance: 0.04 });
+      tower(L, r, x, base, w, r.int(50, 120), 1, { win: 2, winGap: 4, broken: r.chance(0.5), antenna: true, litWin: 3, litChance: 0.04, greeble: 2 });
       x += w + r.int(-3, 6);
     } else if (kind < 0.6) {
       const rr = r.int(6, 12);
@@ -141,7 +141,7 @@ function midRuins(): Canvas {
     const w = r.int(34, 72);
     const h = r.int(70, 170);
     const top = H - h;
-    tower(L, r, x, H, w, h, 1, { broken: r.chance(0.7), ledges: r.int(0, 2) });
+    tower(L, r, x, H, w, h, 1, { broken: r.chance(0.7), ledges: r.int(0, 2), greeble: 5 });
     // big openings showing the dark interior, with a lip of concrete
     for (let k = 0; k < r.int(1, 3); k++) {
       const ow = r.int(6, Math.max(7, w / 2.5));
@@ -281,8 +281,8 @@ function concrete(seed: number, slab = false): Canvas {
   for (let k = 0; k < 3; k++) {
     const x = r.int(0, 15);
     const y = r.int(0, 14);
-    c.set(x, y, K[0]!);
-    if (r.chance(0.5)) c.set((x + 1) % TILE, y, K[0]!);
+    c.set(x, y, K[1]!);
+    if (r.chance(0.5)) c.set((x + 1) % TILE, y, K[1]!);
     c.set(x, (y + 1) % TILE, K[3]!);
   }
   if (slab) {
@@ -296,10 +296,10 @@ function concrete(seed: number, slab = false): Canvas {
   }
   crack(c, r, r.int(0, 15), r.int(0, 8), r.int(4, 8), K[0]!);
   // a rebar stub bleeding rust
-  if (r.chance(0.7)) {
+  if (r.chance(0.5)) {
     const x = r.int(1, 14);
     const y = r.int(1, 8);
-    c.set(x, y, C.rust[3]!);
+    c.set(x, y, C.rust[2]!);
     for (let k = 1; k < r.int(3, 6); k++) c.set(x, y + k, k < 2 ? C.rust[1]! : C.rust[0]!);
   }
   for (let k = 0; k < 3; k++) c.set(r.int(0, 15), r.int(0, 15), K[4]!);
@@ -406,7 +406,7 @@ function lizardSheet(): SpriteSheet {
   const FH = 20;
   const pal = new Palette();
   const [ol, olLit] = pal.ramp(['#06090a', '#1d2a2b']);
-  const body = pal.ramp(['#1a2426', '#2f3c3c', '#4a5856', '#6c7a74']);
+  const body = pal.ramp(['#223032', '#3a4a49', '#576866', '#7d8d85']);
   const head = pal.ramp(['#5a1438', '#a52d63', '#e2639c', '#ffb0d2']);
   const [tooth] = pal.ramp(['#f3ece2']);
   const [flash] = pal.ramp(['#ffffff']);
@@ -647,7 +647,7 @@ function props(): { props: Record<string, Raster>; info: Record<string, PropInfo
   {
     const pal = new Palette();
     const [ol, olLit] = pal.ramp(['#0b1213', '#1d2728']);
-    const K = pal.ramp(C.concrete.slice(1));
+    const K = pal.ramp(C.concrete.slice(2).concat(['#7a8c80']));
     const [rb, rl] = pal.ramp([C.rust[1]!, C.rust[3]!]);
     const [m1, m2] = pal.ramp([C.moss[2]!, C.moss[3]!]);
     const c = new Ix(28, 14, pal);
@@ -725,15 +725,19 @@ function props(): { props: Record<string, Raster>; info: Record<string, PropInfo
   return { props: out, info };
 }
 
+export const RAIN_RUINS_META = {
+  id: 'rain-ruins',
+  name: 'Rain Ruins',
+  description: 'Moody rain-soaked industrial ruins in teal fog: rusted towers, pipes, moss and a small pale creature with a red scarf.',
+  keywords: ['rain', 'ruins', 'industrial', 'moody', 'dark', 'robot', 'city', 'rust', 'pipes', 'factory', 'fog', 'abandoned', 'post-apocalyptic', 'creature', 'survival', 'storm', 'wet', 'grey', 'melancholy', 'atmospheric'],
+  palette: [C.skyTop, C.skyMid, C.horizon, C.haze, ...C.concrete, ...C.moss, ...C.rust, ...C.steel, C.glow, C.lamp, '#eceadd', '#d4603a'],
+  background: C.skyTop,
+};
+
 export function rainRuins(): ArtTheme {
   const { props: p, info } = props();
   return {
-    id: 'rain-ruins',
-    name: 'Rain Ruins',
-    description: 'Moody rain-soaked industrial ruins in teal fog: rusted towers, pipes, moss and a small pale creature with a red scarf.',
-    keywords: ['rain', 'ruins', 'industrial', 'moody', 'dark', 'robot', 'city', 'rust', 'pipes', 'factory', 'fog', 'abandoned', 'post-apocalyptic', 'creature', 'survival', 'storm', 'wet', 'grey', 'melancholy', 'atmospheric'],
-    palette: [C.skyTop, C.skyMid, C.horizon, C.haze, ...C.concrete, ...C.moss, ...C.rust, ...C.steel, C.glow, C.lamp, '#eceadd', '#d4603a'],
-    background: C.skyTop,
+    ...RAIN_RUINS_META,
     layers: layers(),
     tiles: rainTiles(),
     sprites: {
@@ -753,8 +757,8 @@ export function rainRuins(): ArtTheme {
       goal: { color: '#bff5dc', radius: 72, intensity: 0.8, flicker: 0.04 },
     },
     environment: {
-      ambient: { color: '#d6ece6', intensity: 0.86 },
-      fog: { color: C.haze, density: 0.3, height: 0.45 },
+      ambient: { color: '#e0f0ec', intensity: 0.86 },
+      fog: { color: C.haze, density: 0.22, height: 0.45 },
       bloom: { strength: 0.45, threshold: 0.72 },
       vignette: 0.5,
       grade: { contrast: 1.08, saturation: 0.85, tint: '#eaf6f2' },

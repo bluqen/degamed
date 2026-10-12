@@ -469,7 +469,12 @@ export interface SpawnOverrides {
 }
 
 /** Starts a project inside `parent`. Rejects with a ScriptError if the project can't load. */
-export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks: RuntimeHooks): Promise<GameHandle> {
+export interface StartOptions {
+  /** Visual quality: 'auto' (default) steps effects down on slow devices. */
+  quality?: 'auto' | 'high' | 'low';
+}
+
+export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks: RuntimeHooks, options: StartOptions = {}): Promise<GameHandle> {
   const { manifest, scene, frames, scriptPaths } = parseProject(files);
   const input = new InputState(manifest.input);
   input.attach(window);
@@ -800,8 +805,10 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
         const sprite = layer.tiled
           ? this.add.tileSprite(0, layer.y, W, src.height, layer.asset)
           : this.add.image(0, layer.y, layer.asset);
-        sprite.setOrigin(0, 0).setScrollFactor(0).setDepth(-100 + i);
-        parallaxObjects.push(sprite);
+        // Layers faster than the world are foreground: drawn in front of everything but the UI.
+        const front = layer.factor > 1;
+        sprite.setOrigin(0, 0).setScrollFactor(0).setDepth(front ? DEPTH.foreground + i : -100 + i);
+        if (!front) parallaxObjects.push(sprite);
         if (layer.tiled && sprite instanceof Phaser.GameObjects.TileSprite) this.parallaxSprites.push({ sprite, factor: layer.factor });
       });
 
@@ -863,6 +870,7 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
             parallax: parallaxObjects,
             surfaces: () => world.surfaces(),
             lights: () => world.lightSources(),
+            quality: options.quality,
           })
         : null;
       // Lights without an environment still glow (no darkness).
@@ -874,6 +882,7 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
           parallax: parallaxObjects,
           surfaces: () => world.surfaces(),
           lights: () => world.lightSources(),
+          quality: options.quality,
         });
       }
 

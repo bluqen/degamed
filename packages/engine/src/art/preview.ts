@@ -6,7 +6,7 @@
  *
  * It is also the reference for how the engine is expected to interpret `environment`.
  */
-import { Canvas, hash2, haze, luminance, rgb, rng, type RGB } from './core';
+import { Canvas, fbm, hash2, luminance, rgb, rng, type RGB } from './core';
 import type { Raster } from '../pixel';
 import type { ArtTheme, Light, SpriteSheet } from './types';
 
@@ -68,26 +68,46 @@ export function renderPreview(theme: ArtTheme, o: PreviewOptions = {}): Raster {
 
   // ── background ──
   const bg = new Canvas(W, H, theme.background);
-  const fg = theme.layers.filter((l) => l.factor > 1);
-  // fog (engine semantics): far layers are hazed more, then a low mist rises to `height`
-  for (const l of theme.layers) {
-    if (l.factor > 1) continue;
-    let r0 = l.raster;
-    if (env.fog && l.factor > 0) {
-      const c = Canvas.from(l.raster);
-      haze(c, env.fog.color, env.fog.density * (1 - l.factor) * 0.6);
-      r0 = c.toRaster();
+  // fog, mirroring the engine (atmosphere.ts): every layer is veiled by the fog of each layer in
+  // front of it (far layers end up haziest), graded down the screen to `height`; then a drifting
+  // mist band sits between the background and the world, and a thin one in front of everything.
+  const fogVeil = (i: number): number => {
+    if (!env.fog) return 0;
+    const n = theme.layers.length;
+    let keep = 1;
+    for (let j = i; j < n; j++) {
+      const depth = n <= 1 ? 1 : 1 - j / (n - 1);
+      keep *= 1 - Math.min(0.85, env.fog.density * (0.18 + 0.35 * depth));
     }
-    blitTiled(bg, r0, -camX * l.factor, l.y ?? 0);
-  }
+    return 1 - keep;
+  };
+  const fogged = (i: number, r0: Raster): Raster => {
+    const amount = fogVeil(i);
+    if (!env.fog || amount <= 0.01) return r0;
+    const c = Canvas.from(r0);
+    const start = 1 - (env.fog.height ?? 0.6);
+    for (let y = 0; y < c.h; y++) {
+      const t = y / H;
+      const a = t < start ? amount * (0.55 + (0.05 * t) / Math.max(0.01, start)) : amount * (0.6 + (0.4 * (t - start)) / Math.max(0.01, 1 - start));
+      for (let x = 0; x < c.w; x++) if (c.alpha(x, y)) c.set(x, y, env.fog.color, Math.min(1, a) * (c.alpha(x, y) / 255));
+    }
+    return c.toRaster();
+  };
+  const mist = (c: Canvas, top: number, bottom: number, alpha: number, seed: number) => {
+    for (let y = Math.max(0, Math.floor(top)); y < Math.min(H, bottom); y++)
+      for (let x = 0; x < W; x++) {
+        const n = fbm(x + camX * 0.6, y, { w: W, h: H, cells: 6, octaves: 3, seed, wrapX: true, aspect: 0.4 });
+        const edge = Math.min(1, (y - top) / 24);
+        const a = alpha * edge * (0.45 + n * 0.8);
+        if (a > 0.01) c.set(x, y, env.fog!.color, Math.min(1, a));
+      }
+  };
+  theme.layers.forEach((l, i) => {
+    if (l.factor <= 1) blitTiled(bg, fogged(i, l.raster), -camX * l.factor, l.y ?? 0);
+  });
   if (env.fog) {
-    const fc = env.fog.color;
-    const h = env.fog.height ?? 0.6;
-    for (let y = 0; y < H; y++) {
-      const t = Math.max(0, (y / H - (1 - h)) / h);
-      const a = env.fog.density * t * t * 0.7;
-      if (a > 0) for (let x = 0; x < W; x++) bg.set(x, y, fc, a);
-    }
+    const top = H * (1 - (env.fog.height ?? 0.6));
+    mist(bg, top - 10, H, Math.min(0.7, env.fog.density * 0.9), 17);
   }
 
   // ── world ──
@@ -208,8 +228,10 @@ export function renderPreview(theme: ArtTheme, o: PreviewOptions = {}): Raster {
     const amb = rgb(env.ambient.color);
     const k = env.ambient.intensity;
     // light colour per pixel = ambient (tinted) + point lights
-    // ambient (engine semantics): unlit pixels are multiplied by colour × intensity
-    const base: RGB = [(k * amb[0]) / 255, (k * amb[1]) / 255, (k * amb[2]) / 255];
+    // ambient (engine semantics): the colour is only the hue of the shadows (normalised so its
+    // brightest channel is 1); the intensity is how bright unlit areas are
+    const mx = Math.max(amb[0], amb[1], amb[2], 1);
+    const base: RGB = [(k * amb[0]) / mx, (k * amb[1]) / mx, (k * amb[2]) / mx];
     const d = world.data;
     for (let y = 0; y < H; y++)
       for (let x = 0; x < W; x++) {
@@ -235,20 +257,14 @@ export function renderPreview(theme: ArtTheme, o: PreviewOptions = {}): Raster {
 
   const out = bg;
   out.blit(world, 0, 0);
-  if (env.fog) {
-    // a thin veil of fog over the world's lower area too
-    const h = env.fog.height ?? 0.6;
-    for (let y = 0; y < H; y++) {
-      const t = Math.max(0, (y / H - (1 - h * 0.5)) / (h * 0.5));
-      const a = env.fog.density * Math.min(1, t) * 0.25;
-      if (a > 0) for (let x = 0; x < W; x++) if (world.alpha(x, y)) out.set(x, y, env.fog.color, a);
-    }
-  }
   // light glow over everything (soft halos around lamps)
   if (!o.raw) for (const L of lights) out.glow(L.x, L.y, L.radius * 0.6, L.color, L.intensity * 0.18);
 
   // foreground layers (in front of the world)
-  for (const l of fg) blitTiled(out, l.raster, -camX * l.factor, l.y ?? 0);
+  theme.layers.forEach((l, i) => {
+    if (l.factor > 1) blitTiled(out, fogged(i, l.raster), -camX * l.factor, l.y ?? 0);
+  });
+  if (env.fog) mist(out, H - 64, H, Math.min(0.45, env.fog.density * 0.5), 23);
 
   if (o.raw) return out.toRaster();
 
@@ -347,7 +363,7 @@ export function renderPreview(theme: ArtTheme, o: PreviewOptions = {}): Raster {
       const l = 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
       c = c.map((v) => l + (v - l) * sat) as RGB;
       c = c.map((v) => (v - 0.5) * contrast + 0.5) as RGB;
-      if (tint) c = c.map((v, k) => (v * tint[k]!) / 255) as RGB; // tint multiplies (white = unchanged)
+      if (tint) c = c.map((v, k) => (v * tint[k]!) / Math.max(tint[0], tint[1], tint[2], 1)) as RGB; // hue shift, no darkening
       if (vig) {
         const dx = x / W - 0.5;
         const dy = y / H - 0.5;

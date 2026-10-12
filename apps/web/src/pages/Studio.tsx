@@ -96,6 +96,7 @@ function Studio({ id, initial, title }: { id: string; initial: ProjectFiles; tit
           </Link>
         </Tooltip>
         <span className="h-6 w-px bg-line" aria-hidden="true" />
+        <h1 className="sr-only">{studio.title}</h1>
         <TitleField value={studio.title} onCommit={studio.setTitle} />
         <span className="hidden items-center gap-1.5 text-body-sm text-muted md:inline-flex" aria-live="polite">
           {studio.saved ? <Check size={15} className="text-ok" aria-hidden="true" /> : <CloudOff size={15} className="text-warn" aria-hidden="true" />}

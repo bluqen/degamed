@@ -1,22 +1,15 @@
 /**
  * End to end in free instant mode: prompt → spec → buildGame → the player's own pre-flight checks.
- * Uses the engine's real kits and art themes when `@degamed/engine/kits` is available, and the
- * local stub otherwise (the kit/theme expectations then only cover what the stub offers).
+ * Runs on the engine's real kits and art themes (`@degamed/engine/kits`), and on the local stub
+ * (whose kit/theme expectations only cover what the stub offers).
  */
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { backendFromKits, getBackend, setBackend, stubBackend, type GameBackend, type KitsModule } from './catalog';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { engineBackend, getBackend, setBackend, stubBackend, type GameBackend } from './catalog';
 import { checkPlayable, checkProject } from './check';
-import { createGame } from './game';
+import { createGame, editGame } from './game';
+import { suggestions } from './suggest';
+import { instantSpec } from './instant';
 import { encode } from './test-helpers';
-
-async function realKits(): Promise<KitsModule | null> {
-  const id = '@degamed/engine/kits';
-  try {
-    return (await import(/* @vite-ignore */ id)) as KitsModule;
-  } catch {
-    return null;
-  }
-}
 
 /** [prompt, kit, theme]. `null` = any. */
 const CASES: [string, string | null, string | null][] = [
@@ -38,18 +31,17 @@ const CASES: [string, string | null, string | null][] = [
 ];
 
 for (const mode of ['engine', 'stub'] as const) {
-  describe(`instant mode end to end (${mode} kits)`, async () => {
-    const mod = mode === 'engine' ? await realKits() : null;
-    const backend: GameBackend | null = mode === 'stub' ? stubBackend : mod ? backendFromKits(mod) : null;
+  describe(`instant mode end to end (${mode} kits)`, () => {
+    const backend: GameBackend = mode === 'stub' ? stubBackend : engineBackend();
     let previous: GameBackend;
     beforeAll(() => {
       previous = getBackend();
-      if (backend) setBackend(backend);
+      setBackend(backend);
     });
     afterAll(() => setBackend(previous));
 
-    it.skipIf(!backend).each(CASES)('%s', async (prompt, kit, theme) => {
-      const b = backend!;
+    it.each(CASES)('%s', async (prompt, kit, theme) => {
+      const b = backend;
       const r = await createGame({ prompt, settings: { provider: 'instant' }, encode });
       const kits = b.kits.map((k) => k.id);
       const themes = b.themes.map((t) => t.id);
@@ -65,3 +57,74 @@ for (const mode of ['engine', 'stub'] as const) {
     });
   });
 }
+
+describe('instant chat edits on the engine kits', () => {
+  let previous: GameBackend;
+  beforeAll(() => {
+    previous = getBackend();
+    setBackend(engineBackend());
+  });
+  afterAll(() => setBackend(previous));
+
+  const EDITS: [string, string, Record<string, unknown>][] = [
+    ['a rainy robot platformer', 'Make it night', { time: 'night' }],
+    ['a rainy robot platformer', 'make it harder', { difficulty: 3 }],
+    ['a sunny meadow platformer', 'make it snow', { weather: 'snow' }],
+    ['a sunny meadow platformer', 'Floatier jumps', {}],
+    ['a sunny meadow platformer', 'remove the enemies', { enemies: 'none' }],
+    ['a sunny meadow platformer', 'add a double jump', { doubleJump: true }],
+    ['an endless runner', 'make it faster', {}],
+    ['a dark cave metroidvania', 'make it brighter', { darkness: 'light' }],
+    ['a dark cave metroidvania', 'more crystals', {}],
+  ];
+
+  it.each(EDITS)('%s → "%s"', async (prompt, request, expected) => {
+    const made = await createGame({ prompt, settings: { provider: 'instant' }, encode });
+    const before = getBackend().readSpec(made.files)!;
+    const r = await editGame({ files: made.files, request, settings: { provider: 'instant' }, encode });
+    const after = getBackend().readSpec(r.files)!;
+    expect(r.changed.length).toBeGreaterThan(0);
+    expect(after.params).toMatchObject(expected);
+    expect(JSON.stringify(after.params)).not.toBe(JSON.stringify(before.params));
+    expect(checkPlayable(r.files)).toEqual([]);
+  });
+
+  it.each(['a rainy robot platformer', 'an endless runner', 'a dark cave metroidvania'])('chips for "%s" all work for free', async (prompt) => {
+    const made = await createGame({ prompt, settings: { provider: 'instant' }, encode });
+    const chips = suggestions(made.files);
+    expect(chips.length).toBeGreaterThanOrEqual(4);
+    expect(chips.length).toBeLessThanOrEqual(6);
+    for (const chip of chips) {
+      const r = await editGame({ files: made.files, request: chip, settings: { provider: 'instant' }, encode });
+      expect(r.changed, chip).not.toEqual([]);
+    }
+  });
+});
+
+it('the default backend is the engine’s kits and themes', async () => {
+  vi.resetModules();
+  const fresh = await import('./catalog');
+  expect(fresh.getBackend().kits.map((k) => k.id)).toEqual(expect.arrayContaining(['platformer', 'runner', 'cave']));
+  expect(fresh.getBackend().themes.map((t) => t.id)).toEqual(expect.arrayContaining(['rain-ruins', 'hollow-caverns', 'sunlit-meadow']));
+  setBackend(engineBackend());
+  expect(getBackend().kits.map((k) => k.id)).toEqual(expect.arrayContaining(['platformer', 'runner', 'cave']));
+  expect(getBackend().themes.map((t) => t.id)).toEqual(expect.arrayContaining(['rain-ruins', 'hollow-caverns', 'sunlit-meadow']));
+});
+
+describe('instant params on the engine kits', () => {
+  const b = engineBackend();
+  it.each([
+    ['a snowy meadow platformer at dusk', { weather: 'snow', time: 'dusk' }],
+    ['a very hard platformer with lots of enemies', { difficulty: 3, enemies: 'lots' }],
+    ['a relaxing platformer with no enemies', { difficulty: 1, enemies: 'none' }],
+    ['a short platformer at night', { length: 3, time: 'night' }],
+    ['a floaty platformer with a double jump', { doubleJump: true }],
+    ['a small cave metroidvania with 2 enemies', { size: 'small', enemies: 'few' }],
+    ['an endless runner in the rain-soaked ruins', {}],
+  ])('%s', (prompt, params) => {
+    const { spec } = instantSpec(prompt, b);
+    expect(spec.params ?? {}).toMatchObject(params);
+    if (prompt.includes('floaty')) expect(spec.params!.gravity as number).toBeLessThan(900);
+    if (prompt.includes('rain-soaked')) expect(spec.params?.weather).toBeUndefined(); // the theme already rains
+  });
+});

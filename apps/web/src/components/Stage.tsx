@@ -135,9 +135,9 @@ export const Stage = forwardRef<StageHandle, {
         <button
           type="button"
           onClick={() => frame.current?.focus()}
-          className="absolute bottom-4 left-1/2 inline-flex -translate-x-1/2 animate-rise items-center gap-2 rounded-full bg-black/60 px-3.5 py-1.5 text-body-sm font-medium text-white backdrop-blur hover:bg-black/70"
+          className="absolute bottom-4 left-1/2 hidden -translate-x-1/2 animate-rise items-center gap-2 rounded-full bg-black/60 px-3.5 py-1.5 text-body-sm font-medium whitespace-nowrap text-white backdrop-blur hover:bg-black/70 sm:inline-flex"
         >
-          <MousePointerClick size={15} aria-hidden="true" /> Click the game to play · arrows to move, space to jump
+          <MousePointerClick size={15} aria-hidden="true" /> Click the game to play
         </button>
       )}
 

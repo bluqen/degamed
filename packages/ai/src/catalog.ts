@@ -1,11 +1,11 @@
 /**
  * The game backend: kit + theme catalogues, buildGame and readSpec.
  *
- * The real implementations live in the engine (`packages/engine/src/kits`) and art
- * (`packages/engine/src/art`) packages. Until they land, a small local stub stands in: one
- * platformer kit built on the existing starter template, plus three theme ids. Everything in
- * this package goes through `getBackend()`, so switching to the real thing is one line.
+ * The default is the engine's real genre kits (`@degamed/engine/kits`) with the art team's themes.
+ * A small local stub (one platformer kit, three theme ids) remains for fast, engine-independent
+ * unit tests. Everything in this package goes through `getBackend()`.
  */
+import * as engineKits from '@degamed/engine/kits';
 import { createPlatformerTemplate, type Encoder } from '@degamed/engine/templates';
 import type { ProjectFiles } from '@degamed/shared';
 import type { Catalog, GameSpec, KitParam } from './protocol';
@@ -117,10 +117,15 @@ function stubReadSpec(files: ProjectFiles): GameSpec | null {
 
 export const stubBackend: GameBackend = { kits: STUB_KITS, themes: STUB_THEMES, buildGame: stubBuildGame, readSpec: stubReadSpec };
 
-let current: GameBackend = stubBackend;
+let current: GameBackend | undefined;
+
+/** The real thing: the engine's genre kits and the art team's themes. */
+export function engineBackend(): GameBackend {
+  return backendFromKits(engineKits);
+}
 
 export function getBackend(): GameBackend {
-  return current;
+  return (current ??= engineBackend());
 }
 
 /** Swap the backend (tests, or the web app wiring in the engine's real kits before they're the default). */
@@ -142,17 +147,24 @@ export interface KitsModule {
  * Themes the engine doesn't list fall back to the stub ids so instant mode keeps working.
  */
 export function backendFromKits(mod: KitsModule): GameBackend {
-  const themes = mod.listThemes?.().map((t) => ({ id: t.id, name: t.name, description: t.description, keywords: t.keywords ?? [] }));
+  let themes: ThemeInfo[] | undefined;
   return {
     kits: mod.KITS,
-    themes: themes?.length ? themes : STUB_THEMES,
+    // Listing themes builds their art, so do it on first use, not on import.
+    get themes() {
+      if (!themes) {
+        const listed = mod.listThemes?.().map((t) => ({ id: t.id, name: t.name, description: t.description, keywords: t.keywords ?? [] }));
+        themes = listed?.length ? listed : STUB_THEMES;
+      }
+      return themes;
+    },
     buildGame: (spec, encode) => mod.buildGame(spec, encode),
     readSpec: (files) => mod.readSpec(files),
   };
 }
 
 /** The slice of the catalogue sent to the model: no keywords, short descriptions. */
-export function catalogFor(backend: GameBackend = current): Catalog {
+export function catalogFor(backend: GameBackend = getBackend()): Catalog {
   return {
     kits: backend.kits.slice(0, 16).map((k) => ({ id: k.id, name: k.name, description: k.description.slice(0, 240), params: k.params.slice(0, 24) })),
     themes: backend.themes.slice(0, 32).map((t) => ({ id: t.id, name: t.name, description: t.description.slice(0, 240) })),

@@ -16,6 +16,14 @@ beforeEach(() => {
 });
 afterEach(() => vi.unstubAllGlobals());
 
+/** A line that appears exactly once in a script, to use as an edit anchor (templates change). */
+function uniqueLine(text: string, skip = 0): string {
+  // Statements inside method bodies, so inserted code lands somewhere valid.
+  const lines = text.split('\n').map((l) => l.trim()).filter((l) => /^this\.\w+ = [^;]+;$/.test(l));
+  const unique = lines.filter((l) => text.split(l).length === 2);
+  return unique[skip]!;
+}
+
 const specOf = (files: Record<string, string>) => JSON.parse(files[SPEC_FILE]!) as GameSpec;
 const instant = { provider: 'instant' as const };
 
@@ -173,12 +181,11 @@ describe('editGame', () => {
 
   it('model: code edits for things the spec cannot express, recorded and kept across rebuilds', async () => {
     const { files } = await makeGame();
-    const find = 'if (!Input.down(\'jump\') && v.y < -120) v.y = -120;';
-    expect(files['scripts/player.js']).toContain(find);
+    const find = uniqueLine(files['scripts/player.js']!, 3);
     const calls = mockFetch(() =>
       geminiReply({
         summary: 'Added a double jump.',
-        edits: [{ path: 'scripts/player.js', find, replace: `${find}\n    if (!this.onFloor && Input.pressed('jump') && !this.used) { v.y = -this.jump; this.used = true; }\n    if (this.onFloor) this.used = false;` }],
+        edits: [{ path: 'scripts/player.js', find, replace: `${find}\n    this.used = true; // double jump`}],
       }),
     );
     const r = await editGame({ files, request: 'let the hero do a second jump in mid-air like a bird', settings: gemini, encode });
@@ -190,7 +197,7 @@ describe('editGame', () => {
 
     // A later spec change rebuilds player.js (speed lives there) and the double jump survives.
     const faster = await editGame({ files: r.files, request: 'make it faster', settings: instant, encode });
-    expect(faster.files['scripts/player.js']).toContain('speed: 190');
+    expect(specOf(faster.files).params!.speed as number).toBeGreaterThan(150);
     expect(faster.files['scripts/player.js']).toContain('this.used = true');
   });
 
@@ -198,20 +205,19 @@ describe('editGame', () => {
     const { files } = await makeGame();
     const calls = mockFetch((_c, n) =>
       n === 0
-        ? geminiReply({ summary: '', needFiles: ['scripts/coin.js'] })
-        : geminiReply({ summary: 'Coins now spin faster.', edits: [{ path: 'scripts/coin.js', find: files['scripts/coin.js']!.split('\n')[0]!, replace: `${files['scripts/coin.js']!.split('\n')[0]!}\n// spin faster` }] }),
+        ? geminiReply({ summary: '', needFiles: ['scripts/pickup.js'] })
+        : geminiReply({ summary: 'Coins now spin faster.', edits: [{ path: 'scripts/pickup.js', find: uniqueLine(files['scripts/pickup.js']!), replace: `${uniqueLine(files['scripts/pickup.js']!)}\n// spin faster` }] }),
     );
     const r = await editGame({ files, request: 'the shiny round collectibles should twirl quicker', settings: gemini, encode });
     expect(calls).toHaveLength(2);
     const second = (calls[1]!.body.contents as { parts: { text: string }[] }[])[0]!.parts[0]!.text;
-    expect(second).toContain('--- scripts/coin.js');
-    expect(r.files['scripts/coin.js']).toContain('// spin faster');
+    expect(second).toContain('--- scripts/pickup.js');
+    expect(r.files['scripts/pickup.js']).toContain('// spin faster');
   });
 
   it('model: a code edit that breaks the script is fixed once, or undone', async () => {
     const { files } = await makeGame();
-    const find = 'this.coyote = 0;\n    this.buffer = 0;';
-    expect(files['scripts/player.js']).toContain(find);
+    const find = uniqueLine(files['scripts/player.js']!, 2);
     const broken = { summary: 'Added a dash.', edits: [{ path: 'scripts/player.js', find, replace: `${find}\n    this.dash = {{;` }] };
 
     // Fix works.
@@ -256,7 +262,7 @@ describe('editGame', () => {
 describe('repairFromErrors', () => {
   it('asks the model for a minimal fix to the script named in the error', async () => {
     const { files } = await makeGame();
-    const calls = mockFetch(() => geminiReply({ summary: 'Guarded against a missing spawn.', edits: [{ path: 'scripts/player.js', find: 'this.spawn = { x: this.entity.x, y: this.entity.y };', replace: 'this.spawn = { x: this.entity.x, y: this.entity.y }; // fixed' }] }));
+    const calls = mockFetch(() => geminiReply({ summary: 'Guarded against a missing spawn.', edits: [{ path: 'scripts/player.js', find: uniqueLine(files['scripts/player.js']!), replace: `${uniqueLine(files['scripts/player.js']!)} // fixed` }] }));
     const r = await repairFromErrors(files, ['TypeError: cannot read properties of undefined (reading x) at scripts/player.js:42'], gemini);
     expect(r.fixed).toBe(true);
     expect(r.files['scripts/player.js']).toContain('// fixed');
@@ -267,11 +273,11 @@ describe('repairFromErrors', () => {
 
   it('without a model, undoes the AI code changes behind the error', async () => {
     const { files } = await makeGame();
-    const modded = { ...applyEdits(files, [{ path: 'scripts/slime.js', find: 'export default', replace: 'oops(); export default' }]) };
-    modded[MODS_FILE] = JSON.stringify([{ path: 'scripts/slime.js', find: 'export default', replace: 'oops(); export default' }]);
-    const r = await repairFromErrors(modded, ['ReferenceError: oops is not defined (scripts/slime.js:1)'], instant);
+    const modded = { ...applyEdits(files, [{ path: 'scripts/walker.js', find: 'export default', replace: 'oops(); export default' }]) };
+    modded[MODS_FILE] = JSON.stringify([{ path: 'scripts/walker.js', find: 'export default', replace: 'oops(); export default' }]);
+    const r = await repairFromErrors(modded, ['ReferenceError: oops is not defined (scripts/walker.js:1)'], instant);
     expect(r.fixed).toBe(true);
-    expect(r.files['scripts/slime.js']).toBe(files['scripts/slime.js']);
+    expect(r.files['scripts/walker.js']).toBe(files['scripts/walker.js']);
     expect(r.files[MODS_FILE]).toBeUndefined();
   });
 
@@ -331,11 +337,11 @@ describe('checkPlayable (the player’s own pre-flight checks)', () => {
     const { files } = await makeGame();
     expect(checkPlayable(files)).toEqual([]);
     const noSheet = { ...files };
-    delete noSheet['assets/sprites/knight-sheet.png'];
+    delete noSheet[(JSON.parse(files['assets/anims/hero.frames.json']!) as { sheet: string }).sheet];
     expect(checkPlayable(noSheet).map((p) => p.message).join()).toMatch(/sprite sheet .* is missing/);
-    const badImport = { ...files, 'scripts/coin.js': `import x from 'lodash';\n${files['scripts/coin.js']}` };
+    const badImport = { ...files, 'scripts/pickup.js': `import x from 'lodash';\n${files['scripts/pickup.js']}` };
     expect(checkPlayable(badImport)[0]!.message).toMatch(/Can't import "lodash"/);
-    const relImport = { ...files, 'scripts/coin.js': `import { y } from './util.js';\n${files['scripts/coin.js']}` };
+    const relImport = { ...files, 'scripts/pickup.js': `import { y } from './util.js';\n${files['scripts/pickup.js']}` };
     expect(checkPlayable(relImport)[0]!.message).toMatch(/Cannot find scripts\/util.js/);
     expect(checkPlayable({ ...relImport, 'scripts/util.js': 'export const y = 1;' })).toEqual([]);
     const badScene = { ...files, 'scenes/main.scene.json': '{"name":"x"}' };

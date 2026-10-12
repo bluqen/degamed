@@ -11,6 +11,9 @@ type Outgoing = PlayToHost extends infer M ? (M extends unknown ? Omit<M, 'chann
 const container = document.getElementById('game')!;
 const status = document.getElementById('status')!;
 let game: GameHandle | null = null;
+// ?quality=high|low pins the visual quality (screenshots, testing); otherwise it adapts to the device.
+const q = new URLSearchParams(location.search).get('quality');
+const quality = q === 'high' || q === 'low' ? q : 'auto';
 let loadToken = 0;
 
 function send(message: Outgoing) {
@@ -37,7 +40,7 @@ async function load(files: Record<string, string>) {
   container.replaceChildren();
   showStatus('Loading…');
   try {
-    const next = await startGame(container, files, hooks);
+    const next = await startGame(container, files, hooks, { quality });
     if (token !== loadToken) return next.destroy();
     game = next;
     showStatus(null);

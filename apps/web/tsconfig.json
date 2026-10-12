@@ -13,6 +13,9 @@
     "paths": {
       "@degamed/engine/art": [
         "../../packages/engine/src/art/index.ts"
+      ],
+      "@degamed/engine/kits": [
+        "../../packages/engine/src/kits/index.ts"
       ]
     }
   },

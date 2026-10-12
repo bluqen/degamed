@@ -34,6 +34,7 @@ export default class Player extends Behaviour {
     this.dustT = 0;
     this.startTime = Game.time;
     this.totalCoins = Game.findAll('coin').length;
+    this.coins = 0;
     this.publish();
   }
 
@@ -41,7 +42,7 @@ export default class Player extends Behaviour {
     Game.state.lives = this.left;
     Game.state.hp = this.hp;
     Game.state.maxHp = this.health;
-    Game.state.coins = Game.score;
+    Game.state.coins = this.coins;
     Game.state.totalCoins = this.totalCoins;
   }
 
@@ -180,6 +181,7 @@ export default class Player extends Behaviour {
       kit.floatText(other.x, other.y - 10, '+1', this.accent);
       other.destroy();
       Game.score += 1;
+      this.coins += 1;
       Game.sound('coin');
       this.publish();
     } else if (other.hasTag('heart')) {
@@ -211,10 +213,10 @@ export default class Player extends Behaviour {
       this.ladderX = other.x;
     } else if (other.hasTag('goal')) {
       const need = Number(other.behaviours[0]?.need ?? 0);
-      if (Game.score >= need) this.win(other);
+      if (this.coins >= need) this.win(other);
       else if (!this.nagT || Game.time - this.nagT > 2) {
         this.nagT = Game.time;
-        kit.floatText(other.x, other.y - 30, 'FIND ' + (need - Game.score) + ' MORE', '#FFFFFF');
+        kit.floatText(other.x, other.y - 30, 'FIND ' + (need - this.coins) + ' MORE', '#FFFFFF');
       }
     }
   }
@@ -251,7 +253,7 @@ export default class Player extends Behaviour {
     this.publish();
     kit.after(700, () => {
       if (this.left <= 0) {
-        kit.banner('GAME OVER', 'COINS ' + Game.score, { color: '#FF6A6A', hint: 'PRESS JUMP TO TRY AGAIN' });
+        kit.banner('GAME OVER', 'SCORE ' + Game.score, { color: '#FF6A6A', hint: 'PRESS JUMP TO TRY AGAIN' });
         kit.after(600, () => (this.waiting = true));
       } else kit.transition(() => this.respawn(), { ms: 260 });
     });
@@ -282,7 +284,7 @@ export default class Player extends Behaviour {
     if (goal.hasAnimation && goal.hasAnimation('open')) goal.play('open');
     const t = Math.max(0, Game.time - this.startTime);
     const time = Math.floor(t / 60) + ':' + String(Math.floor(t % 60)).padStart(2, '0');
-    const coins = this.totalCoins ? 'COINS ' + Game.score + '/' + this.totalCoins + '   ' : '';
+    const coins = this.totalCoins ? '◆ ' + this.coins + '/' + this.totalCoins + '   ' : '';
     kit.after(350, () => kit.banner(this.goalText, coins + 'TIME ' + time, { color: this.accent, hint: 'PRESS JUMP TO PLAY AGAIN' }));
     kit.after(1300, () => (this.waiting = true));
   }
@@ -449,7 +451,7 @@ export default class Goal extends Behaviour {
 
   onUpdate(dt) {
     this.pulse += dt;
-    if (!this.open && Game.score >= this.need) {
+    if (!this.open && (Game.state.coins || 0) >= this.need) {
       this.open = true;
       kit.sparkle(this.entity.x, this.entity.y - 16, this.color);
       kit.floatText(this.entity.x, this.entity.y - 34, 'THE WAY IS OPEN', this.color);
@@ -475,7 +477,7 @@ export default class Hud extends Behaviour {
     const show = String(this.show).split(',');
     if (show.includes('health') && s.maxHp > 1) parts.push('♥'.repeat(Math.max(0, s.hp ?? 0)) + '-'.repeat(Math.max(0, (s.maxHp ?? 0) - (s.hp ?? 0))));
     if (show.includes('lives')) parts.push('♥ ' + (s.lives ?? 0));
-    if (show.includes('coins')) parts.push('◆ ' + String(Game.score).padStart(2, '0') + (s.totalCoins ? '/' + s.totalCoins : ''));
+    if (show.includes('coins')) parts.push('◆ ' + String(s.coins ?? Game.score).padStart(2, '0') + (s.totalCoins ? '/' + s.totalCoins : ''));
     if (show.includes('distance')) parts.push(String(s.distance ?? 0) + ' M' + (s.best ? '   BEST ' + s.best + ' M' : ''));
     this.entity.text = parts.join('    ');
   }

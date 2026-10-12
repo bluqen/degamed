@@ -209,6 +209,17 @@ function textPaths(files: ProjectFiles): string[] {
     .slice(0, LIMITS.paths);
 }
 
+/** The spec without params that are at their defaults (the catalogue already lists defaults). */
+function compactSpec(spec: GameSpec, backend: GameBackend): GameSpec {
+  const kit = backend.kits.find((k) => k.id === spec.kit);
+  if (!kit || !spec.params) return spec;
+  const params = Object.fromEntries(Object.entries(spec.params).filter(([k, v]) => kit.params.find((p) => p.key === k)?.default !== v));
+  const out: GameSpec = { ...spec };
+  if (Object.keys(params).length) out.params = params;
+  else delete out.params;
+  return out;
+}
+
 function trimHistory(history: ChatTurn[] | undefined): ChatTurn[] {
   return (history ?? []).slice(-LIMITS.historyTurns).map((t) => ({ role: t.role, text: t.text.slice(0, LIMITS.historyChars) }));
 }
@@ -294,7 +305,7 @@ export async function editGame(i: {
   const paths = textPaths(i.files);
   // Spec-shaped requests don't need code in the prompt: keep them cheap.
   const context = free?.understood ? {} : pickContext(request, i.files);
-  const base: Omit<TaskRequest & { task: 'edit' }, 'files'> = { task: 'edit', request, spec, history: trimHistory(i.history), paths, catalog };
+  const base: Omit<TaskRequest & { task: 'edit' }, 'files'> = { task: 'edit', request, spec: spec && compactSpec(spec, backend), history: trimHistory(i.history), paths, catalog };
   let usage = NO_USAGE;
   let out: EditOutput;
   say('designing', 'Working out the change…');

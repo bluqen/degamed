@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
-import { ArrowLeft, Gamepad2, Maximize2, Shuffle } from 'lucide-react';
+import { ArrowLeft, Gamepad2, Shuffle } from 'lucide-react';
 import type { ProjectFiles } from '@degamed/shared';
 import { LogoMark } from '../components/Logo';
 import { Stage } from '../components/Stage';
@@ -76,8 +76,9 @@ export function PlayPage() {
         ) : game ? (
           <div className="w-full max-w-[min(100%,calc((100dvh-56px-64px)*16/9))]">
             <Stage files={game.files} title={game.title} poster={poster} className="max-sm:rounded-none" />
-            <p className="mt-3 flex items-center justify-center gap-2 text-body-sm text-muted">
-              <Maximize2 size={14} aria-hidden="true" /> Arrow keys to move, Space to jump. On a phone, use the on-screen buttons.
+            <p className="mt-3 px-4 text-center text-body-sm text-muted">
+              <span className="max-sm:hidden">Arrow keys to move, Space to jump.</span>
+              <span className="sm:hidden">Use the on-screen buttons. Turn your phone sideways for a bigger view.</span>
             </p>
           </div>
         ) : (

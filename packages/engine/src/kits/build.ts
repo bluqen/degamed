@@ -238,7 +238,11 @@ export function decorate(b: KitBuilder, level: Level, opts: DecorateOptions = {}
   const used = new Set<string>();
   const theme = b.theme;
   const props: PropChoice[] = Object.entries(theme.props).map(([name, raster]) => ({ name, raster, info: propInfoFor(theme, name) }));
-  const ground = props.filter((p) => p.info.anchor === 'ground' && !p.info.light);
+  // Glowing ground things (mushrooms, crystals) are scattered too, just more rarely.
+  const ground = props
+    .filter((p) => p.info.anchor === 'ground' && (!p.info.light || p.raster.height <= 2 * T))
+    .map((p) => (p.info.light ? { ...p, info: { ...p.info, weight: (p.info.weight ?? 1) * 0.4 } } : p));
+  const wall = props.filter((p) => p.info.anchor === 'wall');
   const ceiling = props.filter((p) => p.info.anchor === 'ceiling' && !p.info.light);
   const lamps = props.filter((p) => p.info.light);
   const fog = theme.environment.fog?.color;
@@ -248,20 +252,18 @@ export function decorate(b: KitBuilder, level: Level, opts: DecorateOptions = {}
     if (!asset) return;
     const w = p.raster.width;
     const h = p.raster.height;
-    const entity: Json = {
+    const flip = typeof extra.flipX === 'boolean' ? extra.flipX : p.info.light ? false : b.rand() < 0.5;
+    const l = p.info.light;
+    into.push({
       id: b.id(`prop-${p.name}`),
       name: p.name,
       tags: ['decor'],
       components: {
         Transform: { position: { x: Math.round(cx), y: Math.round(top + h / 2) } },
-        Sprite: { asset, depth, flipX: b.rand() < 0.5, ...extra },
-        ...(p.info.light
-          ? { Light: lightOf(p.info.light, p.info.light, { x: p.info.light.x - Math.round(w / 2), y: p.info.light.y - Math.round(h / 2) }) }
-          : {}),
+        Sprite: { asset, depth, ...extra, flipX: flip },
+        ...(l ? { Light: lightOf(l, l, { x: (flip ? w - l.x : l.x) - Math.round(w / 2), y: l.y - Math.round(h / 2) }) } : {}),
       },
-    };
-    if (p.info.light) (entity.components as Json).Sprite = { asset, depth, flipX: false, ...extra };
-    into.push(entity);
+    });
   };
 
   const fits = (x: number, y: number, cellsWide: number) => {
@@ -332,9 +334,32 @@ export function decorate(b: KitBuilder, level: Level, opts: DecorateOptions = {}
       }
   }
 
-  // A few big dark silhouettes in the very front, passing faster than the world (depth).
-  const tall = [...ground].sort((a, b2) => b2.raster.height - a.raster.height).slice(0, 3);
-  if (tall.length && density > 0) {
+  // Wall things (torches, signs, banners): on the side of rock faces, or on background walls.
+  if (wall.length) {
+    for (let y = 1; y < level.height - 1; y++)
+      for (let x = 0; x < level.width; x++) {
+        const c = level.get(x, y);
+        if (c !== '.' && c !== '+') continue;
+        if (used.has(`${x},${y}`) || avoid.has(`${x},${y}`) || level.standable(x, y)) continue;
+        const side = level.solid(x - 1, y) ? -1 : level.solid(x + 1, y) ? 1 : 0;
+        const onBack = c === '+' && level.get(x, y - 1) === '+' && level.get(x, y + 1) === '+';
+        if (!side && !onBack) continue;
+        // Keep them at about head height: 2–3 tiles above a floor.
+        if (!(level.standable(x, y + 2) || level.standable(x, y + 3))) continue;
+        if (b.rand() > (side ? 0.12 : 0.03) * density) continue;
+        const p = weighted(wall, b.rand);
+        if (!p) continue;
+        used.add(`${x},${y}`);
+        const cx = x0 + x * T + T / 2 + (side ? side * (T / 2 - p.raster.width / 2) : 0);
+        add(p, cx, y0 + y * T + T / 2 - p.raster.height / 2, -2, side ? { flipX: side > 0 } : {});
+      }
+  }
+
+  // A few big dark silhouettes in the very front, passing faster than the world (depth) —
+  // unless the theme paints its own foreground layer.
+  const hasForeground = theme.layers.some((l) => l.factor > 1);
+  const tall = [...ground].filter((p) => !p.info.light).sort((a, b2) => b2.raster.height - a.raster.height).slice(0, 3);
+  if (tall.length && density > 0 && !hasForeground) {
     const tint = fog ? darken(fog, 0.22) : b.shade(0);
     const step = 340;
     for (let wx = 160 + b.rand() * 200; wx < level.width * T; wx += step + b.rand() * 260) {

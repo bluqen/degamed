@@ -254,3 +254,15 @@ describe('providers', () => {
     expect(fetchImpl).toHaveBeenCalledWith('https://api.test/art/generate', expect.objectContaining({ method: 'POST' }));
   });
 });
+
+describe('theme-matched styles', () => {
+  it('link each procedural theme to a pixel style tuned to it', () => {
+    const linked = ART_STYLES.map((s) => getStyle(s.id)).filter((s) => s.theme);
+    expect(linked.map((s) => s.theme)).toEqual(expect.arrayContaining(['rain-ruins', 'hollow-caverns', 'sunlit-meadow', 'ember-forge']));
+    for (const s of linked) {
+      expect(s.family).toBe('pixel');
+      expect(s.pixel?.outline).toBe(true);
+      expect(buildPrompt).toBeTypeOf('function');
+    }
+  });
+});
