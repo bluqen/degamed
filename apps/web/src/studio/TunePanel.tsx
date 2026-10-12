@@ -69,7 +69,9 @@ export function TunePanel({
                 key={p.key}
                 param={p}
                 value={values[p.key] ?? p.default}
-                onChange={(v) => studio.setParam(p.key, v, `Change ${plainLabel(p.label).toLowerCase()}`)}
+                onChange={(v) =>
+                  studio.setParam(p.key, v, `Change ${plainLabel(p.label).toLowerCase()}`)
+                }
               />
             ))}
           </div>

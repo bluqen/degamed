@@ -44,7 +44,15 @@ function saveChat(gameId: string, messages: Message[]) {
 }
 
 /** Change the game by talking to it. */
-export function ChatPanel({ studio, intro, fresh = false }: { studio: Studio; intro: string; fresh?: boolean }) {
+export function ChatPanel({
+  studio,
+  intro,
+  fresh = false,
+}: {
+  studio: Studio;
+  intro: string;
+  fresh?: boolean;
+}) {
   const [messages, setMessages] = useState<Message[]>(() => {
     const saved = loadChat(studio.id);
     const greeting: Message = { id: ++nextId, role: 'assistant', text: intro, status: 'done' };

@@ -35,7 +35,13 @@ describe('game adapter (engine kits + art themes)', () => {
 });
 
 describe('share links', () => {
-  const spec = { kit: 'platformer', theme: 'rain-ruins', title: 'Robôt’s Quest', seed: 42, params: { speed: 200, enemies: false, difficulty: 'tricky' } };
+  const spec = {
+    kit: 'platformer',
+    theme: 'rain-ruins',
+    title: 'Robôt’s Quest',
+    seed: 42,
+    params: { speed: 200, enemies: false, difficulty: 'tricky' },
+  };
 
   it('round-trips a spec, including non-ASCII titles', async () => {
     const code = await encodeSpec(spec);
@@ -50,7 +56,9 @@ describe('share links', () => {
   });
 
   it('still opens links made in the older format', async () => {
-    const legacy = btoa(JSON.stringify({ k: 'platformer', t: 'rain-ruins', n: 'Old', s: 1 })).replace(/=+$/, '');
+    const legacy = btoa(
+      JSON.stringify({ k: 'platformer', t: 'rain-ruins', n: 'Old', s: 1 }),
+    ).replace(/=+$/, '');
     expect(await decodeSpec(legacy)).toMatchObject({ kit: 'platformer', title: 'Old' });
   });
 

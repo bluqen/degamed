@@ -11,7 +11,13 @@ const navClass = ({ isActive }: { isActive: boolean }) =>
 
 /** Marketing-site header: logo, a couple of links, appearance and one primary action. */
 /** `quiet`: the page has its own primary action (the landing's prompt), so the header button steps back. */
-export function SiteHeader({ overlay = false, quiet = false }: { overlay?: boolean; quiet?: boolean }) {
+export function SiteHeader({
+  overlay = false,
+  quiet = false,
+}: {
+  overlay?: boolean;
+  quiet?: boolean;
+}) {
   const { session } = useAuth();
   return (
     <header

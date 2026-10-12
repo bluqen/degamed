@@ -27,7 +27,10 @@ export function ShareDialog({
       live = false;
     };
   }, [open, spec, title]);
-  const canNativeShare = typeof navigator !== 'undefined' && 'share' in navigator && window.matchMedia('(pointer: coarse)').matches;
+  const canNativeShare =
+    typeof navigator !== 'undefined' &&
+    'share' in navigator &&
+    window.matchMedia('(pointer: coarse)').matches;
   const nativeShare = async () => {
     if (!url) return;
     try {
@@ -71,7 +74,11 @@ export function ShareDialog({
               <ExternalLink size={16} aria-hidden="true" /> Open
             </a>
             {canNativeShare && (
-              <Button variant="secondary" icon={<Share2 size={16} />} onClick={() => void nativeShare()}>
+              <Button
+                variant="secondary"
+                icon={<Share2 size={16} />}
+                onClick={() => void nativeShare()}
+              >
                 Share…
               </Button>
             )}

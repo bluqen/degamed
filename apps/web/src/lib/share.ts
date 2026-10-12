@@ -20,7 +20,10 @@ const unb64url = (s: string) => {
   return Uint8Array.from(bin, (c) => c.charCodeAt(0));
 };
 
-async function pipe(bytes: Uint8Array, stream: CompressionStream | DecompressionStream): Promise<Uint8Array> {
+async function pipe(
+  bytes: Uint8Array,
+  stream: CompressionStream | DecompressionStream,
+): Promise<Uint8Array> {
   const out = new Response(new Blob([bytes as BlobPart]).stream().pipeThrough(stream));
   return new Uint8Array(await out.arrayBuffer());
 }
@@ -45,11 +48,18 @@ export async function decodeSpec(code: string): Promise<GameSpec | null> {
   try {
     const version = code[0];
     let bytes: Uint8Array;
-    if (version === '1') bytes = await pipe(unb64url(code.slice(1)), new DecompressionStream('deflate-raw'));
+    if (version === '1')
+      bytes = await pipe(unb64url(code.slice(1)), new DecompressionStream('deflate-raw'));
     else if (version === '0') bytes = unb64url(code.slice(1));
     else return decodeLegacy(code);
     const t = JSON.parse(new TextDecoder().decode(bytes)) as unknown[];
-    if (!Array.isArray(t) || typeof t[0] !== 'string' || typeof t[1] !== 'string' || typeof t[2] !== 'string') return null;
+    if (
+      !Array.isArray(t) ||
+      typeof t[0] !== 'string' ||
+      typeof t[1] !== 'string' ||
+      typeof t[2] !== 'string'
+    )
+      return null;
     return {
       kit: t[0],
       theme: t[1],
@@ -64,20 +74,38 @@ export async function decodeSpec(code: string): Promise<GameSpec | null> {
 
 function cleanParams(p: unknown): Params | undefined {
   if (!p || typeof p !== 'object') return undefined;
-  return Object.fromEntries(Object.entries(p).filter(([, v]) => ['number', 'string', 'boolean'].includes(typeof v))) as Params;
+  return Object.fromEntries(
+    Object.entries(p).filter(([, v]) => ['number', 'string', 'boolean'].includes(typeof v)),
+  ) as Params;
 }
 
 /** Links made earlier this round: base64url of a JSON object. */
 function decodeLegacy(code: string): GameSpec | null {
   try {
-    const o = JSON.parse(new TextDecoder().decode(unb64url(code))) as { k?: unknown; t?: unknown; n?: unknown; s?: unknown; p?: unknown };
+    const o = JSON.parse(new TextDecoder().decode(unb64url(code))) as {
+      k?: unknown;
+      t?: unknown;
+      n?: unknown;
+      s?: unknown;
+      p?: unknown;
+    };
     if (typeof o.k !== 'string' || typeof o.t !== 'string' || typeof o.n !== 'string') return null;
-    return { kit: o.k, theme: o.t, title: o.n.slice(0, 80), seed: typeof o.s === 'number' ? o.s : undefined, params: cleanParams(o.p) };
+    return {
+      kit: o.k,
+      theme: o.t,
+      title: o.n.slice(0, 80),
+      seed: typeof o.s === 'number' ? o.s : undefined,
+      params: cleanParams(o.p),
+    };
   } catch {
     return null;
   }
 }
 
-export async function shareUrl(spec: GameSpec, defaults: Params = {}, origin = window.location.origin): Promise<string> {
+export async function shareUrl(
+  spec: GameSpec,
+  defaults: Params = {},
+  origin = window.location.origin,
+): Promise<string> {
   return `${origin}/p/${await encodeSpec(spec, defaults)}`;
 }

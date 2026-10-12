@@ -11,9 +11,7 @@ const engineSrc = (sub: string) =>
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
-    alias: [
-      { find: /^@degamed\/engine\/art$/, replacement: engineSrc('art') },
-    ],
+    alias: [{ find: /^@degamed\/engine\/art$/, replacement: engineSrc('art') }],
   },
   server: { port: 5173 },
 });

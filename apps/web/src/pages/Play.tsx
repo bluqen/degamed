@@ -128,10 +128,17 @@ export function PlayPage() {
             </p>
             {/* On phones: one clear way to a big, landscape game. */}
             <div className="flex flex-col items-center gap-3 px-4 pt-6 sm:hidden">
-              <Button size="lg" block icon={<Maximize2 size={18} />} onClick={() => stage.current?.fullscreen()}>
+              <Button
+                size="lg"
+                block
+                icon={<Maximize2 size={18} />}
+                onClick={() => stage.current?.fullscreen()}
+              >
                 Play full screen
               </Button>
-              <p className="text-center text-body-sm text-muted">Turn your phone sideways. Use the on-screen buttons to move and jump.</p>
+              <p className="text-center text-body-sm text-muted">
+                Turn your phone sideways. Use the on-screen buttons to move and jump.
+              </p>
             </div>
           </div>
         ) : (

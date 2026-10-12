@@ -17,7 +17,11 @@ const guard = (el: React.ReactNode) => <RequireAuth>{el}</RequireAuth>;
  * Everything but the landing, pricing and login pages loads on demand, so the first visit
  * stays light and a broken module in one area can't blank the whole site.
  */
-function page<T extends Record<string, unknown>>(load: () => Promise<T>, name: keyof T, fallback: ReactNode = <PageLoading />) {
+function page<T extends Record<string, unknown>>(
+  load: () => Promise<T>,
+  name: keyof T,
+  fallback: ReactNode = <PageLoading />,
+) {
   const Lazy = lazy(() => load().then((m) => ({ default: m[name] as ComponentType })));
   return function Page() {
     return (
@@ -30,7 +34,10 @@ function page<T extends Record<string, unknown>>(load: () => Promise<T>, name: k
 
 function PageLoading({ label }: { label?: string }) {
   return (
-    <div className="flex h-dvh items-center justify-center bg-bg text-body text-muted" aria-busy="true">
+    <div
+      className="flex h-dvh items-center justify-center bg-bg text-body text-muted"
+      aria-busy="true"
+    >
       {label ?? ''}
     </div>
   );
@@ -39,7 +46,11 @@ function PageLoading({ label }: { label?: string }) {
 const Create = page(() => import('./pages/Create'), 'Create');
 const Studio = page(() => import('./pages/Studio'), 'StudioPage');
 const Play = page(() => import('./pages/Play'), 'PlayPage');
-const Advanced = page(() => import('./pages/Editor'), 'Editor', <PageLoading label="Opening the advanced editor…" />);
+const Advanced = page(
+  () => import('./pages/Editor'),
+  'Editor',
+  <PageLoading label="Opening the advanced editor…" />,
+);
 const Dashboard = page(() => import('./pages/Dashboard'), 'Dashboard');
 const Settings = page(() => import('./pages/Settings'), 'Settings');
 const Login = page(() => import('./pages/Login'), 'Login');
@@ -64,15 +75,29 @@ const router = createBrowserRouter([
       { path: '/art', element: guard(<ArtLab />) },
       {
         path: '/dashboard/:section',
-        element: guard(<ComingSoon title="Coming soon" body="This section arrives in a later update." />),
+        element: guard(
+          <ComingSoon title="Coming soon" body="This section arrives in a later update." />,
+        ),
       },
       {
         path: '/explore',
-        element: <ComingSoon shell="site" title="Explore" body="The community gallery opens once publishing is ready." />,
+        element: (
+          <ComingSoon
+            shell="site"
+            title="Explore"
+            body="The community gallery opens once publishing is ready."
+          />
+        ),
       },
       {
         path: '/market',
-        element: <ComingSoon shell="site" title="Marketplace" body="Templates, art packs and music packs are coming." />,
+        element: (
+          <ComingSoon
+            shell="site"
+            title="Marketplace"
+            body="Templates, art packs and music packs are coming."
+          />
+        ),
       },
       { path: '*', element: <NotFound /> },
     ],

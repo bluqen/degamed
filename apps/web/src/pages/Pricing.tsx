@@ -3,7 +3,14 @@ import type { ReactNode } from 'react';
 import { SiteFooter, SiteHeader } from '../components/SiteHeader';
 import { ButtonLink, Card, cx } from '../ui';
 
-const PLANS: { icon: ReactNode; name: string; price: string; blurb: string; points: string[]; featured?: boolean }[] = [
+const PLANS: {
+  icon: ReactNode;
+  name: string;
+  price: string;
+  blurb: string;
+  points: string[];
+  featured?: boolean;
+}[] = [
   {
     icon: <Zap size={18} />,
     name: 'Instant mode',
@@ -39,13 +46,22 @@ export function Pricing() {
           Free while we’re in beta
         </h1>
         <p className="mt-4 max-w-[560px] text-center text-body-lg text-balance text-muted">
-          Make, play and share as many games as you like. If we ever add paid extras, we’ll tell you well before anything changes.
+          Make, play and share as many games as you like. If we ever add paid extras, we’ll tell you
+          well before anything changes.
         </p>
         <div className="mt-14 grid w-full gap-5 md:grid-cols-3">
           {PLANS.map((p) => (
-            <Card key={p.name} className={cx('relative flex flex-col gap-5 p-6', p.featured && 'border-brand shadow-[0_0_0_1px_var(--c-brand)]')}>
+            <Card
+              key={p.name}
+              className={cx(
+                'relative flex flex-col gap-5 p-6',
+                p.featured && 'border-brand shadow-[0_0_0_1px_var(--c-brand)]',
+              )}
+            >
               <div className="flex items-center gap-3">
-                <span className="flex size-10 items-center justify-center rounded-md bg-brand-tint text-brand-ink">{p.icon}</span>
+                <span className="flex size-10 items-center justify-center rounded-md bg-brand-tint text-brand-ink">
+                  {p.icon}
+                </span>
                 <div className="flex flex-col">
                   <h2 className="text-subtitle font-semibold">{p.name}</h2>
                   <span className="text-body-sm font-semibold text-muted">{p.price}</span>
