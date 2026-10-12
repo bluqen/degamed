@@ -1,12 +1,40 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
-import { ArrowLeft, Check, CloudOff, Gamepad2, Maximize2, MessageCircle, MoreHorizontal, Palette, Play, RotateCcw, Share2, SlidersHorizontal, Undo2, Wrench } from 'lucide-react';
+import {
+  ArrowLeft,
+  Check,
+  CloudOff,
+  Gamepad2,
+  Maximize2,
+  MessageCircle,
+  MoreHorizontal,
+  Palette,
+  Play,
+  RotateCcw,
+  Share2,
+  SlidersHorizontal,
+  Undo2,
+  Wrench,
+} from 'lucide-react';
 import type { ProjectFiles } from '@degamed/shared';
 import { LogoMark } from '../components/Logo';
 import { Stage, type StageHandle } from '../components/Stage';
 import { themes } from '../lib/game';
 import { themePreview } from '../lib/game/preview';
-import { Button, ButtonLink, EmptyState, IconButton, Kbd, Menu, Skeleton, Tabs, ThemeToggle, Tooltip, tabPanelProps, cx } from '../ui';
+import {
+  Button,
+  ButtonLink,
+  EmptyState,
+  IconButton,
+  Kbd,
+  Menu,
+  Skeleton,
+  Tabs,
+  ThemeToggle,
+  Tooltip,
+  tabPanelProps,
+  cx,
+} from '../ui';
 import { ChatPanel } from '../studio/ChatPanel';
 import { TunePanel } from '../studio/TunePanel';
 import { LookPanel } from '../studio/LookPanel';
@@ -61,7 +89,12 @@ function Studio({ id, initial, title }: { id: string; initial: ProjectFiles; tit
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement;
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey && !/INPUT|TEXTAREA|SELECT/.test(t.tagName)) {
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        e.key.toLowerCase() === 'z' &&
+        !e.shiftKey &&
+        !/INPUT|TEXTAREA|SELECT/.test(t.tagName)
+      ) {
         e.preventDefault();
         studio.undo();
       }
@@ -81,7 +114,11 @@ function Studio({ id, initial, title }: { id: string; initial: ProjectFiles; tit
 
   const tabs = [
     { id: 'chat' as const, label: 'Chat', icon: <MessageCircle size={16} aria-hidden="true" /> },
-    { id: 'tune' as const, label: 'Tune', icon: <SlidersHorizontal size={16} aria-hidden="true" /> },
+    {
+      id: 'tune' as const,
+      label: 'Tune',
+      icon: <SlidersHorizontal size={16} aria-hidden="true" />,
+    },
     { id: 'look' as const, label: 'Look', icon: <Palette size={16} aria-hidden="true" /> },
   ];
 
@@ -90,7 +127,11 @@ function Studio({ id, initial, title }: { id: string; initial: ProjectFiles; tit
       {/* Top bar */}
       <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b border-line bg-surface px-2 sm:px-3">
         <Tooltip label={isDemo ? 'Home' : 'Your games'}>
-          <Link to={isDemo ? '/' : '/create'} aria-label={isDemo ? 'Home' : 'Your games'} className="flex h-10 items-center gap-1 rounded-md px-2 text-ink-2 hover:bg-surface-2 hover:text-ink">
+          <Link
+            to={isDemo ? '/' : '/create'}
+            aria-label={isDemo ? 'Home' : 'Your games'}
+            className="flex h-10 items-center gap-1 rounded-md px-2 text-ink-2 hover:bg-surface-2 hover:text-ink"
+          >
             <ArrowLeft size={18} aria-hidden="true" />
             <LogoMark size={22} hole="var(--c-surface)" />
           </Link>
@@ -98,28 +139,60 @@ function Studio({ id, initial, title }: { id: string; initial: ProjectFiles; tit
         <span className="h-6 w-px bg-line" aria-hidden="true" />
         <h1 className="sr-only">{studio.title}</h1>
         <TitleField value={studio.title} onCommit={studio.setTitle} />
-        <span className="hidden items-center gap-1.5 text-body-sm text-muted md:inline-flex" aria-live="polite">
-          {studio.saved ? <Check size={15} className="text-ok" aria-hidden="true" /> : <CloudOff size={15} className="text-warn" aria-hidden="true" />}
+        <span
+          className="hidden items-center gap-1.5 text-body-sm text-muted md:inline-flex"
+          aria-live="polite"
+        >
+          {studio.saved ? (
+            <Check size={15} className="text-ok" aria-hidden="true" />
+          ) : (
+            <CloudOff size={15} className="text-warn" aria-hidden="true" />
+          )}
           {studio.saved ? 'Saved' : 'Not saved: storage full'}
         </span>
 
         <div className="ml-auto flex items-center gap-1.5">
           <Tooltip label={studio.undoLabel ? `Undo: ${studio.undoLabel}` : 'Nothing to undo'}>
-            <IconButton label="Undo" tooltip={false} disabled={!studio.canUndo} onClick={studio.undo} className="max-sm:hidden">
+            <IconButton
+              label="Undo"
+              tooltip={false}
+              disabled={!studio.canUndo}
+              onClick={studio.undo}
+              className="max-sm:hidden"
+            >
               <Undo2 size={18} />
             </IconButton>
           </Tooltip>
-          <Button variant="ghost" icon={<Wrench size={16} />} onClick={openAdvanced} className="max-md:hidden">
+          <Button
+            variant="ghost"
+            icon={<Wrench size={16} />}
+            onClick={openAdvanced}
+            className="max-md:hidden"
+          >
             Advanced
           </Button>
           <ThemeToggle />
-          <Button variant="secondary" icon={<Play size={16} />} onClick={play} className="max-md:hidden">
+          <Button
+            variant="secondary"
+            icon={<Play size={16} />}
+            onClick={play}
+            className="max-md:hidden"
+          >
             Play
           </Button>
-          <Button icon={<Share2 size={16} />} onClick={() => setSharing(true)} className="max-sm:hidden">
+          <Button
+            icon={<Share2 size={16} />}
+            onClick={() => setSharing(true)}
+            className="max-sm:hidden"
+          >
             Share
           </Button>
-          <IconButton label="Share" variant="primary" className="sm:hidden" onClick={() => setSharing(true)}>
+          <IconButton
+            label="Share"
+            variant="primary"
+            className="sm:hidden"
+            onClick={() => setSharing(true)}
+          >
             <Share2 size={18} />
           </IconButton>
           <div className="md:hidden">
@@ -133,9 +206,19 @@ function Studio({ id, initial, title }: { id: string; initial: ProjectFiles; tit
               }
               items={[
                 { label: 'Play full screen', icon: <Play size={16} />, onSelect: play },
-                { label: 'Undo', icon: <Undo2 size={16} />, disabled: !studio.canUndo, onSelect: studio.undo },
+                {
+                  label: 'Undo',
+                  icon: <Undo2 size={16} />,
+                  disabled: !studio.canUndo,
+                  onSelect: studio.undo,
+                },
                 { type: 'separator' },
-                { label: 'Advanced editor', description: 'Scenes, code and art', icon: <Wrench size={16} />, onSelect: openAdvanced },
+                {
+                  label: 'Advanced editor',
+                  description: 'Scenes, code and art',
+                  icon: <Wrench size={16} />,
+                  onSelect: openAdvanced,
+                },
               ]}
             />
           </div>
@@ -144,9 +227,18 @@ function Studio({ id, initial, title }: { id: string; initial: ProjectFiles; tit
 
       <div className="flex min-h-0 flex-1 flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_400px]">
         {/* Game */}
-        <section aria-label="Game" className="flex min-h-0 min-w-0 flex-col items-center justify-center gap-4 p-3 sm:p-6 lg:p-8">
+        <section
+          aria-label="Game"
+          className="flex min-h-0 min-w-0 flex-col items-center justify-center gap-4 p-3 sm:p-6 lg:p-8"
+        >
           <div className="flex w-full max-w-[min(100%,calc((100dvh-56px-140px)*16/9))] flex-col gap-3 max-lg:max-w-none">
-            <Stage ref={stage} files={studio.files} title={studio.title} poster={poster} className="shadow-3 ring-1 ring-line" />
+            <Stage
+              ref={stage}
+              files={studio.files}
+              title={studio.title}
+              poster={poster}
+              className="shadow-3 ring-1 ring-line"
+            />
             <div className="flex items-center gap-3 px-1">
               <span className="hidden items-center gap-1.5 text-body-sm text-muted sm:inline-flex">
                 <Kbd>←</Kbd>
@@ -154,10 +246,20 @@ function Studio({ id, initial, title }: { id: string; initial: ProjectFiles; tit
               </span>
               <span className="text-body-sm text-muted sm:hidden">Tap the game to play</span>
               <div className="ml-auto flex items-center gap-1">
-                <Button variant="ghost" size="sm" icon={<RotateCcw size={15} />} onClick={() => stage.current?.restart()}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  icon={<RotateCcw size={15} />}
+                  onClick={() => stage.current?.restart()}
+                >
                   Restart
                 </Button>
-                <Button variant="ghost" size="sm" icon={<Maximize2 size={15} />} onClick={() => stage.current?.fullscreen()}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  icon={<Maximize2 size={15} />}
+                  onClick={() => stage.current?.fullscreen()}
+                >
                   Full screen
                 </Button>
               </div>
@@ -166,17 +268,35 @@ function Studio({ id, initial, title }: { id: string; initial: ProjectFiles; tit
         </section>
 
         {/* Panel */}
-        <aside aria-label="Change your game" className="flex min-h-[520px] flex-col border-line bg-surface max-lg:border-t lg:min-h-0 lg:border-l">
+        <aside
+          aria-label="Change your game"
+          className="flex min-h-[520px] flex-col border-line bg-surface max-lg:border-t lg:min-h-0 lg:border-l"
+        >
           <div className="shrink-0 px-4 pt-4 pb-3">
-            <Tabs idBase={tabsId} label="Ways to change your game" items={tabs} value={panel} onChange={setPanel} />
+            <Tabs
+              idBase={tabsId}
+              label="Ways to change your game"
+              items={tabs}
+              value={panel}
+              onChange={setPanel}
+            />
           </div>
-          <div {...tabPanelProps(tabsId, 'chat', panel === 'chat')} className={cx('min-h-0 flex-1', panel === 'chat' ? 'flex flex-col' : 'hidden')}>
+          <div
+            {...tabPanelProps(tabsId, 'chat', panel === 'chat')}
+            className={cx('min-h-0 flex-1', panel === 'chat' ? 'flex flex-col' : 'hidden')}
+          >
             <ChatPanel studio={studio} intro={intro} />
           </div>
-          <div {...tabPanelProps(tabsId, 'tune', panel === 'tune')} className="min-h-0 flex-1 overflow-y-auto">
+          <div
+            {...tabPanelProps(tabsId, 'tune', panel === 'tune')}
+            className="min-h-0 flex-1 overflow-y-auto"
+          >
             {panel === 'tune' && <TunePanel studio={studio} onOpenAdvanced={openAdvanced} />}
           </div>
-          <div {...tabPanelProps(tabsId, 'look', panel === 'look')} className="min-h-0 flex-1 overflow-y-auto">
+          <div
+            {...tabPanelProps(tabsId, 'look', panel === 'look')}
+            className="min-h-0 flex-1 overflow-y-auto"
+          >
             {panel === 'look' && <LookPanel studio={studio} />}
           </div>
         </aside>
@@ -221,7 +341,10 @@ function StudioSkeleton() {
       </div>
       <div className="flex min-h-0 flex-1 flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_400px]">
         <div className="flex items-center justify-center p-3 sm:p-6 lg:p-8">
-          <Skeleton className="aspect-video w-full max-w-[min(100%,calc((100dvh-56px-140px)*16/9))]" rounded="rounded-xl" />
+          <Skeleton
+            className="aspect-video w-full max-w-[min(100%,calc((100dvh-56px-140px)*16/9))]"
+            rounded="rounded-xl"
+          />
         </div>
         <div className="flex flex-col gap-4 border-line bg-surface p-4 lg:border-l">
           <Skeleton className="h-10 w-full" />

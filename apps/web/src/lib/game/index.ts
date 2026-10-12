@@ -44,5 +44,8 @@ export function demoTheme(): ThemeArt {
 
 /** The demo game every agent tests with at /editor/demo. */
 export function demoGame(): ProjectFiles {
-  return buildGame({ kit: KITS[0]!.id, theme: demoTheme().id, title: 'Demo game', seed: 1 }, encode);
+  return buildGame(
+    { kit: KITS[0]!.id, theme: demoTheme().id, title: 'Demo game', seed: 1 },
+    encode,
+  );
 }

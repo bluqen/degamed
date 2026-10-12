@@ -1,10 +1,26 @@
-import { useEffect, useLayoutEffect, useRef, useState, type ReactElement, type ReactNode } from 'react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 import { createPortal } from 'react-dom';
 import { Check } from 'lucide-react';
 import { cx } from './cx';
 
 export type MenuEntry =
-  | { type?: 'item'; label: string; description?: string; icon?: ReactNode; checked?: boolean; disabled?: boolean; danger?: boolean; onSelect: () => void }
+  | {
+      type?: 'item';
+      label: string;
+      description?: string;
+      icon?: ReactNode;
+      checked?: boolean;
+      disabled?: boolean;
+      danger?: boolean;
+      onSelect: () => void;
+    }
   | { type: 'separator' }
   | { type: 'heading'; label: string };
 
@@ -12,7 +28,19 @@ export type MenuEntry =
  * A dropdown menu anchored to a trigger. Arrow keys move, Enter selects,
  * Escape closes and returns focus to the trigger.
  */
-export function Menu({ trigger, items, align = 'end', label, width = 240 }: { trigger: ReactElement<Record<string, unknown>>; items: MenuEntry[]; align?: 'start' | 'end'; label: string; width?: number }) {
+export function Menu({
+  trigger,
+  items,
+  align = 'end',
+  label,
+  width = 240,
+}: {
+  trigger: ReactElement<Record<string, unknown>>;
+  items: MenuEntry[];
+  align?: 'start' | 'end';
+  label: string;
+  width?: number;
+}) {
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const anchor = useRef<HTMLSpanElement>(null);
@@ -33,7 +61,9 @@ export function Menu({ trigger, items, align = 'end', label, width = 240 }: { tr
     const r = el.getBoundingClientRect();
     if (r.bottom > window.innerHeight - 8) {
       const btn = anchor.current?.firstElementChild as HTMLElement | null;
-      const top = btn ? btn.getBoundingClientRect().top - r.height - 6 : window.innerHeight - r.height - 8;
+      const top = btn
+        ? btn.getBoundingClientRect().top - r.height - 6
+        : window.innerHeight - r.height - 8;
       setPos((p) => ({ ...p, y: Math.max(8, top) }));
     }
     el.querySelector<HTMLButtonElement>('[role^=menuitem]:not([disabled])')?.focus();
@@ -42,7 +72,8 @@ export function Menu({ trigger, items, align = 'end', label, width = 240 }: { tr
   useEffect(() => {
     if (!open) return;
     const onDown = (e: PointerEvent) => {
-      if (!list.current?.contains(e.target as Node) && !anchor.current?.contains(e.target as Node)) setOpen(false);
+      if (!list.current?.contains(e.target as Node) && !anchor.current?.contains(e.target as Node))
+        setOpen(false);
     };
     const onResize = () => setOpen(false);
     window.addEventListener('pointerdown', onDown, true);
@@ -58,7 +89,10 @@ export function Menu({ trigger, items, align = 'end', label, width = 240 }: { tr
     if (refocus) (anchor.current?.firstElementChild as HTMLElement | null)?.focus();
   };
 
-  const focusables = () => [...(list.current?.querySelectorAll<HTMLButtonElement>('[role^=menuitem]:not([disabled])') ?? [])];
+  const focusables = () => [
+    ...(list.current?.querySelectorAll<HTMLButtonElement>('[role^=menuitem]:not([disabled])') ??
+      []),
+  ];
 
   return (
     <>
@@ -100,7 +134,8 @@ export function Menu({ trigger, items, align = 'end', label, width = 240 }: { tr
             }}
           >
             {items.map((item, i) => {
-              if (item.type === 'separator') return <div key={i} role="separator" className="mx-1 my-1.5 h-px bg-line" />;
+              if (item.type === 'separator')
+                return <div key={i} role="separator" className="mx-1 my-1.5 h-px bg-line" />;
               if (item.type === 'heading')
                 return (
                   <div key={i} className="px-2.5 pt-2 pb-1 text-caption font-semibold text-muted">
@@ -123,12 +158,18 @@ export function Menu({ trigger, items, align = 'end', label, width = 240 }: { tr
                     item.danger ? 'text-bad' : 'text-ink',
                   )}
                 >
-                  {item.icon && <span className="flex w-4 shrink-0 justify-center text-muted">{item.icon}</span>}
+                  {item.icon && (
+                    <span className="flex w-4 shrink-0 justify-center text-muted">{item.icon}</span>
+                  )}
                   <span className="flex min-w-0 flex-1 flex-col">
                     <span className="font-medium">{item.label}</span>
-                    {item.description && <span className="text-caption text-muted">{item.description}</span>}
+                    {item.description && (
+                      <span className="text-caption text-muted">{item.description}</span>
+                    )}
                   </span>
-                  {item.checked && <Check size={16} className="shrink-0 text-brand-ink" aria-hidden="true" />}
+                  {item.checked && (
+                    <Check size={16} className="shrink-0 text-brand-ink" aria-hidden="true" />
+                  )}
                 </button>
               );
             })}

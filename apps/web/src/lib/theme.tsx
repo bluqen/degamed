@@ -21,7 +21,9 @@ function apply(dark: boolean) {
   if (root.getAttribute('data-theme') === next) return;
   root.classList.add('theme-switching');
   root.setAttribute('data-theme', next);
-  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('theme-switching')));
+  requestAnimationFrame(() =>
+    requestAnimationFrame(() => root.classList.remove('theme-switching')),
+  );
 }
 
 interface ThemeCtx {
@@ -56,7 +58,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  return <Ctx.Provider value={{ pref, resolved: dark ? 'dark' : 'light', setPref }}>{children}</Ctx.Provider>;
+  return (
+    <Ctx.Provider value={{ pref, resolved: dark ? 'dark' : 'light', setPref }}>
+      {children}
+    </Ctx.Provider>
+  );
 }
 
 export const useTheme = () => useContext(Ctx);

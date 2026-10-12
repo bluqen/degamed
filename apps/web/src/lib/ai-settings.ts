@@ -31,11 +31,27 @@ export function setPreferredProvider(p: ProviderId) {
 /** The providers this person can use now, and the settings for the one in use. */
 export function currentAi(): { providers: ProviderId[]; settings: AiSettings } {
   const keys = loadKeys();
-  const providers = availableProviders({ gemini: keys.gemini, openai: keys.openai, anthropic: keys.anthropic }, isAuthConfigured);
+  const providers = availableProviders(
+    { gemini: keys.gemini, openai: keys.openai, anthropic: keys.anthropic },
+    isAuthConfigured,
+  );
   const pref = preferredProvider();
   // Best available by default: your own key, then hosted, then instant.
-  const fallback = providers.find((p) => p !== 'instant' && p !== 'degamed') ?? providers.find((p) => p === 'degamed') ?? 'instant';
+  const fallback =
+    providers.find((p) => p !== 'instant' && p !== 'degamed') ??
+    providers.find((p) => p === 'degamed') ??
+    'instant';
   const provider = pref && providers.includes(pref) ? pref : fallback;
-  const apiKey = provider === 'gemini' ? keys.gemini : provider === 'openai' ? keys.openai : provider === 'anthropic' ? keys.anthropic : undefined;
-  return { providers, settings: { provider, apiKey, apiUrl: provider === 'degamed' ? env.apiUrl : undefined } };
+  const apiKey =
+    provider === 'gemini'
+      ? keys.gemini
+      : provider === 'openai'
+        ? keys.openai
+        : provider === 'anthropic'
+          ? keys.anthropic
+          : undefined;
+  return {
+    providers,
+    settings: { provider, apiKey, apiUrl: provider === 'degamed' ? env.apiUrl : undefined },
+  };
 }

@@ -6,7 +6,10 @@ import { saveDraft } from '../lib/project-files';
 
 export const DEMO_ID = 'demo';
 
-export type LoadState = { status: 'loading' } | { status: 'missing' } | { status: 'ready'; files: ProjectFiles; title: string };
+export type LoadState =
+  | { status: 'loading' }
+  | { status: 'missing' }
+  | { status: 'ready'; files: ProjectFiles; title: string };
 
 /** Loads a game for the Studio: the demo, a game saved on this device, or nothing. */
 export function loadForStudio(id: string): LoadState {
@@ -30,7 +33,11 @@ function titleOf(files: ProjectFiles): string | null {
 function withTitle(files: ProjectFiles, title: string): ProjectFiles {
   const next = { ...files };
   try {
-    next['project.json'] = JSON.stringify({ ...JSON.parse(files['project.json'] ?? '{}'), title }, null, 2);
+    next['project.json'] = JSON.stringify(
+      { ...JSON.parse(files['project.json'] ?? '{}'), title },
+      null,
+      2,
+    );
     const spec = readSpec(files);
     if (spec) next['game.spec.json'] = JSON.stringify({ ...spec, title }, null, 2);
   } catch {
@@ -105,7 +112,11 @@ export function useStudio(id: string, initial: ProjectFiles, initialTitle: strin
     (patch: Partial<GameSpec>, label: string, coalesce?: string) => {
       const s = specRef.current;
       if (!s) return;
-      apply(buildGame({ ...s, ...patch, params: { ...s.params, ...patch.params } }, encode), label, coalesce);
+      apply(
+        buildGame({ ...s, ...patch, params: { ...s.params, ...patch.params } }, encode),
+        label,
+        coalesce,
+      );
     },
     [apply],
   );
@@ -116,7 +127,10 @@ export function useStudio(id: string, initial: ProjectFiles, initialTitle: strin
       draftRef.current = next;
       setDraftParams(next);
       window.clearTimeout(rebuildTimer.current);
-      rebuildTimer.current = window.setTimeout(() => rebuild({ params: draftRef.current }, label, `param:${key}`), typeof value === 'number' ? 180 : 0);
+      rebuildTimer.current = window.setTimeout(
+        () => rebuild({ params: draftRef.current }, label, `param:${key}`),
+        typeof value === 'number' ? 180 : 0,
+      );
     },
     [rebuild],
   );
@@ -131,7 +145,10 @@ export function useStudio(id: string, initial: ProjectFiles, initialTitle: strin
     [apply],
   );
 
-  const setTheme = useCallback((theme: string, name: string) => rebuild({ theme }, `Change the look to ${name}`), [rebuild]);
+  const setTheme = useCallback(
+    (theme: string, name: string) => rebuild({ theme }, `Change the look to ${name}`),
+    [rebuild],
+  );
 
   const setTitle = useCallback(
     (t: string) => {
@@ -147,12 +164,30 @@ export function useStudio(id: string, initial: ProjectFiles, initialTitle: strin
   useEffect(() => {
     if (id === DEMO_ID || !spec) return;
     const entry = getGame(id);
-    if (entry && (entry.theme !== spec.theme || entry.kit !== spec.kit)) touchGame(id, { theme: spec.theme, kit: spec.kit });
-    if (!entry) saveGame({ id, title, prompt: spec.story ?? '', kit: spec.kit, theme: spec.theme }, files);
+    if (entry && (entry.theme !== spec.theme || entry.kit !== spec.kit))
+      touchGame(id, { theme: spec.theme, kit: spec.kit });
+    if (!entry)
+      saveGame({ id, title, prompt: spec.story ?? '', kit: spec.kit, theme: spec.theme }, files);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, spec?.theme, spec?.kit]);
 
-  return { id, files, title, spec, draftParams, saved, canUndo: past.length > 0, undoLabel: past[past.length - 1]?.label, apply, undo, setParam, resetParams, setTheme, setTitle, rebuild };
+  return {
+    id,
+    files,
+    title,
+    spec,
+    draftParams,
+    saved,
+    canUndo: past.length > 0,
+    undoLabel: past[past.length - 1]?.label,
+    apply,
+    undo,
+    setParam,
+    resetParams,
+    setTheme,
+    setTitle,
+    rebuild,
+  };
 }
 
 export type Studio = ReturnType<typeof useStudio>;

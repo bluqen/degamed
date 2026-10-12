@@ -3,7 +3,10 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
 // Bridge until packages/engine exports "./art" and "./kits" (requested on the BOARD): point the subpaths at their source.
-const engineSrc = (sub: string) => decodeURIComponent(new URL(`../../packages/engine/src/${sub}/index.ts`, import.meta.url).pathname);
+const engineSrc = (sub: string) =>
+  decodeURIComponent(
+    new URL(`../../packages/engine/src/${sub}/index.ts`, import.meta.url).pathname,
+  );
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],

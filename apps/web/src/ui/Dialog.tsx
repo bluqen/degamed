@@ -66,12 +66,22 @@ export function Dialog({
                 </p>
               )}
             </div>
-            <IconButton label="Close" size="sm" onClick={onClose} className="-mt-1 -mr-2" tooltip={false}>
+            <IconButton
+              label="Close"
+              size="sm"
+              onClick={onClose}
+              className="-mt-1 -mr-2"
+              tooltip={false}
+            >
               <X size={18} />
             </IconButton>
           </header>
           {children && <div className="min-h-0 overflow-auto px-6 py-4">{children}</div>}
-          {footer && <footer className="flex flex-wrap justify-end gap-2 border-t border-line px-6 py-4">{footer}</footer>}
+          {footer && (
+            <footer className="flex flex-wrap justify-end gap-2 border-t border-line px-6 py-4">
+              {footer}
+            </footer>
+          )}
         </div>
       )}
     </dialog>

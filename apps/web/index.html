@@ -3,12 +3,27 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="description" content="Describe a game and play it in under a minute. Change it by chatting, then share a link anyone can play on a phone or a PC." />
+    <meta
+      name="description"
+      content="Describe a game and play it in under a minute. Change it by chatting, then share a link anyone can play on a phone or a PC."
+    />
     <meta name="theme-color" content="#f6f6f9" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0c0c11" media="(prefers-color-scheme: dark)" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="preload" href="/fonts/plus-jakarta-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/bricolage-grotesque-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link
+      rel="preload"
+      href="/fonts/plus-jakarta-sans-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/bricolage-grotesque-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <script>
       // Pick the theme before first paint so there's no flash: a saved choice, else the system's.
       (function () {
@@ -16,7 +31,9 @@
         try {
           pref = localStorage.getItem('degamed.theme') || 'system';
         } catch (e) {}
-        var dark = pref === 'dark' || (pref !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        var dark =
+          pref === 'dark' ||
+          (pref !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
         document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
       })();
     </script>

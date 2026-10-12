@@ -3,7 +3,11 @@ import { useTheme, type ThemePref } from '../lib/theme';
 import { IconButton } from './Button';
 import { Menu } from './Menu';
 
-const LABEL: Record<ThemePref, string> = { system: 'Match my device', light: 'Light', dark: 'Dark' };
+const LABEL: Record<ThemePref, string> = {
+  system: 'Match my device',
+  light: 'Light',
+  dark: 'Dark',
+};
 
 /** Sun/moon button that opens a small menu: match my device, light or dark. */
 export function ThemeToggle({ size = 'md' }: { size?: 'sm' | 'md' }) {
@@ -20,9 +24,24 @@ export function ThemeToggle({ size = 'md' }: { size?: 'sm' | 'md' }) {
       }
       items={[
         { type: 'heading', label: 'Appearance' },
-        { label: LABEL.system, icon: <Monitor size={16} />, checked: pref === 'system', onSelect: () => setPref('system') },
-        { label: LABEL.light, icon: <Sun size={16} />, checked: pref === 'light', onSelect: () => setPref('light') },
-        { label: LABEL.dark, icon: <Moon size={16} />, checked: pref === 'dark', onSelect: () => setPref('dark') },
+        {
+          label: LABEL.system,
+          icon: <Monitor size={16} />,
+          checked: pref === 'system',
+          onSelect: () => setPref('system'),
+        },
+        {
+          label: LABEL.light,
+          icon: <Sun size={16} />,
+          checked: pref === 'light',
+          onSelect: () => setPref('light'),
+        },
+        {
+          label: LABEL.dark,
+          icon: <Moon size={16} />,
+          checked: pref === 'dark',
+          onSelect: () => setPref('dark'),
+        },
       ]}
     />
   );

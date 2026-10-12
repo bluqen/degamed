@@ -1,0 +1,2793 @@
+{
+  "round": "1",
+  "startedAt": "2026-10-12T01:37:51.634Z",
+  "base": "http://localhost:5173",
+  "pages": [
+    {
+      "id": "landing",
+      "viewport": "desktop",
+      "scheme": "dark",
+      "path": "/",
+      "shots": [
+        "docs/team/shots/critic/round-1/landing--desktop-dark.png",
+        "docs/team/shots/critic/round-1/landing--desktop-dark-full.png"
+      ],
+      "status": 200,
+      "loadMs": 1253,
+      "finalUrl": "/",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 17,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 11,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "12px",
+          "13px",
+          "15px",
+          "17px",
+          "18px",
+          "19px",
+          "21px",
+          "44px",
+          "52px",
+          "96px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(12, 12, 17)",
+        "colorScheme": "dark",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 116
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "landing",
+      "viewport": "desktop",
+      "scheme": "light",
+      "path": "/",
+      "shots": [
+        "docs/team/shots/critic/round-1/landing--desktop-light.png"
+      ],
+      "status": 200,
+      "loadMs": 1246,
+      "finalUrl": "/",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 17,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 11,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "12px",
+          "13px",
+          "15px",
+          "17px",
+          "18px",
+          "19px",
+          "21px",
+          "44px",
+          "52px",
+          "96px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(246, 246, 249)",
+        "colorScheme": "light",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 112
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "landing",
+      "viewport": "phone",
+      "scheme": "dark",
+      "path": "/",
+      "shots": [
+        "docs/team/shots/critic/round-1/landing--phone-dark.png"
+      ],
+      "status": 200,
+      "loadMs": 1241,
+      "finalUrl": "/",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 13,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 8,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "12px",
+          "13px",
+          "15px",
+          "17px",
+          "18px",
+          "21px",
+          "32px",
+          "36px",
+          "48px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(12, 12, 17)",
+        "colorScheme": "dark",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 112
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "landing",
+      "viewport": "phone",
+      "scheme": "light",
+      "path": "/",
+      "shots": [
+        "docs/team/shots/critic/round-1/landing--phone-light.png"
+      ],
+      "status": 200,
+      "loadMs": 1195,
+      "finalUrl": "/",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 13,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 8,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "12px",
+          "13px",
+          "15px",
+          "17px",
+          "18px",
+          "21px",
+          "32px",
+          "36px",
+          "48px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(246, 246, 249)",
+        "colorScheme": "light",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 112
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "create",
+      "viewport": "desktop",
+      "scheme": "dark",
+      "path": "/create",
+      "shots": [
+        "docs/team/shots/critic/round-1/create--desktop-dark.png",
+        "docs/team/shots/critic/round-1/create--desktop-dark-full.png"
+      ],
+      "status": 200,
+      "loadMs": 1163,
+      "finalUrl": "/create",
+      "audit": {
+        "title": "Make a game · Degamed",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 16,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 6,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "12px",
+          "13px",
+          "15px",
+          "17px",
+          "21px",
+          "22px",
+          "56px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(12, 12, 17)",
+        "colorScheme": "dark",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 115
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "create",
+      "viewport": "desktop",
+      "scheme": "light",
+      "path": "/create",
+      "shots": [
+        "docs/team/shots/critic/round-1/create--desktop-light.png"
+      ],
+      "status": 200,
+      "loadMs": 1184,
+      "finalUrl": "/create",
+      "audit": {
+        "title": "Make a game · Degamed",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 16,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 6,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "12px",
+          "13px",
+          "15px",
+          "17px",
+          "21px",
+          "22px",
+          "56px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(246, 246, 249)",
+        "colorScheme": "light",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 111
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "create",
+      "viewport": "phone",
+      "scheme": "dark",
+      "path": "/create",
+      "shots": [
+        "docs/team/shots/critic/round-1/create--phone-dark.png"
+      ],
+      "status": 200,
+      "loadMs": 1027,
+      "finalUrl": "/create",
+      "audit": {
+        "title": "Make a game · Degamed",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 15,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 5,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "12px",
+          "13px",
+          "15px",
+          "17px",
+          "21px",
+          "22px",
+          "40px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(12, 12, 17)",
+        "colorScheme": "dark",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 111
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "create",
+      "viewport": "phone",
+      "scheme": "light",
+      "path": "/create",
+      "shots": [
+        "docs/team/shots/critic/round-1/create--phone-light.png"
+      ],
+      "status": 200,
+      "loadMs": 997,
+      "finalUrl": "/create",
+      "audit": {
+        "title": "Make a game · Degamed",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 15,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 5,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "12px",
+          "13px",
+          "15px",
+          "17px",
+          "21px",
+          "22px",
+          "40px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(246, 246, 249)",
+        "colorScheme": "light",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 111
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "pricing",
+      "viewport": "desktop",
+      "scheme": "dark",
+      "path": "/pricing",
+      "shots": [
+        "docs/team/shots/critic/round-1/pricing--desktop-dark.png",
+        "docs/team/shots/critic/round-1/pricing--desktop-dark-full.png"
+      ],
+      "status": 200,
+      "loadMs": 1271,
+      "finalUrl": "/pricing",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 16,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 8,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "12px",
+          "13px",
+          "15px",
+          "18px",
+          "20px",
+          "21px",
+          "36px",
+          "60px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(12, 12, 17)",
+        "colorScheme": "dark",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 116
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "pricing",
+      "viewport": "desktop",
+      "scheme": "light",
+      "path": "/pricing",
+      "shots": [
+        "docs/team/shots/critic/round-1/pricing--desktop-light.png"
+      ],
+      "status": 200,
+      "loadMs": 1395,
+      "finalUrl": "/pricing",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 16,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 8,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "12px",
+          "13px",
+          "15px",
+          "18px",
+          "20px",
+          "21px",
+          "36px",
+          "60px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(246, 246, 249)",
+        "colorScheme": "light",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 112
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "pricing",
+      "viewport": "phone",
+      "scheme": "dark",
+      "path": "/pricing",
+      "shots": [
+        "docs/team/shots/critic/round-1/pricing--phone-dark.png"
+      ],
+      "status": 200,
+      "loadMs": 1216,
+      "finalUrl": "/pricing",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 12,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 5,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "12px",
+          "13px",
+          "15px",
+          "18px",
+          "20px",
+          "21px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(12, 12, 17)",
+        "colorScheme": "dark",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 112
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "pricing",
+      "viewport": "phone",
+      "scheme": "light",
+      "path": "/pricing",
+      "shots": [
+        "docs/team/shots/critic/round-1/pricing--phone-light.png"
+      ],
+      "status": 200,
+      "loadMs": 1152,
+      "finalUrl": "/pricing",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 12,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 5,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "12px",
+          "13px",
+          "15px",
+          "18px",
+          "20px",
+          "21px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(246, 246, 249)",
+        "colorScheme": "light",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 112
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "login",
+      "viewport": "desktop",
+      "scheme": "dark",
+      "path": "/login",
+      "shots": [
+        "docs/team/shots/critic/round-1/login--desktop-dark.png",
+        "docs/team/shots/critic/round-1/login--desktop-dark-full.png"
+      ],
+      "status": 200,
+      "loadMs": 1166,
+      "finalUrl": "/login",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 1,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "12px",
+          "14px",
+          "15px",
+          "21px",
+          "30px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(12, 12, 17)",
+        "colorScheme": "dark",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 112
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "login",
+      "viewport": "desktop",
+      "scheme": "light",
+      "path": "/login",
+      "shots": [
+        "docs/team/shots/critic/round-1/login--desktop-light.png"
+      ],
+      "status": 200,
+      "loadMs": 1174,
+      "finalUrl": "/login",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 1,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "12px",
+          "14px",
+          "15px",
+          "21px",
+          "30px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(246, 246, 249)",
+        "colorScheme": "light",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [
+        "You are calling ReactDOMClient.createRoot() on a container that has already been passed to createRoot() before. Instead, call root.render() on the existing root instead if you want to update it."
+      ],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 165
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "login",
+      "viewport": "phone",
+      "scheme": "dark",
+      "path": "/login",
+      "shots": [
+        "docs/team/shots/critic/round-1/login--phone-dark.png"
+      ],
+      "status": 200,
+      "loadMs": 1339,
+      "finalUrl": "/login",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 1,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "12px",
+          "14px",
+          "15px",
+          "21px",
+          "30px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(12, 12, 17)",
+        "colorScheme": "dark",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 112
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "login",
+      "viewport": "phone",
+      "scheme": "light",
+      "path": "/login",
+      "shots": [
+        "docs/team/shots/critic/round-1/login--phone-light.png"
+      ],
+      "status": 200,
+      "loadMs": 1548,
+      "finalUrl": "/login",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 1,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "12px",
+          "14px",
+          "15px",
+          "21px",
+          "30px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(246, 246, 249)",
+        "colorScheme": "light",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 112
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "settings",
+      "viewport": "desktop",
+      "scheme": "dark",
+      "path": "/settings",
+      "shots": [
+        "docs/team/shots/critic/round-1/settings--desktop-dark.png",
+        "docs/team/shots/critic/round-1/settings--desktop-dark-full.png"
+      ],
+      "status": 200,
+      "loadMs": 1197,
+      "finalUrl": "/settings",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 12,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 5,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "12px",
+          "14px",
+          "15px",
+          "18px",
+          "21px",
+          "30px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(12, 12, 17)",
+        "colorScheme": "dark",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 112
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "settings",
+      "viewport": "desktop",
+      "scheme": "light",
+      "path": "/settings",
+      "shots": [
+        "docs/team/shots/critic/round-1/settings--desktop-light.png"
+      ],
+      "status": 200,
+      "loadMs": 1341,
+      "finalUrl": "/settings",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 12,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 5,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "12px",
+          "14px",
+          "15px",
+          "18px",
+          "21px",
+          "30px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(246, 246, 249)",
+        "colorScheme": "light",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 112
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "settings",
+      "viewport": "phone",
+      "scheme": "dark",
+      "path": "/settings",
+      "shots": [
+        "docs/team/shots/critic/round-1/settings--phone-dark.png"
+      ],
+      "status": 200,
+      "loadMs": 1372,
+      "finalUrl": "/settings",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 11,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 5,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "12px",
+          "14px",
+          "15px",
+          "18px",
+          "21px",
+          "30px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(12, 12, 17)",
+        "colorScheme": "dark",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [
+        "You are calling ReactDOMClient.createRoot() on a container that has already been passed to createRoot() before. Instead, call root.render() on the existing root instead if you want to update it."
+      ],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 247
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "settings",
+      "viewport": "phone",
+      "scheme": "light",
+      "path": "/settings",
+      "shots": [
+        "docs/team/shots/critic/round-1/settings--phone-light.png"
+      ],
+      "status": 200,
+      "loadMs": 2004,
+      "finalUrl": "/settings",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 11,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 5,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "12px",
+          "14px",
+          "15px",
+          "18px",
+          "21px",
+          "30px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(246, 246, 249)",
+        "colorScheme": "light",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 112
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "explore",
+      "viewport": "desktop",
+      "scheme": "dark",
+      "path": "/explore",
+      "shots": [
+        "docs/team/shots/critic/round-1/explore--desktop-dark.png",
+        "docs/team/shots/critic/round-1/explore--desktop-dark-full.png"
+      ],
+      "status": 200,
+      "loadMs": 1664,
+      "finalUrl": "/explore",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 11,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 8,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "13px",
+          "15px",
+          "21px",
+          "30px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(12, 12, 17)",
+        "colorScheme": "dark",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 111
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "explore",
+      "viewport": "desktop",
+      "scheme": "light",
+      "path": "/explore",
+      "shots": [
+        "docs/team/shots/critic/round-1/explore--desktop-light.png"
+      ],
+      "status": 200,
+      "loadMs": 1599,
+      "finalUrl": "/explore",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 11,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 8,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "13px",
+          "15px",
+          "21px",
+          "30px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(246, 246, 249)",
+        "colorScheme": "light",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 111
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "explore",
+      "viewport": "phone",
+      "scheme": "dark",
+      "path": "/explore",
+      "shots": [
+        "docs/team/shots/critic/round-1/explore--phone-dark.png"
+      ],
+      "status": 200,
+      "loadMs": 1357,
+      "finalUrl": "/explore",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 7,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 5,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "13px",
+          "15px",
+          "21px",
+          "30px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(12, 12, 17)",
+        "colorScheme": "dark",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 111
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "explore",
+      "viewport": "phone",
+      "scheme": "light",
+      "path": "/explore",
+      "shots": [
+        "docs/team/shots/critic/round-1/explore--phone-light.png"
+      ],
+      "status": 200,
+      "loadMs": 960,
+      "finalUrl": "/explore",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 7,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 5,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "13px",
+          "15px",
+          "21px",
+          "30px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(246, 246, 249)",
+        "colorScheme": "light",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 111
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "studio",
+      "viewport": "desktop",
+      "scheme": "dark",
+      "path": "/editor/demo",
+      "shots": [
+        "docs/team/shots/critic/round-1/studio--desktop-dark.png",
+        "docs/team/shots/critic/round-1/studio--desktop-dark-game.png",
+        "docs/team/shots/critic/round-1/studio--desktop-dark-after-input.png"
+      ],
+      "status": 200,
+      "loadMs": 1002,
+      "finalUrl": "/editor/demo",
+      "audit": {
+        "title": "Demo game · Degamed",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 17,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 11,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "12px",
+          "13px",
+          "15px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(12, 12, 17)",
+        "colorScheme": "dark",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "fps": {
+        "samples": [
+          10,
+          8,
+          8,
+          10,
+          13
+        ],
+        "median": 10,
+        "min": 8,
+        "raf": [
+          10
+        ],
+        "longTasks": 13
+      },
+      "consoleErrors": [
+        "You are calling ReactDOMClient.createRoot() on a container that has already been passed to createRoot() before. Instead, call root.render() on the existing root instead if you want to update it."
+      ],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [
+        "net::ERR_ABORTED http://localhost:5174/src/main.ts?t=1791769140426",
+        "net::ERR_ABORTED http://localhost:5174/@vite/client",
+        "net::ERR_ABORTED http://localhost:5174/node_modules/.vite/deps/phaser.js?v=2846a737",
+        "net::ERR_ABORTED http://localhost:5174/@fs/home/user/degamed/packages/engine/src/tilemap.ts",
+        "net::ERR_ABORTED http://localhost:5174/@fs/home/user/degamed/packages/engine/src/touch.ts",
+        "net::ERR_ABORTED http://localhost:5174/@fs/home/user/degamed/packages/engine/src/atmosphere.ts?t=1791769041619",
+        "net::ERR_ABORTED http://localhost:5174/@fs/home/user/degamed/packages/engine/src/kits/index.ts?t=1791769159978",
+        "net::ERR_ABORTED http://localhost:5174/@fs/home/user/degamed/packages/engine/src/font.ts",
+        "net::ERR_ABORTED http://localhost:5174/node_modules/.vite/deps/zod.js?v=f83a1c42",
+        "net::ERR_ABORTED http://localhost:5174/@fs/home/user/degamed/packages/art/src/index.ts?t=1791768751605",
+        "net::ERR_ABORTED http://localhost:5174/@fs/home/user/degamed/packages/engine/src/atmosphere-math.ts?t=1791768603629",
+        "net::ERR_ABORTED http://localhost:5174/"
+      ],
+      "hosts": {
+        "localhost:5173": 358,
+        "localhost:5174": 78
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "studio",
+      "viewport": "desktop",
+      "scheme": "light",
+      "path": "/editor/demo",
+      "shots": [
+        "docs/team/shots/critic/round-1/studio--desktop-light.png",
+        "docs/team/shots/critic/round-1/studio--desktop-light-game.png",
+        "docs/team/shots/critic/round-1/studio--desktop-light-after-input.png"
+      ],
+      "status": 200,
+      "loadMs": 1095,
+      "finalUrl": "/editor/demo",
+      "audit": {
+        "title": "Demo game · Degamed",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 19,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 13,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "12px",
+          "13px",
+          "15px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(246, 246, 249)",
+        "colorScheme": "light",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "fps": {
+        "samples": [
+          14,
+          13,
+          11,
+          10,
+          9
+        ],
+        "median": 11,
+        "min": 9,
+        "raf": [
+          11
+        ],
+        "longTasks": 8
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [
+        "net::ERR_ABORTED http://localhost:5174/@fs/home/user/degamed/packages/engine/src/tilemap.ts",
+        "net::ERR_ABORTED http://localhost:5174/@fs/home/user/degamed/packages/art/src/index.ts?t=1791768751605",
+        "net::ERR_ABORTED http://localhost:5174/node_modules/.vite/deps/zod.js?v=f83a1c42",
+        "net::ERR_ABORTED http://localhost:5174/@fs/home/user/degamed/packages/engine/src/atmosphere-math.ts?t=1791768603629",
+        "net::ERR_ABORTED http://localhost:5174/@fs/home/user/degamed/packages/engine/src/touch.ts",
+        "net::ERR_ABORTED http://localhost:5174/node_modules/.vite/deps/phaser.js?v=2846a737",
+        "net::ERR_ABORTED http://localhost:5174/@fs/home/user/degamed/packages/engine/src/atmosphere.ts?t=1791769041619",
+        "net::ERR_ABORTED http://localhost:5174/@fs/home/user/degamed/packages/engine/src/kits/index.ts?t=1791769159978",
+        "net::ERR_ABORTED http://localhost:5174/@fs/home/user/degamed/packages/engine/src/font.ts"
+      ],
+      "hosts": {
+        "localhost:5173": 231,
+        "localhost:5174": 77
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "studio",
+      "viewport": "phone",
+      "scheme": "dark",
+      "path": "/editor/demo",
+      "shots": [
+        "docs/team/shots/critic/round-1/studio--phone-dark.png",
+        "docs/team/shots/critic/round-1/studio--phone-dark-game.png",
+        "docs/team/shots/critic/round-1/studio--phone-dark-after-input.png"
+      ],
+      "status": 200,
+      "loadMs": 1886,
+      "finalUrl": "/editor/demo",
+      "audit": {
+        "title": "Demo game · Degamed",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 17,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 13,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "12px",
+          "13px",
+          "15px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(5, 5, 8)",
+        "colorScheme": "dark",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "fps": {
+        "samples": [
+          7,
+          11,
+          8,
+          10,
+          11
+        ],
+        "median": 10,
+        "min": 7,
+        "raf": [
+          10
+        ],
+        "longTasks": 7
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [
+        "net::ERR_ABORTED http://localhost:5174/@vite/client",
+        "net::ERR_ABORTED http://localhost:5174/src/main.ts?t=1791769192650"
+      ],
+      "hosts": {
+        "localhost:5173": 222,
+        "localhost:5174": 53
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "studio",
+      "viewport": "phone",
+      "scheme": "light",
+      "path": "/editor/demo",
+      "shots": [
+        "docs/team/shots/critic/round-1/studio--phone-light.png",
+        "docs/team/shots/critic/round-1/studio--phone-light-game.png",
+        "docs/team/shots/critic/round-1/studio--phone-light-after-input.png"
+      ],
+      "status": 200,
+      "loadMs": 1390,
+      "finalUrl": "/editor/demo",
+      "audit": {
+        "title": "Demo game · Degamed",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 17,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 13,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "12px",
+          "13px",
+          "15px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(12, 12, 17)",
+        "colorScheme": "light",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "fps": {
+        "samples": [
+          11,
+          9,
+          9,
+          10,
+          7
+        ],
+        "median": 9,
+        "min": 7,
+        "raf": [
+          9
+        ],
+        "longTasks": 8
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [
+        "net::ERR_ABORTED http://localhost:5174/@vite/client",
+        "net::ERR_ABORTED http://localhost:5174/src/main.ts?t=1791769192650"
+      ],
+      "hosts": {
+        "localhost:5173": 222,
+        "localhost:5174": 53
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "advanced",
+      "viewport": "desktop",
+      "scheme": "dark",
+      "path": "/editor/demo/advanced",
+      "shots": [
+        "docs/team/shots/critic/round-1/advanced--desktop-dark.png",
+        "docs/team/shots/critic/round-1/advanced--desktop-dark-game.png",
+        "docs/team/shots/critic/round-1/advanced--desktop-dark-after-input.png"
+      ],
+      "status": 200,
+      "loadMs": 2123,
+      "finalUrl": "/editor/demo/advanced",
+      "audit": {
+        "title": "Demo game · Advanced · Degamed",
+        "lang": "en",
+        "h1": 0,
+        "interactive": 208,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 208,
+        "tinyText": 27,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "10px",
+          "10.5px",
+          "11px",
+          "11.5px",
+          "12px",
+          "12.5px",
+          "13px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "oklab(0.258239 0.0213286 -0.0710209 / 0.7)",
+        "colorScheme": "dark",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "fps": {
+        "samples": [
+          4,
+          8,
+          5,
+          8,
+          6
+        ],
+        "median": 6,
+        "min": 4,
+        "raf": [
+          6
+        ],
+        "longTasks": 33
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [
+        "net::ERR_ABORTED http://localhost:5174/src/main.ts?t=1791769192650",
+        "net::ERR_ABORTED http://localhost:5174/@vite/client"
+      ],
+      "hosts": {
+        "localhost:5173": 302,
+        "localhost:5174": 53
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "advanced",
+      "viewport": "desktop",
+      "scheme": "light",
+      "path": "/editor/demo/advanced",
+      "shots": [
+        "docs/team/shots/critic/round-1/advanced--desktop-light.png",
+        "docs/team/shots/critic/round-1/advanced--desktop-light-game.png",
+        "docs/team/shots/critic/round-1/advanced--desktop-light-after-input.png"
+      ],
+      "status": 200,
+      "loadMs": 1637,
+      "finalUrl": "/editor/demo/advanced",
+      "audit": {
+        "title": "Demo game · Advanced · Degamed",
+        "lang": "en",
+        "h1": 0,
+        "interactive": 208,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 208,
+        "tinyText": 27,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "10px",
+          "10.5px",
+          "11px",
+          "11.5px",
+          "12px",
+          "12.5px",
+          "13px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "oklab(0.948988 0.011499 -0.0245047 / 0.7)",
+        "colorScheme": "light",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "fps": {
+        "samples": [
+          7,
+          9,
+          5,
+          10,
+          7
+        ],
+        "median": 7,
+        "min": 5,
+        "raf": [
+          8
+        ],
+        "longTasks": 37
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [
+        "net::ERR_ABORTED http://localhost:5174/src/main.ts?t=1791769192650",
+        "net::ERR_ABORTED http://localhost:5174/@vite/client"
+      ],
+      "hosts": {
+        "localhost:5173": 302,
+        "localhost:5174": 53
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "advanced",
+      "viewport": "phone",
+      "scheme": "dark",
+      "path": "/editor/demo/advanced",
+      "shots": [
+        "docs/team/shots/critic/round-1/advanced--phone-dark.png"
+      ],
+      "status": 200,
+      "loadMs": 1371,
+      "finalUrl": "/editor/demo/advanced",
+      "audit": {
+        "title": "Demo game · Advanced · Degamed",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "22px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(12, 12, 17)",
+        "colorScheme": "dark",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "fps": {
+        "error": "no iframe or canvas found"
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 300
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "advanced",
+      "viewport": "phone",
+      "scheme": "light",
+      "path": "/editor/demo/advanced",
+      "shots": [
+        "docs/team/shots/critic/round-1/advanced--phone-light.png"
+      ],
+      "status": 200,
+      "loadMs": 2024,
+      "finalUrl": "/editor/demo/advanced",
+      "audit": {
+        "title": "Demo game · Advanced · Degamed",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "22px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(246, 246, 249)",
+        "colorScheme": "light",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "fps": {
+        "error": "no iframe or canvas found"
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 300
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "play-demo",
+      "viewport": "desktop",
+      "scheme": "dark",
+      "path": "/play/demo",
+      "shots": [
+        "docs/team/shots/critic/round-1/play-demo--desktop-dark.png",
+        "docs/team/shots/critic/round-1/play-demo--desktop-dark-game.png",
+        "docs/team/shots/critic/round-1/play-demo--desktop-dark-after-input.png"
+      ],
+      "status": 200,
+      "loadMs": 1118,
+      "finalUrl": "/play/demo",
+      "audit": {
+        "title": "Demo game · Play on Degamed",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 3,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 2,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "13px",
+          "15px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(5, 5, 8)",
+        "colorScheme": "dark",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "fps": {
+        "samples": [
+          11,
+          11,
+          11,
+          9,
+          10
+        ],
+        "median": 11,
+        "min": 9,
+        "raf": [
+          10
+        ],
+        "longTasks": 9
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 111,
+        "localhost:5174": 50
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "play-demo",
+      "viewport": "desktop",
+      "scheme": "light",
+      "path": "/play/demo",
+      "shots": [
+        "docs/team/shots/critic/round-1/play-demo--desktop-light.png",
+        "docs/team/shots/critic/round-1/play-demo--desktop-light-game.png",
+        "docs/team/shots/critic/round-1/play-demo--desktop-light-after-input.png"
+      ],
+      "status": 200,
+      "loadMs": 1250,
+      "finalUrl": "/play/demo",
+      "audit": {
+        "title": "Demo game · Play on Degamed",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "13px",
+          "15px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(5, 5, 8)",
+        "colorScheme": "light",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "fps": {
+        "samples": [
+          6,
+          8,
+          5,
+          7,
+          8
+        ],
+        "median": 7,
+        "min": 5,
+        "raf": [
+          7
+        ],
+        "longTasks": 11
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 111,
+        "localhost:5174": 50
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "play-demo",
+      "viewport": "phone",
+      "scheme": "dark",
+      "path": "/play/demo",
+      "shots": [
+        "docs/team/shots/critic/round-1/play-demo--phone-dark.png",
+        "docs/team/shots/critic/round-1/play-demo--phone-dark-game.png",
+        "docs/team/shots/critic/round-1/play-demo--phone-dark-after-input.png"
+      ],
+      "status": 200,
+      "loadMs": 1228,
+      "finalUrl": "/play/demo",
+      "audit": {
+        "title": "Demo game · Play on Degamed",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 3,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 2,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "13px",
+          "15px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(5, 5, 8)",
+        "colorScheme": "dark",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "fps": {
+        "samples": [
+          10,
+          10,
+          11,
+          13,
+          10
+        ],
+        "median": 10,
+        "min": 10,
+        "raf": [
+          11
+        ],
+        "longTasks": 11
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 111,
+        "localhost:5174": 50
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "play-demo",
+      "viewport": "phone",
+      "scheme": "light",
+      "path": "/play/demo",
+      "shots": [
+        "docs/team/shots/critic/round-1/play-demo--phone-light.png",
+        "docs/team/shots/critic/round-1/play-demo--phone-light-game.png",
+        "docs/team/shots/critic/round-1/play-demo--phone-light-after-input.png"
+      ],
+      "status": 200,
+      "loadMs": 1327,
+      "finalUrl": "/play/demo",
+      "audit": {
+        "title": "Demo game · Play on Degamed",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 3,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 2,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "13px",
+          "15px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(5, 5, 8)",
+        "colorScheme": "light",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "fps": {
+        "samples": [
+          10,
+          8,
+          13,
+          8,
+          12
+        ],
+        "median": 10,
+        "min": 8,
+        "raf": [
+          10
+        ],
+        "longTasks": 9
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 111,
+        "localhost:5174": 50
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "gallery",
+      "viewport": "desktop",
+      "scheme": "dark",
+      "path": "/gallery",
+      "shots": [
+        "docs/team/shots/critic/round-1/gallery--desktop-dark.png",
+        "docs/team/shots/critic/round-1/gallery--desktop-dark-full.png"
+      ],
+      "status": 200,
+      "loadMs": 1537,
+      "finalUrl": "/gallery",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(12, 12, 17)",
+        "colorScheme": "dark",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 112
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "gallery",
+      "viewport": "desktop",
+      "scheme": "light",
+      "path": "/gallery",
+      "shots": [
+        "docs/team/shots/critic/round-1/gallery--desktop-light.png"
+      ],
+      "status": 200,
+      "loadMs": 1470,
+      "finalUrl": "/gallery",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(246, 246, 249)",
+        "colorScheme": "light",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 112
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "gallery",
+      "viewport": "phone",
+      "scheme": "dark",
+      "path": "/gallery",
+      "shots": [
+        "docs/team/shots/critic/round-1/gallery--phone-dark.png"
+      ],
+      "status": 200,
+      "loadMs": 1458,
+      "finalUrl": "/gallery",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(12, 12, 17)",
+        "colorScheme": "dark",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 112
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "gallery",
+      "viewport": "phone",
+      "scheme": "light",
+      "path": "/gallery",
+      "shots": [
+        "docs/team/shots/critic/round-1/gallery--phone-light.png"
+      ],
+      "status": 200,
+      "loadMs": 1485,
+      "finalUrl": "/gallery",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(246, 246, 249)",
+        "colorScheme": "light",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 112
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "not-found",
+      "viewport": "desktop",
+      "scheme": "dark",
+      "path": "/this-page-does-not-exist",
+      "shots": [
+        "docs/team/shots/critic/round-1/not-found--desktop-dark.png",
+        "docs/team/shots/critic/round-1/not-found--desktop-dark-full.png"
+      ],
+      "status": 200,
+      "loadMs": 1360,
+      "finalUrl": "/this-page-does-not-exist",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(12, 12, 17)",
+        "colorScheme": "dark",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 112
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "not-found",
+      "viewport": "desktop",
+      "scheme": "light",
+      "path": "/this-page-does-not-exist",
+      "shots": [
+        "docs/team/shots/critic/round-1/not-found--desktop-light.png"
+      ],
+      "status": 200,
+      "loadMs": 1322,
+      "finalUrl": "/this-page-does-not-exist",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(246, 246, 249)",
+        "colorScheme": "light",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 112
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "not-found",
+      "viewport": "phone",
+      "scheme": "dark",
+      "path": "/this-page-does-not-exist",
+      "shots": [
+        "docs/team/shots/critic/round-1/not-found--phone-dark.png"
+      ],
+      "status": 200,
+      "loadMs": 1390,
+      "finalUrl": "/this-page-does-not-exist",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(12, 12, 17)",
+        "colorScheme": "dark",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 112
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "not-found",
+      "viewport": "phone",
+      "scheme": "light",
+      "path": "/this-page-does-not-exist",
+      "shots": [
+        "docs/team/shots/critic/round-1/not-found--phone-light.png"
+      ],
+      "status": 200,
+      "loadMs": 1274,
+      "finalUrl": "/this-page-does-not-exist",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(246, 246, 249)",
+        "colorScheme": "light",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 112
+      },
+      "apiRequests": []
+    }
+  ],
+  "journey": [
+    {
+      "viewport": "desktop",
+      "reachedPlay": true,
+      "seconds": 12,
+      "clicks": 3,
+      "typed": true,
+      "finalUrl": "/play/gmv4l88n593q4k3",
+      "steps": [
+        {
+          "at": 0,
+          "what": "landing",
+          "shot": "docs/team/shots/critic/round-1/journey--desktop-00-landing.png"
+        },
+        {
+          "at": 3829,
+          "what": "typed prompt",
+          "shot": "docs/team/shots/critic/round-1/journey--desktop-01-typed.png"
+        },
+        {
+          "at": 4307,
+          "what": "clicked \"Make my game\"",
+          "url": "/editor/gmv4l88n593q4k3",
+          "shot": "docs/team/shots/critic/round-1/journey--desktop-03-step.png"
+        },
+        {
+          "at": 10918,
+          "what": "clicked \"Play\"",
+          "url": "/play/gmv4l88n593q4k3",
+          "shot": "docs/team/shots/critic/round-1/journey--desktop-04-step.png"
+        }
+      ],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 112,
+        "localhost:5174": 150
+      },
+      "apiRequests": [],
+      "finalShot": "docs/team/shots/critic/round-1/journey--desktop-04-playing.png"
+    },
+    {
+      "viewport": "phone",
+      "reachedPlay": true,
+      "seconds": 11.8,
+      "clicks": 2,
+      "typed": true,
+      "finalUrl": "/editor/gmv4l8kxkesv1t0",
+      "steps": [
+        {
+          "at": 0,
+          "what": "landing",
+          "shot": "docs/team/shots/critic/round-1/journey--phone-00-landing.png"
+        },
+        {
+          "at": 5440,
+          "what": "typed prompt",
+          "shot": "docs/team/shots/critic/round-1/journey--phone-01-typed.png"
+        },
+        {
+          "at": 6097,
+          "what": "clicked \"Make my game\"",
+          "url": "/editor/gmv4l8kxkesv1t0",
+          "shot": "docs/team/shots/critic/round-1/journey--phone-03-step.png"
+        }
+      ],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 112,
+        "localhost:5174": 50
+      },
+      "apiRequests": [],
+      "finalShot": "docs/team/shots/critic/round-1/journey--phone-03-playing.png"
+    }
+  ],
+  "bundles": {
+    "web": {
+      "pkg": "@degamed/web",
+      "ok": true,
+      "ms": 3042,
+      "totalBytes": 2420522,
+      "jsGzip": 528006,
+      "cssGzip": 13034,
+      "initialGzip": 306931,
+      "initialFiles": [
+        "assets/index-ClgMw9Kf.js",
+        "assets/index-CfNppZtt.css"
+      ],
+      "largest": [
+        {
+          "file": "assets/index-ClgMw9Kf.js",
+          "bytes": 980041,
+          "gzip": 293897
+        },
+        {
+          "file": "assets/Editor-OJHZSN7r.js",
+          "bytes": 715775,
+          "gzip": 234109
+        },
+        {
+          "file": "art/themes/rain-ruins.png",
+          "bytes": 156083,
+          "gzip": 156083
+        },
+        {
+          "file": "art/themes/hollow-caverns.png",
+          "bytes": 146010,
+          "gzip": 146010
+        },
+        {
+          "file": "art/themes/sunlit-meadow.png",
+          "bytes": 109608,
+          "gzip": 109608
+        },
+        {
+          "file": "art/themes/ember-forge.png",
+          "bytes": 99230,
+          "gzip": 99230
+        },
+        {
+          "file": "fonts/bricolage-grotesque-latin-wght-normal.woff2",
+          "bytes": 41344,
+          "gzip": 41344
+        },
+        {
+          "file": "fonts/jetbrains-mono-latin-wght-normal.woff2",
+          "bytes": 40404,
+          "gzip": 40404
+        }
+      ],
+      "fileCount": 16,
+      "warnings": [
+        "(!) Some chunks are larger than 500 kB after minification. Consider:",
+        "- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit."
+      ]
+    },
+    "play": {
+      "pkg": "@degamed/play",
+      "ok": true,
+      "ms": 1854,
+      "totalBytes": 1626321,
+      "jsGzip": 434689,
+      "cssGzip": 0,
+      "initialGzip": 434689,
+      "initialFiles": [
+        "assets/index-vZkSOf_q.js"
+      ],
+      "largest": [
+        {
+          "file": "assets/index-vZkSOf_q.js",
+          "bytes": 1624788,
+          "gzip": 434689
+        },
+        {
+          "file": "_headers",
+          "bytes": 774,
+          "gzip": 774
+        },
+        {
+          "file": "index.html",
+          "bytes": 759,
+          "gzip": 487
+        }
+      ],
+      "fileCount": 3,
+      "warnings": []
+    }
+  },
+  "budget": {
+    "consoleErrors": 0,
+    "journeySeconds": 60,
+    "journeyClicks": 3,
+    "fpsMedian": 55,
+    "fpsMedianHeadless": 30,
+    "initialJsGzip": 174080,
+    "largestChunkGzip": 409600,
+    "cssGzip": 35840,
+    "playerJsGzip": 256000,
+    "pageLoadMs": 2500
+  },
+  "contracts": [
+    {
+      "ok": true,
+      "owner": "art",
+      "what": "packages/engine/src/art/index.ts exports ART_THEMES, getTheme, ArtTheme, SpriteSheet, SheetAnim"
+    },
+    {
+      "ok": true,
+      "owner": "engine",
+      "what": "packages/engine/src/kits/index.ts exports KITS, buildGame, readSpec, Kit, KitParam, GameSpec"
+    },
+    {
+      "ok": true,
+      "owner": "engine",
+      "what": "packages/shared/src/index.ts exports Environment, Light"
+    },
+    {
+      "ok": true,
+      "owner": "ai",
+      "what": "packages/ai/src/index.ts exports createGame, editGame, suggestions, availableProviders, ProviderId, AiSettings, Progress, ChatTurn"
+    },
+    {
+      "ok": true,
+      "owner": "engine",
+      "what": "@degamed/engine/kits: exported"
+    },
+    {
+      "ok": false,
+      "owner": "engine",
+      "what": "@degamed/engine/art is imported by apps/web/src/lib/game/index.ts, apps/web/src/lib/game/preview.ts but packages/engine/package.json has no \"exports\"[\"./art\"]"
+    },
+    {
+      "ok": true,
+      "owner": "design",
+      "what": "apps/web → @degamed/ai: imported and declared"
+    },
+    {
+      "ok": true,
+      "owner": "ai",
+      "what": "packages/ai → @degamed/engine: imported and declared"
+    },
+    {
+      "ok": true,
+      "owner": "engine",
+      "what": "apps/play → @degamed/engine: imported and declared"
+    }
+  ],
+  "checks": {
+    "typecheck": {
+      "ok": false,
+      "failing": [
+        "packages/engine"
+      ],
+      "tail": "packages/engine typecheck: src/kits/kits.test.ts(168,36): error TS2345: Argument of type '{ jumpHeight?: undefined; speed?: undefined; gravity?: undefined; difficulty?: undefined; length?: undefined; } | { jumpHeight: number; speed: number; gravity: number; difficulty?: undefined; length?: undefined; } | { ...; } | { ...; }' is not assignable to parameter of type 'Record<string, string | number | boolean> | undefined'.\npackages/engine typecheck: Failed\n ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @degamed/engine@0.0.0 typecheck: `tsc -p tsconfig.json`\n ELIFECYCLE  Command failed with exit code 1."
+    },
+    "test": {
+      "ok": true,
+      "failing": [],
+      "tail": ""
+    }
+  },
+  "fails": [
+    "login/desktop/light: 1 console/page errors, first: You are calling ReactDOMClient.createRoot() on a container that has already been passed to createRoot() before. Instead, call root.render() ",
+    "settings/phone/dark: 1 console/page errors, first: You are calling ReactDOMClient.createRoot() on a container that has already been passed to createRoot() before. Instead, call root.render() ",
+    "studio/desktop/dark: 1 console/page errors, first: You are calling ReactDOMClient.createRoot() on a container that has already been passed to createRoot() before. Instead, call root.render() ",
+    "web initial 299.7 kB > 170.0 kB",
+    "player JS 424.5 kB > 250.0 kB",
+    "contract [engine]: @degamed/engine/art is imported by apps/web/src/lib/game/index.ts, apps/web/src/lib/game/preview.ts but packages/engine/package.json has no \"exports\"[\"./art\"]",
+    "pnpm typecheck failing in packages/engine"
+  ],
+  "warns": [
+    "studio/desktop/dark: fps median 10 (headless)",
+    "studio/desktop/light: fps median 11 (headless)",
+    "studio/phone/dark: fps median 10 (headless)",
+    "studio/phone/light: fps median 9 (headless)",
+    "advanced/desktop/dark: fps median 6 (headless)",
+    "advanced/desktop/light: fps median 7 (headless)",
+    "play-demo/desktop/dark: fps median 11 (headless)",
+    "play-demo/desktop/light: fps median 7 (headless)",
+    "play-demo/phone/dark: fps median 10 (headless)",
+    "play-demo/phone/light: fps median 10 (headless)"
+  ]
+}

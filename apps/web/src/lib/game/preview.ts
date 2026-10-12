@@ -11,11 +11,22 @@ function toCanvas(r: Raster): HTMLCanvasElement {
   const c = document.createElement('canvas');
   c.width = r.width;
   c.height = r.height;
-  c.getContext('2d')!.putImageData(new ImageData(new Uint8ClampedArray(r.data), r.width, r.height), 0, 0);
+  c.getContext('2d')!.putImageData(
+    new ImageData(new Uint8ClampedArray(r.data), r.width, r.height),
+    0,
+    0,
+  );
   return c;
 }
 
-function frame(ctx: CanvasRenderingContext2D, s: SpriteSheet, index: number, x: number, y: number, flip = false) {
+function frame(
+  ctx: CanvasRenderingContext2D,
+  s: SpriteSheet,
+  index: number,
+  x: number,
+  y: number,
+  flip = false,
+) {
   const src = toCanvas(s.raster);
   const cols = Math.max(1, Math.floor(s.raster.width / s.frameWidth));
   const sx = (index % cols) * s.frameWidth;
@@ -29,9 +40,17 @@ function frame(ctx: CanvasRenderingContext2D, s: SpriteSheet, index: number, x: 
   ctx.restore();
 }
 
-function tileRow(ctx: CanvasRenderingContext2D, r: Raster, x0: number, x1: number, y: number, rows = 1) {
+function tileRow(
+  ctx: CanvasRenderingContext2D,
+  r: Raster,
+  x0: number,
+  x1: number,
+  y: number,
+  rows = 1,
+) {
   const c = toCanvas(r);
-  for (let row = 0; row < rows; row++) for (let x = x0; x < x1; x += r.width) ctx.drawImage(c, x, y + row * r.height);
+  for (let row = 0; row < rows; row++)
+    for (let x = x0; x < x1; x += r.width) ctx.drawImage(c, x, y + row * r.height);
 }
 
 /** A PNG data URL of the theme's key art. Width × height in game pixels (shown pixelated). */
@@ -42,7 +61,9 @@ export function themePreview(theme: ThemeArt, width = 320, height = 180): string
   // Real themes have an environment: use the art package's renderer (lighting, fog, particles).
   if (theme.environment) {
     try {
-      const url = toCanvas(renderPreview(theme as unknown as ArtTheme, { width, height })).toDataURL('image/png');
+      const url = toCanvas(
+        renderPreview(theme as unknown as ArtTheme, { width, height }),
+      ).toDataURL('image/png');
       cache.set(key, url);
       return url;
     } catch {
@@ -68,16 +89,36 @@ export function themePreview(theme: ThemeArt, width = 320, height = 180): string
 
   const { ground, fill, platform } = theme.tiles;
   tileRow(ctx, ground, 0, width, groundY);
-  tileRow(ctx, fill, 0, width, groundY + ground.height, Math.ceil((height - groundY) / fill.height));
+  tileRow(
+    ctx,
+    fill,
+    0,
+    width,
+    groundY + ground.height,
+    Math.ceil((height - groundY) / fill.height),
+  );
   const pw = platform.width * 4;
   const px = Math.round(width * 0.52);
   const py = groundY - 52;
   tileRow(ctx, platform, px, px + pw, py);
 
   const s = theme.sprites;
-  frame(ctx, s.hero, s.hero.animations.jump?.frames[0] ?? 0, Math.round(width * 0.22), groundY - s.hero.frameHeight - 22);
+  frame(
+    ctx,
+    s.hero,
+    s.hero.animations.jump?.frames[0] ?? 0,
+    Math.round(width * 0.22),
+    groundY - s.hero.frameHeight - 22,
+  );
   frame(ctx, s.enemy, 0, Math.round(width * 0.4), groundY - s.enemy.frameHeight, true);
-  for (let k = 0; k < 3; k++) frame(ctx, s.pickup, k % Math.max(1, s.pickup.animations.idle?.frames.length ?? 1), px + 6 + k * (s.pickup.frameWidth + 6), py - s.pickup.frameHeight - 6);
+  for (let k = 0; k < 3; k++)
+    frame(
+      ctx,
+      s.pickup,
+      k % Math.max(1, s.pickup.animations.idle?.frames.length ?? 1),
+      px + 6 + k * (s.pickup.frameWidth + 6),
+      py - s.pickup.frameHeight - 6,
+    );
   frame(ctx, s.goal, 0, Math.round(width * 0.86), groundY - s.goal.frameHeight);
 
   const url = c.toDataURL('image/png');

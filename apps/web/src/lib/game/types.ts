@@ -57,7 +57,13 @@ export interface ThemeArt {
   background: string;
   layers: { name: string; raster: Raster; factor: number; y?: number; tiled?: boolean }[];
   tiles: { ground: Raster; fill: Raster; platform: Raster; [k: string]: Raster };
-  sprites: { hero: SpriteSheet; enemy: SpriteSheet; pickup: SpriteSheet; goal: SpriteSheet; [k: string]: SpriteSheet };
+  sprites: {
+    hero: SpriteSheet;
+    enemy: SpriteSheet;
+    pickup: SpriteSheet;
+    goal: SpriteSheet;
+    [k: string]: SpriteSheet;
+  };
   props?: Record<string, Raster>;
   /** Lighting, fog, particles and grade (rendered by the engine). */
   environment?: Record<string, unknown>;

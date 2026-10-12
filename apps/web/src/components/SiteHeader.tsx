@@ -4,13 +4,21 @@ import { ButtonLink, ThemeToggle, cx } from '../ui';
 import { Logo } from './Logo';
 
 const navClass = ({ isActive }: { isActive: boolean }) =>
-  cx('rounded-sm px-1 text-body font-medium transition-colors', isActive ? 'text-ink' : 'text-muted hover:text-ink');
+  cx(
+    'rounded-sm px-1 text-body font-medium transition-colors',
+    isActive ? 'text-ink' : 'text-muted hover:text-ink',
+  );
 
 /** Marketing-site header: logo, a couple of links, appearance and one primary action. */
 export function SiteHeader({ overlay = false }: { overlay?: boolean }) {
   const { session } = useAuth();
   return (
-    <header className={cx('sticky top-0 z-40 border-b backdrop-blur-xl', overlay ? 'border-transparent bg-transparent' : 'border-line/60 bg-glass')}>
+    <header
+      className={cx(
+        'sticky top-0 z-40 border-b backdrop-blur-xl',
+        overlay ? 'border-transparent bg-transparent' : 'border-line/60 bg-glass',
+      )}
+    >
       <div className="mx-auto flex h-16 max-w-[1200px] items-center gap-8 px-4 sm:px-6">
         <Logo />
         <nav aria-label="Site" className="hidden items-center gap-6 md:flex">
@@ -27,7 +35,10 @@ export function SiteHeader({ overlay = false }: { overlay?: boolean }) {
         <div className="ml-auto flex items-center gap-2">
           <ThemeToggle />
           {!session && (
-            <Link to="/login" className="hidden h-10 items-center rounded-md px-3 text-body font-semibold text-ink-2 hover:bg-surface-2 hover:text-ink sm:inline-flex">
+            <Link
+              to="/login"
+              className="hidden h-10 items-center rounded-md px-3 text-body font-semibold text-ink-2 hover:bg-surface-2 hover:text-ink sm:inline-flex"
+            >
               Log in
             </Link>
           )}

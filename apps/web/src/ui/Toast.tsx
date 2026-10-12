@@ -30,15 +30,33 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <Ctx.Provider value={push}>
       {children}
-      <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-4 z-[300] flex flex-col items-center gap-2 px-4 sm:bottom-6">
+      <div
+        aria-live="polite"
+        className="pointer-events-none fixed inset-x-0 bottom-4 z-[300] flex flex-col items-center gap-2 px-4 sm:bottom-6"
+      >
         {items.map((t) => (
           <div
             key={t.id}
             role="status"
             className="pointer-events-auto flex w-full max-w-md animate-rise items-start gap-3 rounded-lg border border-line bg-surface py-3 pr-2 pl-4 text-ink shadow-3"
           >
-            <span className={cx('mt-0.5 shrink-0', t.tone === 'success' ? 'text-ok' : t.tone === 'error' ? 'text-bad' : 'text-brand-ink')}>
-              {t.tone === 'success' ? <CheckCircle2 size={18} /> : t.tone === 'error' ? <TriangleAlert size={18} /> : <Info size={18} />}
+            <span
+              className={cx(
+                'mt-0.5 shrink-0',
+                t.tone === 'success'
+                  ? 'text-ok'
+                  : t.tone === 'error'
+                    ? 'text-bad'
+                    : 'text-brand-ink',
+              )}
+            >
+              {t.tone === 'success' ? (
+                <CheckCircle2 size={18} />
+              ) : t.tone === 'error' ? (
+                <TriangleAlert size={18} />
+              ) : (
+                <Info size={18} />
+              )}
             </span>
             <div className="flex min-w-0 flex-1 flex-col">
               <strong className="text-body font-semibold">{t.title}</strong>
@@ -56,7 +74,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 {t.action.label}
               </button>
             )}
-            <button type="button" aria-label="Dismiss" onClick={() => dismiss(t.id)} className="flex size-8 shrink-0 items-center justify-center rounded-sm text-muted hover:bg-surface-2 hover:text-ink">
+            <button
+              type="button"
+              aria-label="Dismiss"
+              onClick={() => dismiss(t.id)}
+              className="flex size-8 shrink-0 items-center justify-center rounded-sm text-muted hover:bg-surface-2 hover:text-ink"
+            >
               <X size={16} />
             </button>
           </div>

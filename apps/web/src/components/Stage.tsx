@@ -1,4 +1,13 @@
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState, type ReactNode } from 'react';
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import { Maximize2, MousePointerClick, Play, RotateCcw, TriangleAlert } from 'lucide-react';
 import type { ProjectFiles } from '@degamed/shared';
 import { usePlayFrame } from '../lib/play';
@@ -15,23 +24,42 @@ export interface StageHandle {
  * Shows real art (poster) while the engine loads, a gentle "click to play" hint,
  * and a calm message if the game crashes.
  */
-export const Stage = forwardRef<StageHandle, {
-  /** The game. A function is only called once the game starts (keeps the landing page light). */
-  files: ProjectFiles | null | (() => ProjectFiles);
-  title: string;
-  /** Image shown before the game starts and while it loads. */
-  poster?: string;
-  /** Start right away (Studio) or wait for a click (landing page). */
-  autoStart?: boolean;
-  className?: string;
-  /** Hide the hover controls (restart, full screen). */
-  bare?: boolean;
-  startLabel?: string;
-  startHint?: ReactNode;
-  rounded?: boolean;
-}>(function Stage({ files: filesProp, title, poster, autoStart = true, className, bare = false, startLabel = 'Play', startHint, rounded = true }, ref) {
+export const Stage = forwardRef<
+  StageHandle,
+  {
+    /** The game. A function is only called once the game starts (keeps the landing page light). */
+    files: ProjectFiles | null | (() => ProjectFiles);
+    title: string;
+    /** Image shown before the game starts and while it loads. */
+    poster?: string;
+    /** Start right away (Studio) or wait for a click (landing page). */
+    autoStart?: boolean;
+    className?: string;
+    /** Hide the hover controls (restart, full screen). */
+    bare?: boolean;
+    startLabel?: string;
+    startHint?: ReactNode;
+    rounded?: boolean;
+  }
+>(function Stage(
+  {
+    files: filesProp,
+    title,
+    poster,
+    autoStart = true,
+    className,
+    bare = false,
+    startLabel = 'Play',
+    startHint,
+    rounded = true,
+  },
+  ref,
+) {
   const [started, setStarted] = useState(autoStart);
-  const files = useMemo(() => (typeof filesProp === 'function' ? (started ? filesProp() : null) : filesProp), [filesProp, started]);
+  const files = useMemo(
+    () => (typeof filesProp === 'function' ? (started ? filesProp() : null) : filesProp),
+    [filesProp, started],
+  );
   const [focused, setFocused] = useState(false);
   const [hinted, setHinted] = useState(false);
   const box = useRef<HTMLDivElement>(null);
@@ -87,14 +115,21 @@ export const Stage = forwardRef<StageHandle, {
   return (
     <div
       ref={box}
-      className={cx('group relative isolate aspect-video w-full overflow-hidden bg-stage', rounded && 'rounded-xl', className)}
+      className={cx(
+        'group relative isolate aspect-video w-full overflow-hidden bg-stage',
+        rounded && 'rounded-xl',
+        className,
+      )}
     >
       {poster && (
         <img
           src={poster}
           alt=""
           aria-hidden="true"
-          className={cx('pixelated absolute inset-0 h-full w-full object-cover transition-opacity duration-300', started && play.ready ? 'opacity-0' : 'opacity-100')}
+          className={cx(
+            'pixelated absolute inset-0 h-full w-full object-cover transition-opacity duration-300',
+            started && play.ready ? 'opacity-0' : 'opacity-100',
+          )}
         />
       )}
 
@@ -105,7 +140,10 @@ export const Stage = forwardRef<StageHandle, {
           title={`${title} (game)`}
           sandbox="allow-scripts"
           allow="autoplay; fullscreen; gamepad"
-          className={cx('absolute inset-0 h-full w-full border-0 transition-opacity duration-300', play.ready ? 'opacity-100' : 'opacity-0')}
+          className={cx(
+            'absolute inset-0 h-full w-full border-0 transition-opacity duration-300',
+            play.ready ? 'opacity-100' : 'opacity-0',
+          )}
         />
       )}
 
@@ -118,12 +156,19 @@ export const Stage = forwardRef<StageHandle, {
           >
             <Play size={20} fill="currentColor" aria-hidden="true" /> {startLabel}
           </button>
-          {startHint && <span className="text-body-sm font-medium text-white/90 [text-shadow:0_1px_8px_rgb(0_0_0/0.6)]">{startHint}</span>}
+          {startHint && (
+            <span className="text-body-sm font-medium text-white/90 [text-shadow:0_1px_8px_rgb(0_0_0/0.6)]">
+              {startHint}
+            </span>
+          )}
         </div>
       )}
 
       {loading && (
-        <div className="absolute inset-0 flex items-end justify-center bg-black/25 pb-6" aria-live="polite">
+        <div
+          className="absolute inset-0 flex items-end justify-center bg-black/25 pb-6"
+          aria-live="polite"
+        >
           <span className="inline-flex items-center gap-2 rounded-full bg-black/60 px-3.5 py-1.5 text-body-sm font-medium text-white backdrop-blur">
             <span className="size-2 animate-pulse-soft rounded-full bg-[#4fd8ef]" />
             Loading the game…
@@ -142,10 +187,17 @@ export const Stage = forwardRef<StageHandle, {
       )}
 
       {error && (
-        <div role="alert" className="absolute inset-x-4 bottom-4 flex animate-rise items-center gap-3 rounded-lg bg-black/75 py-2.5 pr-2.5 pl-3.5 text-body-sm text-white backdrop-blur">
+        <div
+          role="alert"
+          className="absolute inset-x-4 bottom-4 flex animate-rise items-center gap-3 rounded-lg bg-black/75 py-2.5 pr-2.5 pl-3.5 text-body-sm text-white backdrop-blur"
+        >
           <TriangleAlert size={16} className="shrink-0 text-[#fbbf24]" aria-hidden="true" />
           <span className="min-w-0 flex-1 truncate">The game hit a problem: {error.message}</span>
-          <button type="button" onClick={() => files && play.run(files)} className="h-8 shrink-0 rounded-sm bg-white/15 px-3 font-semibold hover:bg-white/25">
+          <button
+            type="button"
+            onClick={() => files && play.run(files)}
+            className="h-8 shrink-0 rounded-sm bg-white/15 px-3 font-semibold hover:bg-white/25"
+          >
             Restart
           </button>
         </div>
@@ -153,10 +205,20 @@ export const Stage = forwardRef<StageHandle, {
 
       {!bare && started && play.ready && (
         <div className="absolute top-3 right-3 flex gap-1 rounded-md bg-black/55 p-1 opacity-0 backdrop-blur transition-opacity duration-200 group-hover:opacity-100 focus-within:opacity-100">
-          <IconButton label="Restart" size="sm" className="text-white hover:bg-white/15 hover:text-white" onClick={() => play.restart()}>
+          <IconButton
+            label="Restart"
+            size="sm"
+            className="text-white hover:bg-white/15 hover:text-white"
+            onClick={() => play.restart()}
+          >
             <RotateCcw size={16} />
           </IconButton>
-          <IconButton label="Full screen" size="sm" className="text-white hover:bg-white/15 hover:text-white" onClick={() => void box.current?.requestFullscreen?.()}>
+          <IconButton
+            label="Full screen"
+            size="sm"
+            className="text-white hover:bg-white/15 hover:text-white"
+            onClick={() => void box.current?.requestFullscreen?.()}
+          >
             <Maximize2 size={16} />
           </IconButton>
         </div>

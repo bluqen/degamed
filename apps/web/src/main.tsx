@@ -22,7 +22,13 @@ const guard = (el: React.ReactNode) => <RequireAuth>{el}</RequireAuth>;
 // The Advanced editor (code editor, scene tools) is big; load it only when it's opened.
 const LazyAdvanced = lazy(() => import('./pages/Editor').then((m) => ({ default: m.Editor })));
 const Advanced = () => (
-  <Suspense fallback={<div className="flex h-dvh items-center justify-center bg-bg text-body text-muted">Opening the advanced editor…</div>}>
+  <Suspense
+    fallback={
+      <div className="flex h-dvh items-center justify-center bg-bg text-body text-muted">
+        Opening the advanced editor…
+      </div>
+    }
+  >
     <LazyAdvanced />
   </Suspense>
 );
@@ -43,15 +49,29 @@ const router = createBrowserRouter([
   { path: '/art', element: guard(<ArtLab />) },
   {
     path: '/dashboard/:section',
-    element: guard(<ComingSoon title="Coming soon" body="This section arrives in a later update." />),
+    element: guard(
+      <ComingSoon title="Coming soon" body="This section arrives in a later update." />,
+    ),
   },
   {
     path: '/explore',
-    element: <ComingSoon shell="site" title="Explore" body="The community gallery opens once publishing is ready." />,
+    element: (
+      <ComingSoon
+        shell="site"
+        title="Explore"
+        body="The community gallery opens once publishing is ready."
+      />
+    ),
   },
   {
     path: '/market',
-    element: <ComingSoon shell="site" title="Marketplace" body="Templates, art packs and music packs are coming." />,
+    element: (
+      <ComingSoon
+        shell="site"
+        title="Marketplace"
+        body="Templates, art packs and music packs are coming."
+      />
+    ),
   },
   { path: '*', element: <NotFound /> },
 ]);

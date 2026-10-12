@@ -21,7 +21,9 @@ export function listGames(): GameEntry[] {
   try {
     const raw = localStorage.getItem(KEY);
     const list = raw ? (JSON.parse(raw) as GameEntry[]) : [];
-    return Array.isArray(list) ? list.filter((g) => g && typeof g.id === 'string').sort((a, b) => b.updatedAt - a.updatedAt) : [];
+    return Array.isArray(list)
+      ? list.filter((g) => g && typeof g.id === 'string').sort((a, b) => b.updatedAt - a.updatedAt)
+      : [];
   } catch {
     return [];
   }
@@ -45,12 +47,20 @@ export function newGameId(): string {
 }
 
 /** Saves the files and upserts the entry. Returns false when the device is out of space. */
-export function saveGame(entry: Omit<GameEntry, 'createdAt' | 'updatedAt'> & Partial<Pick<GameEntry, 'createdAt'>>, files: ProjectFiles): boolean {
+export function saveGame(
+  entry: Omit<GameEntry, 'createdAt' | 'updatedAt'> & Partial<Pick<GameEntry, 'createdAt'>>,
+  files: ProjectFiles,
+): boolean {
   const ok = saveDraft(entry.id, files);
   const list = listGames();
   const prev = list.find((g) => g.id === entry.id);
   const now = Date.now();
-  const next: GameEntry = { createdAt: prev?.createdAt ?? entry.createdAt ?? now, ...prev, ...entry, updatedAt: now };
+  const next: GameEntry = {
+    createdAt: prev?.createdAt ?? entry.createdAt ?? now,
+    ...prev,
+    ...entry,
+    updatedAt: now,
+  };
   writeList([next, ...list.filter((g) => g.id !== entry.id)]);
   return ok;
 }

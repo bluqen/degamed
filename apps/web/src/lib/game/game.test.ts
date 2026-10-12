@@ -11,7 +11,8 @@ describe('game adapter (engine kits + art themes)', () => {
     expect(KITS.length).toBeGreaterThan(0);
     for (const p of KITS.flatMap((k) => k.params)) {
       expect(p.label).toMatch(/^[A-Z]/);
-      if (p.type === 'number') expect(typeof p.min === 'number' && typeof p.max === 'number').toBe(true);
+      if (p.type === 'number')
+        expect(typeof p.min === 'number' && typeof p.max === 'number').toBe(true);
       if (p.type === 'choice') expect(p.choices).toContain(p.default);
     }
   });
@@ -35,7 +36,13 @@ describe('game adapter (engine kits + art themes)', () => {
 
 describe('share links', () => {
   it('round-trips a spec, including non-ASCII titles', () => {
-    const spec = { kit: 'platformer', theme: 'rain-ruins', title: 'Robôt’s Quest', seed: 42, params: { speed: 200, enemies: false, difficulty: 'tricky' } };
+    const spec = {
+      kit: 'platformer',
+      theme: 'rain-ruins',
+      title: 'Robôt’s Quest',
+      seed: 42,
+      params: { speed: 200, enemies: false, difficulty: 'tricky' },
+    };
     const code = encodeSpec(spec);
     expect(code).toMatch(/^[A-Za-z0-9_-]+$/);
     expect(decodeSpec(code)).toMatchObject(spec);

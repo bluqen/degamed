@@ -12,7 +12,23 @@ export interface TabItem<T extends string> {
  * Accessible tabs (arrow keys move between tabs). Renders the tab list only;
  * give each panel `role="tabpanel"` and `aria-labelledby={tabId(id)}` via `panelProps`.
  */
-export function Tabs<T extends string>({ items, value, onChange, label, variant = 'pill', className, idBase }: { items: TabItem<T>[]; value: T; onChange: (id: T) => void; label: string; variant?: 'pill' | 'line'; className?: string; idBase?: string }) {
+export function Tabs<T extends string>({
+  items,
+  value,
+  onChange,
+  label,
+  variant = 'pill',
+  className,
+  idBase,
+}: {
+  items: TabItem<T>[];
+  value: T;
+  onChange: (id: T) => void;
+  label: string;
+  variant?: 'pill' | 'line';
+  className?: string;
+  idBase?: string;
+}) {
   const auto = useId();
   const base = idBase ?? auto;
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -25,7 +41,12 @@ export function Tabs<T extends string>({ items, value, onChange, label, variant 
     <div
       role="tablist"
       aria-label={label}
-      className={cx(variant === 'pill' ? 'flex rounded-md bg-surface-2 p-1 shadow-[inset_0_0_0_1px_var(--c-line)]' : 'flex gap-5 border-b border-line', className)}
+      className={cx(
+        variant === 'pill'
+          ? 'flex rounded-md bg-surface-2 p-1 shadow-[inset_0_0_0_1px_var(--c-line)]'
+          : 'flex gap-5 border-b border-line',
+        className,
+      )}
     >
       {items.map((t, i) => {
         const active = t.id === value;
@@ -53,8 +74,16 @@ export function Tabs<T extends string>({ items, value, onChange, label, variant 
             className={cx(
               'inline-flex items-center justify-center gap-2 font-semibold whitespace-nowrap transition-[background-color,color,box-shadow] duration-150 ease-standard',
               variant === 'pill'
-                ? cx('h-8 flex-1 rounded-[8px] px-3 text-body-sm', active ? 'bg-surface text-ink shadow-1' : 'text-muted hover:text-ink')
-                : cx('-mb-px h-11 border-b-2 text-body', active ? 'border-brand text-ink' : 'border-transparent text-muted hover:text-ink'),
+                ? cx(
+                    'h-8 flex-1 rounded-[8px] px-3 text-body-sm',
+                    active ? 'bg-surface text-ink shadow-1' : 'text-muted hover:text-ink',
+                  )
+                : cx(
+                    '-mb-px h-11 border-b-2 text-body',
+                    active
+                      ? 'border-brand text-ink'
+                      : 'border-transparent text-muted hover:text-ink',
+                  ),
             )}
           >
             {t.icon}
@@ -69,5 +98,10 @@ export function Tabs<T extends string>({ items, value, onChange, label, variant 
 
 /** Props for a panel controlled by <Tabs idBase={…}/>. */
 export function tabPanelProps(idBase: string, id: string, active: boolean) {
-  return { role: 'tabpanel' as const, id: `${idBase}-panel-${id}`, 'aria-labelledby': `${idBase}-tab-${id}`, hidden: !active };
+  return {
+    role: 'tabpanel' as const,
+    id: `${idBase}-panel-${id}`,
+    'aria-labelledby': `${idBase}-tab-${id}`,
+    hidden: !active,
+  };
 }

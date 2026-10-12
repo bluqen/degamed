@@ -25,9 +25,14 @@ const EXAMPLES = [
   'A neon city runner where a cat hacker dodges drones',
 ];
 
-export const promptForTheme = (t: ThemeArt) => THEME_PROMPTS[t.id] ?? `A platformer set in ${t.name.toLowerCase()}: ${t.description.replace(/\.$/, '').toLowerCase()}`;
+export const promptForTheme = (t: ThemeArt) =>
+  THEME_PROMPTS[t.id] ??
+  `A platformer set in ${t.name.toLowerCase()}: ${t.description.replace(/\.$/, '').toLowerCase()}`;
 
-type Phase = { kind: 'idle' } | { kind: 'working'; progress: Progress[] } | { kind: 'error'; message: string };
+type Phase =
+  | { kind: 'idle' }
+  | { kind: 'working'; progress: Progress[] }
+  | { kind: 'error'; message: string };
 
 export function Create() {
   const [params] = useSearchParams();
@@ -63,26 +68,53 @@ export function Create() {
         settings: ai.settings,
         encode,
         signal: ctrl.signal,
-        onProgress: (p) => setPhase((ph) => (ph.kind === 'working' ? { kind: 'working', progress: [...ph.progress, p] } : ph)),
+        onProgress: (p) =>
+          setPhase((ph) =>
+            ph.kind === 'working' ? { kind: 'working', progress: [...ph.progress, p] } : ph,
+          ),
       });
       // Instant mode can finish in a blink; let the steps land so the moment registers.
       const rest = 1600 - (Date.now() - t0);
       if (rest > 0) {
-        setPhase((ph) => (ph.kind === 'working' ? { kind: 'working', progress: [...ph.progress, { stage: 'done', message: 'Ready to play' }] } : ph));
+        setPhase((ph) =>
+          ph.kind === 'working'
+            ? {
+                kind: 'working',
+                progress: [...ph.progress, { stage: 'done', message: 'Ready to play' }],
+              }
+            : ph,
+        );
         await new Promise((r) => window.setTimeout(r, rest));
       }
       if (ctrl.signal.aborted) return;
       const id = newGameId();
-      const ok = saveGame({ id, title: result.title, prompt: idea, kit: result.spec.kit, theme: result.spec.theme }, result.files);
-      if (result.notice) toast({ tone: 'info', title: 'Made with free instant mode', body: result.notice, duration: 7000 });
-      if (!ok) toast({ tone: 'error', title: 'This device is out of space', body: 'Your game will play, but delete an old game to keep it.' });
+      const ok = saveGame(
+        { id, title: result.title, prompt: idea, kit: result.spec.kit, theme: result.spec.theme },
+        result.files,
+      );
+      if (result.notice)
+        toast({
+          tone: 'info',
+          title: 'Made with free instant mode',
+          body: result.notice,
+          duration: 7000,
+        });
+      if (!ok)
+        toast({
+          tone: 'error',
+          title: 'This device is out of space',
+          body: 'Your game will play, but delete an old game to keep it.',
+        });
       navigate(`/editor/${id}`, { state: { fresh: true, summary: result.summary } });
     } catch (e) {
       if (ctrl.signal.aborted) {
         setPhase({ kind: 'idle' });
         return;
       }
-      setPhase({ kind: 'error', message: e instanceof Error ? e.message : 'Something went wrong.' });
+      setPhase({
+        kind: 'error',
+        message: e instanceof Error ? e.message : 'Something went wrong.',
+      });
     }
   };
 
@@ -136,14 +168,22 @@ export function Create() {
       <main className="flex-1">
         {/* Describe */}
         <section className="relative overflow-hidden">
-          <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 -top-40 h-[520px] bg-[radial-gradient(60%_60%_at_50%_30%,var(--c-brand-tint-2),transparent_70%)] opacity-70" />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 -top-40 h-[520px] bg-[radial-gradient(60%_60%_at_50%_30%,var(--c-brand-tint-2),transparent_70%)] opacity-70"
+          />
           <div className="relative mx-auto flex max-w-[760px] flex-col items-center px-4 pt-14 pb-12 text-center sm:px-6 sm:pt-20">
             <span className="inline-flex h-7 items-center gap-1.5 rounded-full border border-line bg-surface px-3 text-caption font-semibold text-ink-2 shadow-1">
               <Sparkles size={13} className="text-brand-ink" aria-hidden="true" />
               Free to try · no sign-up
             </span>
-            <h1 className="mt-5 font-display text-[40px] leading-[1.05] font-bold tracking-[-0.03em] text-balance sm:text-[56px]">What do you want to play?</h1>
-            <p className="mt-4 max-w-[520px] text-body-lg text-muted text-pretty">Describe a game in a sentence. We’ll build it in under a minute, and you can change anything after.</p>
+            <h1 className="mt-5 font-display text-[40px] leading-[1.05] font-bold tracking-[-0.03em] text-balance sm:text-[56px]">
+              What do you want to play?
+            </h1>
+            <p className="mt-4 max-w-[520px] text-body-lg text-muted text-pretty">
+              Describe a game in a sentence. We’ll build it in under a minute, and you can change
+              anything after.
+            </p>
 
             <form onSubmit={submit} className="mt-9 w-full">
               <Card className="flex flex-col p-2 shadow-3 transition-shadow duration-200 focus-within:shadow-[var(--shadow-3),0_0_0_3px_var(--c-brand-tint-2)] focus-within:border-brand">
@@ -172,7 +212,10 @@ export function Create() {
                     Surprise me
                   </Button>
                   <Tooltip label="Change in Settings">
-                    <Link to="/settings" className="hidden h-8 items-center gap-1.5 rounded-sm px-2 text-body-sm text-muted hover:bg-surface-2 hover:text-ink sm:inline-flex">
+                    <Link
+                      to="/settings"
+                      className="hidden h-8 items-center gap-1.5 rounded-sm px-2 text-body-sm text-muted hover:bg-surface-2 hover:text-ink sm:inline-flex"
+                    >
                       <span className="size-1.5 rounded-full bg-ok" aria-hidden="true" />
                       {PROVIDER_LABEL[ai.settings.provider]}
                     </Link>
@@ -180,7 +223,13 @@ export function Create() {
                   <span className="ml-auto hidden items-center gap-1 text-caption text-faint md:inline-flex">
                     <Kbd>Enter</Kbd> to make it
                   </span>
-                  <Button type="submit" size="md" disabled={!prompt.trim()} iconEnd={<ArrowRight size={18} aria-hidden="true" />} className="max-sm:ml-auto">
+                  <Button
+                    type="submit"
+                    size="md"
+                    disabled={!prompt.trim()}
+                    iconEnd={<ArrowRight size={18} aria-hidden="true" />}
+                    className="max-sm:ml-auto"
+                  >
                     Make my game
                   </Button>
                 </div>
@@ -218,16 +267,27 @@ export function Create() {
                   const theme = allThemes.find((t) => t.id === g.theme) ?? allThemes[0]!;
                   return (
                     <li key={g.id}>
-                      <Card interactive className="group relative flex h-full flex-col overflow-hidden">
+                      <Card
+                        interactive
+                        className="group relative flex h-full flex-col overflow-hidden"
+                      >
                         <div className="aspect-video overflow-hidden bg-stage">
-                          <ThemeArtImage theme={theme} className="transition-transform duration-300 group-hover:scale-[1.04]" />
+                          <ThemeArtImage
+                            theme={theme}
+                            className="transition-transform duration-300 group-hover:scale-[1.04]"
+                          />
                         </div>
                         <div className="flex items-start gap-2 p-4">
                           <div className="flex min-w-0 flex-1 flex-col">
-                            <Link to={`/editor/${g.id}`} className="truncate text-body font-semibold text-ink after:absolute after:inset-0 after:content-[''] focus-visible:outline-none">
+                            <Link
+                              to={`/editor/${g.id}`}
+                              className="truncate text-body font-semibold text-ink after:absolute after:inset-0 after:content-[''] focus-visible:outline-none"
+                            >
                               {g.title}
                             </Link>
-                            <span className="text-body-sm text-muted">Edited {timeAgo(new Date(g.updatedAt).toISOString())}</span>
+                            <span className="text-body-sm text-muted">
+                              Edited {timeAgo(new Date(g.updatedAt).toISOString())}
+                            </span>
                           </div>
                           <div className="relative z-10">
                             <Menu
@@ -262,8 +322,21 @@ export function Create() {
           )}
 
           <section aria-labelledby="looks" className="flex flex-col gap-5">
-            <SectionHead id="looks" title="Start from a look" body="Every game is drawn in a hand-made art style. Pick one for ideas." />
-            <ul className={cx('grid grid-cols-2 gap-x-3 gap-y-5 sm:gap-x-5 sm:gap-y-6', allThemes.length % 3 === 0 ? 'lg:grid-cols-3' : allThemes.length === 5 ? 'lg:grid-cols-5' : 'lg:grid-cols-4')}>
+            <SectionHead
+              id="looks"
+              title="Start from a look"
+              body="Every game is drawn in a hand-made art style. Pick one for ideas."
+            />
+            <ul
+              className={cx(
+                'grid grid-cols-2 gap-x-3 gap-y-5 sm:gap-x-5 sm:gap-y-6',
+                allThemes.length % 3 === 0
+                  ? 'lg:grid-cols-3'
+                  : allThemes.length === 5
+                    ? 'lg:grid-cols-5'
+                    : 'lg:grid-cols-4',
+              )}
+            >
               {allThemes.map((t) => (
                 <li key={t.id}>
                   <button
@@ -283,7 +356,11 @@ export function Create() {
           </section>
 
           <section aria-labelledby="kinds" className="flex flex-col gap-5">
-            <SectionHead id="kinds" title="Kinds of game" body="Mention one in your idea, or let us pick." />
+            <SectionHead
+              id="kinds"
+              title="Kinds of game"
+              body="Mention one in your idea, or let us pick."
+            />
             <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {KITS.map((k, i) => (
                 <li key={k.id}>
@@ -298,7 +375,11 @@ export function Create() {
                   >
                     <Card interactive className="flex items-center gap-4 p-3 pr-5">
                       <span className="size-16 shrink-0 overflow-hidden rounded-lg bg-stage">
-                        <ThemeArtImage theme={allThemes[(i + 1) % allThemes.length]!} width={96} height={96} />
+                        <ThemeArtImage
+                          theme={allThemes[(i + 1) % allThemes.length]!}
+                          width={96}
+                          height={96}
+                        />
                       </span>
                       <span className="flex min-w-0 flex-col">
                         <span className="flex items-center gap-2 text-body font-semibold text-ink">

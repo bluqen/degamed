@@ -8,7 +8,17 @@ type Side = 'top' | 'bottom';
  * Wraps one focusable element and links it with aria-describedby only when the
  * label adds something beyond the element's own name.
  */
-export function Tooltip({ label, children, side = 'bottom', delay = 450 }: { label: string; children: ReactElement<Record<string, unknown>>; side?: Side; delay?: number }) {
+export function Tooltip({
+  label,
+  children,
+  side = 'bottom',
+  delay = 450,
+}: {
+  label: string;
+  children: ReactElement<Record<string, unknown>>;
+  side?: Side;
+  delay?: number;
+}) {
   const id = useId();
   const [pos, setPos] = useState<{ x: number; y: number; side: Side } | null>(null);
   const timer = useRef<number>(undefined);
@@ -17,7 +27,12 @@ export function Tooltip({ label, children, side = 'bottom', delay = 450 }: { lab
     window.clearTimeout(timer.current);
     timer.current = window.setTimeout(() => {
       const r = el.getBoundingClientRect();
-      const s: Side = side === 'top' && r.top < 48 ? 'bottom' : side === 'bottom' && r.bottom > window.innerHeight - 48 ? 'top' : side;
+      const s: Side =
+        side === 'top' && r.top < 48
+          ? 'bottom'
+          : side === 'bottom' && r.bottom > window.innerHeight - 48
+            ? 'top'
+            : side;
       setPos({ x: r.left + r.width / 2, y: s === 'top' ? r.top - 8 : r.bottom + 8, side: s });
     }, wait);
   };

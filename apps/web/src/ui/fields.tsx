@@ -6,7 +6,21 @@ const control =
   'w-full rounded-md border border-line-strong bg-surface text-ink placeholder:text-faint shadow-[inset_0_1px_1px_rgb(0_0_0/0.03)] transition-[border-color,box-shadow] duration-150 ease-standard hover:border-faint focus:border-brand focus:shadow-[0_0_0_3px_var(--c-brand-tint-2)] focus:outline-none focus-visible:outline-none disabled:opacity-50 aria-[invalid=true]:border-bad';
 
 /** Label + control + hint/error, stacked with consistent spacing. */
-export function Field({ label, hint, error, children, htmlFor, className }: { label?: ReactNode; hint?: ReactNode; error?: ReactNode; children: ReactNode; htmlFor?: string; className?: string }) {
+export function Field({
+  label,
+  hint,
+  error,
+  children,
+  htmlFor,
+  className,
+}: {
+  label?: ReactNode;
+  hint?: ReactNode;
+  error?: ReactNode;
+  children: ReactNode;
+  htmlFor?: string;
+  className?: string;
+}) {
   return (
     <div className={cx('flex flex-col gap-1.5', className)}>
       {label && (
@@ -26,43 +40,105 @@ export function Field({ label, hint, error, children, htmlFor, className }: { la
   );
 }
 
-export const Input = forwardRef<HTMLInputElement, ComponentProps<'input'> & { icon?: ReactNode }>(function Input({ className, icon, ...props }, ref) {
-  if (!icon) return <input ref={ref} className={cx(control, 'h-10 px-3 text-body', className)} {...props} />;
+export const Input = forwardRef<HTMLInputElement, ComponentProps<'input'> & { icon?: ReactNode }>(
+  function Input({ className, icon, ...props }, ref) {
+    if (!icon)
+      return (
+        <input ref={ref} className={cx(control, 'h-10 px-3 text-body', className)} {...props} />
+      );
+    return (
+      <div className="relative">
+        <span className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted">
+          {icon}
+        </span>
+        <input
+          ref={ref}
+          className={cx(control, 'h-10 pr-3 pl-9 text-body', className)}
+          {...props}
+        />
+      </div>
+    );
+  },
+);
+
+export const Textarea = forwardRef<HTMLTextAreaElement, ComponentProps<'textarea'>>(
+  function Textarea({ className, ...props }, ref) {
+    return (
+      <textarea
+        ref={ref}
+        className={cx(control, 'min-h-24 resize-y px-3 py-2.5 text-body', className)}
+        {...props}
+      />
+    );
+  },
+);
+
+export const Select = forwardRef<HTMLSelectElement, ComponentProps<'select'>>(function Select(
+  { className, children, ...props },
+  ref,
+) {
   return (
     <div className="relative">
-      <span className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted">{icon}</span>
-      <input ref={ref} className={cx(control, 'h-10 pr-3 pl-9 text-body', className)} {...props} />
-    </div>
-  );
-});
-
-export const Textarea = forwardRef<HTMLTextAreaElement, ComponentProps<'textarea'>>(function Textarea({ className, ...props }, ref) {
-  return <textarea ref={ref} className={cx(control, 'min-h-24 resize-y px-3 py-2.5 text-body', className)} {...props} />;
-});
-
-export const Select = forwardRef<HTMLSelectElement, ComponentProps<'select'>>(function Select({ className, children, ...props }, ref) {
-  return (
-    <div className="relative">
-      <select ref={ref} className={cx(control, 'h-10 cursor-pointer appearance-none pr-9 pl-3 text-body', className)} {...props}>
+      <select
+        ref={ref}
+        className={cx(
+          control,
+          'h-10 cursor-pointer appearance-none pr-9 pl-3 text-body',
+          className,
+        )}
+        {...props}
+      >
         {children}
       </select>
-      <ChevronDown size={16} aria-hidden="true" className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-muted" />
+      <ChevronDown
+        size={16}
+        aria-hidden="true"
+        className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-muted"
+      />
     </div>
   );
 });
 
 /** An on/off switch. Renders a real checkbox with role="switch" for screen readers. */
-export function Switch({ checked, onChange, label, description, disabled, id }: { checked: boolean; onChange: (v: boolean) => void; label: ReactNode; description?: ReactNode; disabled?: boolean; id?: string }) {
+export function Switch({
+  checked,
+  onChange,
+  label,
+  description,
+  disabled,
+  id,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label: ReactNode;
+  description?: ReactNode;
+  disabled?: boolean;
+  id?: string;
+}) {
   const auto = useId();
   const inputId = id ?? auto;
   return (
-    <label htmlFor={inputId} className={cx('group flex cursor-pointer items-center justify-between gap-4', disabled && 'cursor-default opacity-50')}>
+    <label
+      htmlFor={inputId}
+      className={cx(
+        'group flex cursor-pointer items-center justify-between gap-4',
+        disabled && 'cursor-default opacity-50',
+      )}
+    >
       <span className="flex min-w-0 flex-col">
         <span className="text-body text-ink">{label}</span>
         {description && <span className="text-body-sm text-muted">{description}</span>}
       </span>
       <span className="relative inline-flex shrink-0">
-        <input id={inputId} type="checkbox" role="switch" className="peer sr-only" checked={checked} disabled={disabled} onChange={(e) => onChange(e.target.checked)} />
+        <input
+          id={inputId}
+          type="checkbox"
+          role="switch"
+          className="peer sr-only"
+          checked={checked}
+          disabled={disabled}
+          onChange={(e) => onChange(e.target.checked)}
+        />
         <span
           aria-hidden="true"
           className="h-6 w-10 rounded-full bg-surface-3 shadow-[inset_0_0_0_1px_var(--c-line-strong)] transition-colors duration-200 ease-standard peer-checked:bg-brand peer-checked:shadow-none peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[var(--c-focus)]"
@@ -136,10 +212,26 @@ export function Slider({
 }
 
 /** A row of mutually exclusive choices (radio group styled as a segmented control). */
-export function Segmented<T extends string>({ label, value, options, onChange, size = 'md' }: { label: string; value: T; options: { value: T; label: string }[]; onChange: (v: T) => void; size?: 'sm' | 'md' }) {
+export function Segmented<T extends string>({
+  label,
+  value,
+  options,
+  onChange,
+  size = 'md',
+}: {
+  label: string;
+  value: T;
+  options: { value: T; label: string }[];
+  onChange: (v: T) => void;
+  size?: 'sm' | 'md';
+}) {
   const name = useId();
   return (
-    <div role="radiogroup" aria-label={label} className="flex w-full rounded-md bg-surface-2 p-0.5 shadow-[inset_0_0_0_1px_var(--c-line)]">
+    <div
+      role="radiogroup"
+      aria-label={label}
+      className="flex w-full rounded-md bg-surface-2 p-0.5 shadow-[inset_0_0_0_1px_var(--c-line)]"
+    >
       {options.map((o) => (
         <label
           key={o.value}
@@ -149,7 +241,14 @@ export function Segmented<T extends string>({ label, value, options, onChange, s
             value === o.value ? 'bg-surface text-ink shadow-1' : 'text-muted hover:text-ink',
           )}
         >
-          <input type="radio" name={name} value={o.value} checked={value === o.value} onChange={() => onChange(o.value)} className="sr-only" />
+          <input
+            type="radio"
+            name={name}
+            value={o.value}
+            checked={value === o.value}
+            onChange={() => onChange(o.value)}
+            className="sr-only"
+          />
           {o.label}
         </label>
       ))}
