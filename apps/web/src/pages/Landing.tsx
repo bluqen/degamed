@@ -15,7 +15,7 @@ import { SiteFooter, SiteHeader } from '../components/SiteHeader';
 import { Stage } from '../components/Stage';
 import { ThemeArtImage } from '../components/ThemeCard';
 import { demoGame, demoTheme as pickDemoTheme, themes } from '../lib/game';
-import { themePreview } from '../lib/game/preview';
+import { themeThumb } from '../lib/game/preview';
 import { Button, ButtonLink, Card, Segmented, Slider, Switch, cx } from '../ui';
 
 const EXAMPLES = [
@@ -29,7 +29,7 @@ export function Landing() {
   const [idea, setIdea] = useState('');
   const allThemes = useMemo(themes, []);
   const demoTheme = useMemo(pickDemoTheme, []);
-  const poster = useMemo(() => themePreview(demoTheme, 480, 270), [demoTheme]);
+  const poster = useMemo(() => themeThumb(demoTheme.id), [demoTheme]);
 
   useEffect(() => {
     document.title = 'Degamed: describe a game, play it, share it';

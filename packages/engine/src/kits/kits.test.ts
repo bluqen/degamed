@@ -158,7 +158,7 @@ describe('platformer levels', () => {
 
   it('the goal is reachable for many seeds, including the weakest settings', () => {
     const kit = getKit('platformer');
-    const settings = [
+    const settings: Record<string, number>[] = [
       {},
       { jumpHeight: 3, speed: 90, gravity: 1600 },
       { jumpHeight: 7, speed: 240, gravity: 500, difficulty: 3 },

@@ -31,9 +31,9 @@ export const PREVIEW_LEVEL = [
   '..............................',
   '..............................',
   '..............................',
-  '..................====........',
-  '..............................',
-  '.....====.....................',
+  '................++++++........',
+  '................+====+........',
+  '.....====.......++++++........',
   '..............................',
   '.......................#######',
   '.......................#######',
@@ -103,7 +103,19 @@ export function renderPreview(theme: ArtTheme, o: PreviewOptions = {}): Raster {
       }
   };
   theme.layers.forEach((l, i) => {
-    if (l.factor <= 1) blitTiled(bg, fogged(i, l.raster), -camX * l.factor, l.y ?? 0);
+    if (l.factor > 1) return;
+    blitTiled(bg, fogged(i, l.raster), -camX * l.factor, l.y ?? 0);
+    // layer glows (beacons, furnace mouths), shown in their "on" state
+    for (const g of l.glows ?? []) {
+      const lw = l.raster.width;
+      let gx = (((g.x - camX * l.factor) % lw) + lw) % lw;
+      for (gx -= lw; gx < W + lw; gx += lw) {
+        if (gx < -g.radius * 3 || gx > W + g.radius * 3) continue;
+        bg.glow(gx, g.y + (l.y ?? 0), g.radius * 2.5, g.color, 0.5 * (g.intensity ?? 1));
+        bg.disc(gx, g.y + (l.y ?? 0), Math.max(1, g.radius / 4), g.color);
+        bg.set(gx, g.y + (l.y ?? 0), '#ffffff');
+      }
+    }
   });
   if (env.fog) {
     const top = H * (1 - (env.fog.height ?? 0.6));
@@ -120,6 +132,15 @@ export function renderPreview(theme: ArtTheme, o: PreviewOptions = {}): Raster {
     return theme.tiles[opts[Math.floor(hash2(cx, cy, 5) * opts.length)]!]!;
   };
   const solid = (ch: string) => ch === '#';
+  const isBack = (cx: number, cy: number) => at(cx, cy) === '+' || (at(cx, cy) === '=' && (at(cx, cy - 1) === '+' || at(cx, cy + 1) === '+'));
+  const backTile = (cx: number, cy: number): Raster => {
+    const t = theme.tiles;
+    if (!isBack(cx, cy - 1) && t.backTop) return t.backTop;
+    if (!isBack(cx, cy + 1) && t.backBottom) return t.backBottom;
+    if (!isBack(cx - 1, cy) && t.backLeft) return t.backLeft;
+    if (!isBack(cx + 1, cy) && t.backRight) return t.backRight;
+    return t.back!;
+  };
   const tops: [number, number][] = [];
   for (let cy = 0; cy < rows.length; cy++)
     for (let cx = 0; cx < rows[0]!.length; cx++) {
@@ -134,15 +155,33 @@ export function renderPreview(theme: ArtTheme, o: PreviewOptions = {}): Raster {
         if (top) {
           tops.push([cx, cy]);
           tile = l && theme.tiles.groundLeft ? theme.tiles.groundLeft : rr && theme.tiles.groundRight ? theme.tiles.groundRight : pick('ground', cx, cy, ['ground2', 'ground3']);
-        } else tile = l && theme.tiles.fillLeft ? theme.tiles.fillLeft : rr && theme.tiles.fillRight ? theme.tiles.fillRight : pick('fill', cx, cy, ['fill2']);
+        } else tile = l && theme.tiles.fillLeft ? theme.tiles.fillLeft : rr && theme.tiles.fillRight ? theme.tiles.fillRight : pick('fill', cx, cy, ['fill2', 'fill3']);
         world.blit(tile, x, y);
+      } else if (ch === '+') {
+        world.blit(backTile(cx, cy), x, y);
       } else if (ch === '=') {
         const l = at(cx - 1, cy) !== '=';
         const rr = at(cx + 1, cy) !== '=';
+
+        if (theme.tiles.back && (at(cx, cy - 1) === '+' || at(cx, cy + 1) === '+')) world.blit(backTile(cx, cy), x, y);
         const tile = l && theme.tiles.platformLeft ? theme.tiles.platformLeft : rr && theme.tiles.platformRight ? theme.tiles.platformRight : theme.tiles.platform;
         world.blit(tile, x, y);
       }
     }
+
+  // decals over solid interiors (cells with solid neighbours all round)
+  const decalNames = Object.keys(theme.decals ?? {});
+  if (decalNames.length)
+    for (let cy = 0; cy < rows.length; cy++)
+      for (let cx = 0; cx < rows[0]!.length; cx++) {
+        if (hash2(cx, cy, 31) > 0.16) continue;
+        const d = theme.decals![decalNames[Math.floor(hash2(cx, cy, 32) * decalNames.length)]!]!;
+        const cw = Math.ceil(d.width / T);
+        const ch = Math.ceil(d.height / T);
+        let ok = true;
+        for (let yy = cy - 1; yy <= cy + ch && ok; yy++) for (let xx = cx - 1; xx <= cx + cw && ok; xx++) if (at(xx, yy) !== '#' || (yy >= cy && yy < cy + ch && at(xx, yy - 1) !== '#')) ok = false;
+        if (ok) world.blit(d, cx * T - camX + Math.floor(hash2(cx, cy, 33) * 6), cy * T + Math.floor(hash2(cx, cy, 34) * 4));
+      }
 
   // props behind the actors
   const info = theme.propInfo ?? {};

@@ -358,7 +358,8 @@ export function decorate(b: KitBuilder, level: Level, opts: DecorateOptions = {}
   // A few big dark silhouettes in the very front, passing faster than the world (depth) —
   // unless the theme paints its own foreground layer.
   const hasForeground = theme.layers.some((l) => l.factor > 1);
-  const tall = [...ground].filter((p) => !p.info.light).sort((a, b2) => b2.raster.height - a.raster.height).slice(0, 3);
+  // Short things only (grass, rubble), kept along the bottom edge so they never hide the action.
+  const tall = [...ground].filter((p) => !p.info.light && p.raster.height <= 20).sort((a, b2) => b2.raster.height - a.raster.height).slice(0, 3);
   if (tall.length && density > 0 && !hasForeground) {
     const tint = fog ? darken(fog, 0.22) : b.shade(0);
     const step = 340;
@@ -371,7 +372,7 @@ export function decorate(b: KitBuilder, level: Level, opts: DecorateOptions = {}
         name: 'Foreground',
         tags: ['decor'],
         components: {
-          Transform: { position: { x: Math.round(x0 + wx * 1.25), y: Math.round(y0 + level.height * T - p.raster.height * 0.9) }, scale: { x: 2, y: 2 } },
+          Transform: { position: { x: Math.round(x0 + wx * 1.25), y: Math.round(y0 + level.height * T - p.raster.height * 0.6) }, scale: { x: 2, y: 2 } },
           Sprite: { asset, depth: 40, tint, scrollFactor: 1.25, flipX: b.rand() < 0.5 },
         },
       });

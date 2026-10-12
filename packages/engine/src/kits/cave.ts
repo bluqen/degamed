@@ -286,22 +286,6 @@ export function buildCave(spec: GameSpec, theme: KitTheme, p: ParamValues, encod
   const crystals = new Set(spots.slice(0, wanted).map((m) => `${m.x},${m.y}`));
   const need = Math.max(1, Math.ceil(wanted * 0.75));
 
-  // Background rock: patches of darker wall behind open space, for depth.
-  const noise = mulberry32((spec.seed ?? 1) + 99);
-  const blobs = Array.from({ length: Math.ceil((level.width * level.height) / 90) }, () => ({
-    x: noise() * level.width,
-    y: noise() * level.height,
-    r: 2 + noise() * 5,
-  }));
-  for (let y = 0; y < level.height; y++)
-    for (let x = 0; x < level.width; x++) {
-      if (level.get(x, y) !== '.') continue;
-      // Walls hug the rock: within 1 tile of solid, or inside a blob.
-      const nearRock = level.solid(x - 1, y) || level.solid(x + 1, y) || level.solid(x, y - 1) || level.solid(x, y + 1);
-      const inBlob = blobs.some((bl) => (x - bl.x) ** 2 + (y - bl.y) ** 2 < bl.r * bl.r);
-      if ((nearRock && noise() < 0.55) || inBlob) level.set(x, y, '+');
-    }
-
   b.entities.push({
     id: 'terrain',
     name: 'Cave',

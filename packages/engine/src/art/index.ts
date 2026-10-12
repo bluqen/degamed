@@ -12,7 +12,7 @@ import { sunlitMeadow, SUNLIT_MEADOW_META } from './themes/sunlit-meadow';
 import { emberForge, EMBER_FORGE_META } from './themes/ember-forge';
 
 export type { Raster } from '../pixel';
-export type { ArtTheme, SheetAnim, SpriteSheet, Environment, Light, ParallaxLayer, PropInfo } from './types';
+export type { ArtTheme, SheetAnim, SpriteSheet, Environment, Light, ParallaxLayer, PropInfo, AmbientSprite } from './types';
 export { renderPreview, PREVIEW_LEVEL, type PreviewOptions } from './preview';
 
 /** Cheap fields, available without generating any pixels. */
@@ -48,7 +48,7 @@ function built(e: ThemeEntry): ArtTheme {
  */
 function lazyTheme(e: ThemeEntry): ArtTheme {
   const proxy = { ...e.meta } as ArtTheme;
-  for (const key of ['layers', 'tiles', 'sprites', 'props', 'environment', 'propInfo', 'lights', 'tileSize'] as const) {
+  for (const key of ['layers', 'tiles', 'sprites', 'props', 'environment', 'propInfo', 'lights', 'tileSize', 'decals', 'ambientSprites'] as const) {
     Object.defineProperty(proxy, key, { enumerable: true, get: () => built(e)[key] });
   }
   return proxy;

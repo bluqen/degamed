@@ -5,8 +5,12 @@
  */
 import { Canvas, gradient, Ix, MatLayer, Palette, rng, fbm, bayer, type Material } from '../core';
 import { heroSheet } from '../hero';
-import { cable, crane, elbow, hangingChain, lightShafts, mistBand, overgrow, pipe, pylon, tank, tower, truss } from '../scenery';
+import { bigHeroSheet } from '../hero2';
+import { rainBig } from './big-heroes';
+import { cable, crane, mast, elbow, hangingChain, lightShafts, mistBand, overgrow, pipe, pylon, tank, tower, truss } from '../scenery';
 import { crack, derive, pickRamp, px01, tileNoise, TILE } from '../tiles';
+import { backEdges, backWall } from '../tiles';
+import { crackDecal, grateDecal, pipeDecal, rootsDecal } from '../decals';
 import { sheetOf, type Raster } from '../../pixel';
 import type { ArtTheme, ParallaxLayer, PropInfo, SpriteSheet } from '../types';
 import { rainHeroCostume } from './rain-hero';
@@ -52,6 +56,9 @@ function sky(): Canvas {
   return c;
 }
 
+/** The mast's beacon, in layer pixels. */
+const MAST: [number, number] = [218, 44];
+
 function superstructure(): Canvas {
   const r = rng(101);
   const L = new MatLayer(W, H);
@@ -66,7 +73,11 @@ function superstructure(): Canvas {
   truss(L, 0, 70, W, 6, 1);
   L.rect(0, 118, W, 3, 1);
   for (let x = 0; x < W; x += 64) cable(L, x, 121, x + 64, 121, 9, 1);
+  // the landmark: a colossal radio mast rising out of the haze, its beacon blinking red
+  mast(L, MAST[0], H, MAST[1] + 18, 56, 8, 3);
+  for (let i = 0; i < 4; i++) cable(L, MAST[0], MAST[1] + 40 + i * 30, MAST[0] - 90 + i * 60, H, 18, 3);
   const mats: Record<number, Material> = {
+    3: { base: '#587570', dark: '#54706b', rim: '#7c9890', grain: 12, dither: true, fadeTo: C.horizon, fadeFrom: 0.55, fadeAmt: 0.7 },
     1: { base: '#6b867f', dark: '#66817a', light: '#718b84', rim: '#83a097', grain: 12, dither: true, fadeTo: C.horizon, fadeFrom: 0.5, fadeAmt: 0.8 },
     2: { base: '#5d7771', fadeTo: C.horizon, fadeFrom: 0.5, fadeAmt: 0.8 },
   };
@@ -255,7 +266,7 @@ function foreground(): Canvas {
 function layers(): ParallaxLayer[] {
   return [
     { name: 'sky', raster: sky().toRaster(), factor: 0, tiled: true },
-    { name: 'superstructure', raster: superstructure().toRaster(), factor: 0.06, tiled: true },
+    { name: 'superstructure', raster: superstructure().toRaster(), factor: 0.06, tiled: true, glows: [{ x: MAST[0], y: MAST[1], color: '#ff4a3a', radius: 7, intensity: 1, blink: 1.6 }] },
     { name: 'far ruins', raster: farRuins().toRaster(), factor: 0.18, tiled: true },
     { name: 'mist', raster: mist().toRaster(), factor: 0.28, tiled: true },
     { name: 'mid ruins', raster: midRuins().toRaster(), factor: 0.42, tiled: true },
@@ -335,6 +346,7 @@ function grassTop(base: Canvas, seed: number): Canvas {
 function rainTiles(): ArtTheme['tiles'] {
   const fill = concrete(21);
   const fill2 = concrete(22, true);
+  const fill3 = concrete(27);
   const ground = grassTop(concrete(23), 61);
   const ground2 = grassTop(concrete(24, true), 62);
   const ground3 = grassTop(concrete(25), 63);
@@ -394,6 +406,12 @@ function rainTiles(): ArtTheme['tiles'] {
     platform: t(platform),
     platformLeft: t(platformLeft),
     platformRight: t(platformRight),
+    fill3: t(fill3),
+    ...(() => {
+      const back = backWall(fill2, '#0f1718', 0.55, (x) => (x % 8 === 0 ? 0.2 : 0));
+      const e = backEdges(back, C.concrete[3]!, '#070b0c');
+      return { back: t(back), backTop: t(e.backTop), backBottom: t(e.backBottom), backLeft: t(e.backLeft), backRight: t(e.backRight) };
+    })(),
     spike: spikeStrip([C.rust[0]!, C.rust[1]!, C.steel[3]!, C.steel[4]!], '#0b1213', C.concrete[2]),
   };
 }
@@ -409,6 +427,7 @@ function lizardSheet(): SpriteSheet {
   const body = pal.ramp(['#223032', '#3a4a49', '#576866', '#7d8d85']);
   const head = pal.ramp(['#5a1438', '#a52d63', '#e2639c', '#ffb0d2']);
   const [tooth] = pal.ramp(['#f3ece2']);
+  const [tongue] = pal.ramp(['#ff5a7a']);
   const [flash] = pal.ramp(['#ffffff']);
   const frames: Raster[] = [];
   const HEAD = ['...HHHHH...', '.HHHhhhhHH.', 'HHhhhhhhhhH', 'hhhhhhhhhhh', 'dhhhhhhhhh.'];
@@ -464,6 +483,12 @@ function lizardSheet(): SpriteSheet {
       for (let k = 0; k < open; k++) for (let x = hx + 1; x <= hx + 9; x++) c.set(x, hy + 5 + k, ol!);
       for (let x = hx + 2; x <= hx + 9; x += 2) c.set(x, hy + 5, tooth!), c.set(x + 1, hy + 4 + open, tooth!);
     }
+    // a tongue flick (idle) tastes the air
+    if (mode === 'idle' && ph > 4) {
+      c.line(hx + 8, hy + 4, hx + 9, hy + 4, tongue!);
+      c.set(hx + 10, hy + 3, tongue!);
+      c.set(hx + 10, hy + 5, tongue!);
+    }
     // the pink colour bleeds down the neck and spots the back
     for (let x = 22; x < 29; x++) if ((x * 7) % 3 === 0) c.set(x, Math.round(bodyY(x) - 2), head[1]!);
     for (let x = 14; x < 22; x += 3) c.set(x, Math.round(bodyY(x) - 2), head[0]!);
@@ -472,7 +497,7 @@ function lizardSheet(): SpriteSheet {
     if (mode === 'hurt') for (let i = 0; i < c.px.length; i++) if (c.px[i] && c.px[i] !== ol) c.px[i] = flash!;
     frames.push(c.toRaster());
   };
-  for (let f = 0; f < 6; f++) draw((f / 6) * Math.PI * 2, 'walk');
+  for (let f = 0; f < 8; f++) draw((f / 8) * Math.PI * 2, 'walk');
   for (let f = 0; f < 4; f++) draw((f / 4) * Math.PI * 2, 'idle');
   draw(0, 'bite');
   draw(0.5, 'bite');
@@ -482,10 +507,10 @@ function lizardSheet(): SpriteSheet {
     frameWidth: FW,
     frameHeight: FH,
     animations: {
-      walk: { frames: [0, 1, 2, 3, 4, 5], fps: 10, loop: true },
-      idle: { frames: [6, 7, 8, 9], fps: 4, loop: true },
-      attack: { frames: [10, 11, 10], fps: 10, loop: false },
-      hurt: { frames: [12, 0], fps: 10, loop: false },
+      walk: { frames: [0, 1, 2, 3, 4, 5, 6, 7], fps: 12, loop: true },
+      idle: { frames: [8, 9, 10, 11, 11, 10], fps: 4, loop: true },
+      attack: { frames: [12, 13, 12], fps: 10, loop: false },
+      hurt: { frames: [14, 0, 14, 0], fps: 14, loop: false },
     },
     hitbox: { x: 12, y: 8, w: 27, h: 12 },
     anchor: { x: 24, y: 19 },
@@ -725,6 +750,16 @@ function props(): { props: Record<string, Raster>; info: Record<string, PropInfo
   return { props: out, info };
 }
 
+function decals(): Record<string, Raster> {
+  return {
+    crack: crackDecal(34, 22, C.concrete[0]!, '#080d0e', C.concrete[4]!, 3),
+    crack2: crackDecal(26, 18, C.concrete[0]!, '#080d0e', C.concrete[4]!, 9),
+    pipe: pipeDecal(34, C.steel.slice(0, 4), C.rust.slice(1, 3)),
+    vent: grateDecal(C.steel.slice(0, 3), '#060a0b'),
+    roots: rootsDecal(26, 22, C.moss.slice(0, 3), 5),
+  };
+}
+
 export const RAIN_RUINS_META = {
   id: 'rain-ruins',
   name: 'Rain Ruins',
@@ -741,7 +776,8 @@ export function rainRuins(): ArtTheme {
     layers: layers(),
     tiles: rainTiles(),
     sprites: {
-      hero: heroSheet(rainHeroCostume()),
+      hero: bigHeroSheet(rainBig()),
+      heroSmall: heroSheet(rainHeroCostume()),
       enemy: lizardSheet(),
       pickup: pearlSheet(),
       goal: gateSheet(),
@@ -750,6 +786,7 @@ export function rainRuins(): ArtTheme {
     },
     props: p,
     propInfo: info,
+    decals: decals(),
     tileSize: TILE,
     lights: {
       hero: { color: '#cfe8df', radius: 46, intensity: 0.35 },

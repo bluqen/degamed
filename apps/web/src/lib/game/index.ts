@@ -27,9 +27,6 @@ export function themes(): ThemeArt[] {
   return ART_THEMES as unknown as ThemeArt[];
 }
 
-// The AI builds games through the engine's real kits and themes.
-ai.setBackend(ai.backendFromKits(kits));
-
 export const createGame = ai.createGame;
 export const editGame = ai.editGame;
 export const suggestions = ai.suggestions;

@@ -1,0 +1,144 @@
+{
+  "round": "1",
+  "startedAt": "2026-10-12T07:20:54.784Z",
+  "base": "http://localhost:5173",
+  "pages": [],
+  "journey": [
+    {
+      "viewport": "desktop",
+      "reachedPlay": true,
+      "seconds": 12.1,
+      "clicks": 2,
+      "typed": true,
+      "finalUrl": "/editor/gmv4xb0vjgu0t5h",
+      "steps": [
+        {
+          "at": 0,
+          "what": "landing",
+          "shot": "docs/team/shots/critic/round-1/journey/journey--desktop-00-landing.png"
+        },
+        {
+          "at": 4698,
+          "what": "typed prompt",
+          "shot": "docs/team/shots/critic/round-1/journey/journey--desktop-01-typed.png"
+        },
+        {
+          "at": 5269,
+          "what": "clicked \"Make my game\"",
+          "url": "/editor/gmv4xb0vjgu0t5h",
+          "shot": "docs/team/shots/critic/round-1/journey/journey--desktop-03-step.png"
+        }
+      ],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 116,
+        "localhost:5174": 50
+      },
+      "apiRequests": [],
+      "finalShot": "docs/team/shots/critic/round-1/journey/journey--desktop-03-playing.png"
+    },
+    {
+      "viewport": "phone",
+      "reachedPlay": true,
+      "seconds": 7.7,
+      "clicks": 2,
+      "typed": true,
+      "finalUrl": "/editor/gmv4xb8u6ueo4c7",
+      "steps": [
+        {
+          "at": 0,
+          "what": "landing",
+          "shot": "docs/team/shots/critic/round-1/journey/journey--phone-00-landing.png"
+        },
+        {
+          "at": 1997,
+          "what": "typed prompt",
+          "shot": "docs/team/shots/critic/round-1/journey/journey--phone-01-typed.png"
+        },
+        {
+          "at": 2503,
+          "what": "clicked \"Make my game\"",
+          "url": "/editor/gmv4xb8u6ueo4c7",
+          "shot": "docs/team/shots/critic/round-1/journey/journey--phone-03-step.png"
+        }
+      ],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 116,
+        "localhost:5174": 50
+      },
+      "apiRequests": [],
+      "finalShot": "docs/team/shots/critic/round-1/journey/journey--phone-03-playing.png"
+    }
+  ],
+  "bundles": null,
+  "budget": {
+    "consoleErrors": 0,
+    "journeySeconds": 60,
+    "journeyClicks": 3,
+    "fpsMedian": 55,
+    "fpsMedianHeadless": 30,
+    "initialJsGzip": 174080,
+    "largestChunkGzip": 409600,
+    "cssGzip": 35840,
+    "playerJsGzip": 256000,
+    "pageLoadMs": 2500
+  },
+  "contracts": [
+    {
+      "ok": true,
+      "owner": "art",
+      "what": "packages/engine/src/art/index.ts exports ART_THEMES, getTheme, ArtTheme, SpriteSheet, SheetAnim"
+    },
+    {
+      "ok": true,
+      "owner": "engine",
+      "what": "packages/engine/src/kits/index.ts exports KITS, buildGame, readSpec, Kit, KitParam, GameSpec"
+    },
+    {
+      "ok": true,
+      "owner": "engine",
+      "what": "packages/shared/src/index.ts exports Environment, Light"
+    },
+    {
+      "ok": true,
+      "owner": "ai",
+      "what": "packages/ai/src/index.ts exports createGame, editGame, suggestions, availableProviders, ProviderId, AiSettings, Progress, ChatTurn"
+    },
+    {
+      "ok": true,
+      "owner": "engine",
+      "what": "@degamed/engine/kits: exported"
+    },
+    {
+      "ok": false,
+      "owner": "engine",
+      "what": "@degamed/engine/art is imported by apps/web/src/lib/game/index.ts, apps/web/src/lib/game/preview.ts but packages/engine/package.json has no \"exports\"[\"./art\"]"
+    },
+    {
+      "ok": true,
+      "owner": "design",
+      "what": "apps/web → @degamed/ai: imported and declared"
+    },
+    {
+      "ok": true,
+      "owner": "ai",
+      "what": "packages/ai → @degamed/engine: imported and declared"
+    },
+    {
+      "ok": true,
+      "owner": "engine",
+      "what": "apps/play → @degamed/engine: imported and declared"
+    }
+  ],
+  "fails": [
+    "contract [engine]: @degamed/engine/art is imported by apps/web/src/lib/game/index.ts, apps/web/src/lib/game/preview.ts but packages/engine/package.json has no \"exports\"[\"./art\"]"
+  ],
+  "warns": []
+}

@@ -43,6 +43,12 @@ export interface ParallaxLayer {
   y?: number;
   /** Repeat horizontally. */
   tiled?: boolean;
+  /**
+   * Optional (additive): glowing points painted on this layer (in layer pixels) that the engine
+   * can animate: a beacon on a distant mast, furnace mouths, eyes in the dark. `blink` is the
+   * period in seconds (0 = steady); `flicker` 0..1 adds noise.
+   */
+  glows?: { x: number; y: number; color: string; radius: number; intensity?: number; blink?: number; flicker?: number }[];
 }
 
 /** Optional (additive) placement hints for a prop. */
@@ -81,4 +87,27 @@ export interface ArtTheme {
   lights?: { hero?: Light; pickup?: Light; goal?: Light; enemy?: Light };
   /** Optional (additive): tile size in pixels (all tiles are square). */
   tileSize?: number;
+  /**
+   * Optional (additive): large details (cracks, pipes, bones, roots, fossils) to scatter over
+   * solid interiors and back walls so big areas of fill don't look stamped. Draw them over the
+   * tiles, clipped to fully solid cells, roughly one per 4×3 tiles chosen by a position hash.
+   */
+  decals?: Record<string, Raster>;
+  /**
+   * Optional (additive): small looping animations to sprinkle in the world: dripping water,
+   * swaying grass, lava shimmer, flickering flames. See `AmbientSprite`.
+   */
+  ambientSprites?: Record<string, AmbientSprite>;
+}
+
+/** A small looping decoration animation. */
+export interface AmbientSprite {
+  sheet: SpriteSheet;
+  /** Where it goes: on top of ground, hanging under a ceiling or platform, on a wall face, on lava/water. */
+  anchor: 'ground' | 'ceiling' | 'wall' | 'free';
+  /** Rough relative frequency. */
+  weight?: number;
+  /** Draw in front of actors. */
+  front?: boolean;
+  light?: Light & { x: number; y: number };
 }

@@ -96,15 +96,16 @@ Started 2026-10-12T01:37:51.634Z. Base http://localhost:5173.
 
 ## Journey: landing → playing my own game
 
-- **desktop**: playing after 12s and 3 clicks (typed prompt: true; ended at /play/gmv4l88n593q4k3; API requests 0)
-  - 0.0s landing (docs/team/shots/critic/round-1/journey--desktop-00-landing.png)
-  - 3.8s typed prompt (docs/team/shots/critic/round-1/journey--desktop-01-typed.png)
-  - 4.3s clicked "Make my game" → /editor/gmv4l88n593q4k3 (docs/team/shots/critic/round-1/journey--desktop-03-step.png)
-  - 10.9s clicked "Play" → /play/gmv4l88n593q4k3 (docs/team/shots/critic/round-1/journey--desktop-04-step.png)
-- **phone**: playing after 11.8s and 2 clicks (typed prompt: true; ended at /editor/gmv4l8kxkesv1t0; API requests 0)
-  - 0.0s landing (docs/team/shots/critic/round-1/journey--phone-00-landing.png)
-  - 5.4s typed prompt (docs/team/shots/critic/round-1/journey--phone-01-typed.png)
-  - 6.1s clicked "Make my game" → /editor/gmv4l8kxkesv1t0 (docs/team/shots/critic/round-1/journey--phone-03-step.png)
+- **desktop**: playing after 12.1s and 2 clicks (typed prompt: true; ended at /editor/gmv4xb0vjgu0t5h; API requests 0)
+  - 0.0s landing (docs/team/shots/critic/round-1/journey/journey--desktop-00-landing.png)
+  - 4.7s typed prompt (docs/team/shots/critic/round-1/journey/journey--desktop-01-typed.png)
+  - 5.3s clicked "Make my game" → /editor/gmv4xb0vjgu0t5h (docs/team/shots/critic/round-1/journey/journey--desktop-03-step.png)
+- **phone**: playing after 7.7s and 2 clicks (typed prompt: true; ended at /editor/gmv4xb8u6ueo4c7; API requests 0)
+  - 0.0s landing (docs/team/shots/critic/round-1/journey/journey--phone-00-landing.png)
+  - 2.0s typed prompt (docs/team/shots/critic/round-1/journey/journey--phone-01-typed.png)
+  - 2.5s clicked "Make my game" → /editor/gmv4xb8u6ueo4c7 (docs/team/shots/critic/round-1/journey/journey--phone-03-step.png)
+
+(Re-measured after a harness fix; first pass clicked "Play" before the studio game had started.)
 
 ## Bundles (gzip)
 

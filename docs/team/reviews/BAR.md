@@ -13,7 +13,7 @@ Ratings used in reviews: **Must fix** (blocks the round or the launch), **Should
 | 1 | Landing → playing **my own** game (typed prompt, free instant mode) | **≤ 60 s and ≤ 3 clicks** (stretch: ≤ 10 s, 2 clicks) | `e2e` journey: type the BRIEF prompt, click the nearest call to action, stop when the player posts `{type:'fps'}` |
 | 2 | Console errors + uncaught exceptions on every key page | **0** | `e2e` pages × 2 viewports × 2 themes |
 | 3 | Player frame rate, demo game, desktop | **median ≥ 58 fps, min ≥ 50**; on a 4-year-old phone ≥ 50 | player `{type:'fps'}` messages; headless SwiftShader warns below 30 |
-| 4 | Shared play link weight (everything a phone downloads before the first frame) | **≤ 250 kB gzip JS**, ≤ 600 kB total incl. art; first frame ≤ 2.5 s on 4G | `e2e` bundle step builds `@degamed/play` (and the web play route once it exists) |
+| 4 | Shared play link weight (everything a phone downloads before the first frame) | **≤ 360 kB gzip JS** (Phaser's arcade-only build alone is 312 kB gzip, the full build 344 kB; our engine code ≤ 50 kB on top), ≤ 700 kB total incl. art; a poster frame painted ≤ 1 s, first playable frame ≤ 2.5 s on 4G | `e2e` bundle step builds `@degamed/play` (and the web play route once it exists) |
 | 5 | Running cost per created game (hosted tier) | **≤ 2 Worker requests and ≤ 3,000 tokens** per new game; **≤ 1 request / ≤ 1,500 tokens** per chat edit; **0** for instant mode | `e2e` counts requests to `/api/`, `workers.dev`, `:8787`; ai agent logs token counts in tests |
 
 ---
@@ -122,7 +122,7 @@ Reference feel: a first-party Microsoft app (Clipchamp, Designer, the Photos edi
 | Largest lazy chunk | ≤ 400 kB gzip |
 | CSS | ≤ 35 kB gzip |
 | Fonts | ≤ 2 families, self-hosted woff2, ≤ 100 kB total, `font-display: swap`; no Google Fonts requests |
-| Player / play link JS | **≤ 250 kB gzip** (baseline 382 kB) |
+| Player / play link JS | **≤ 360 kB gzip** (baseline 382 kB; round 1 424 kB). Use `phaser/dist/phaser-arcade-physics` (−32 kB) and keep art generators, kits, AI and zod out of the player |
 | Art per theme (encoded at runtime from code, or PNG) | ≤ 150 kB; generated in < 200 ms on a phone |
 | Worker requests per session (instant mode) | **0** |
 | Worker requests per session (hosted, 1 game + 5 edits) | **≤ 7** |
@@ -157,4 +157,4 @@ Reference feel: a first-party Microsoft app (Clipchamp, Designer, the Photos edi
 6. **Viral loop (the short one):** Play a friend's link → "Make your own" (1 tap) → describe → play → Share (native share sheet on phones) → friend plays. Target: **≤ 4 taps from receiving a link to sending your own**.
 7. **End-of-level screen** carries the loop: time, coins, "Play again", "Share your time", "Remix this game".
 
-Measurables for the hit loop (once publishing exists): play page JS ≤ 250 kB gzip; first frame ≤ 2.5 s on mid phone 4G; OG image ≤ 120 kB; remix → playing ≤ 10 s.
+Measurables for the hit loop (once publishing exists): play page JS ≤ 360 kB gzip with a poster frame in ≤ 1 s; first frame ≤ 2.5 s on mid phone 4G; OG image ≤ 120 kB; remix → playing ≤ 10 s.

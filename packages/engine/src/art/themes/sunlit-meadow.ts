@@ -5,8 +5,12 @@
  */
 import { Canvas, fbm, gradient, Ix, MatLayer, Palette, rng, bayer, mix, type Material, type Rng } from '../core';
 import { heroSheet } from '../hero';
+import { bigHeroSheet } from '../hero2';
+import { meadowBig } from './big-heroes';
 import { mistBand, overgrow, shadedBlob } from '../scenery';
 import { derive, px01, tileNoise, TILE } from '../tiles';
+import { backEdges, backWall } from '../tiles';
+import { bonesDecal, fossilDecal, rootsDecal, stonesDecal } from '../decals';
 import { sheetOf, type Raster } from '../../pixel';
 import type { ArtTheme, ParallaxLayer, PropInfo, SpriteSheet } from '../types';
 import { meadowHeroCostume } from './meadow-hero';
@@ -82,6 +86,30 @@ function clouds(): Canvas {
   return c;
 }
 
+/** A distant castle on a foothill: keep, towers with cone roofs, crenellated wall, pennants. */
+function castle(L: MatLayer, cx: number, base: number): void {
+  // the hill it stands on
+  L.ellipse(cx, base + 10, 46, 16, 7);
+  // curtain wall with crenellations
+  L.rect(cx - 30, base - 14, 60, 14, 6);
+  for (let x = cx - 30; x < cx + 30; x += 4) L.rect(x, base - 17, 2, 3, 6);
+  // keep
+  L.rect(cx - 8, base - 34, 16, 20, 6);
+  L.poly([[cx - 10, base - 34], [cx, base - 48], [cx + 10, base - 34]], 8);
+  // towers
+  for (const tx of [cx - 30, cx + 26]) {
+    L.rect(tx, base - 26, 6, 26, 6);
+    L.poly([[tx - 2, base - 26], [tx + 3, base - 36], [tx + 8, base - 26]], 8);
+    L.rect(tx + 3, base - 41, 1, 5, 6);
+    L.rect(tx + 4, base - 41, 3, 2, 9);
+  }
+  L.rect(cx, base - 54, 1, 6, 6);
+  L.rect(cx + 1, base - 54, 4, 2, 9);
+  // gate and windows
+  L.rect(cx - 2, base - 8, 4, 8, 7);
+  for (const wx of [cx - 4, cx + 3]) L.rect(wx, base - 28, 1, 3, 7);
+}
+
 function mountains(): Canvas {
   const L = new MatLayer(W, H);
   const ridge = (x: number) => {
@@ -110,8 +138,13 @@ function mountains(): Canvas {
       L.set(x, y, m);
     }
   }
+  castle(L, 96, 214);
   const fade = { fadeTo: C.horizon, fadeFrom: 0.55, fadeAmt: 0.9 };
   const mats: Record<number, Material> = {
+    6: { base: '#c4d3ee', rim: '#f2f7ff', rimDir: [1, 0] },
+    7: { base: '#a2b4dc' },
+    8: { base: '#8a86c4', rim: '#b0aae0', rimDir: [1, -1] },
+    9: { base: '#ff8a7a' },
     1: { base: '#7f9fd0', dark: '#7899cb', grain: 30, dither: true, ...fade },
     2: { base: '#fbfdff', rim: '#ffffff', ...fade },
     3: { base: '#9ab8e2', light: '#a5c0e6', grain: 30, dither: true, ...fade },
@@ -119,6 +152,34 @@ function mountains(): Canvas {
     5: { base: '#8aaad8', ...fade },
   };
   return L.paint(mats, 3);
+}
+
+/** A white windmill with a red cap and four lattice sails. */
+function windmill(L: MatLayer, cx: number, base: number): void {
+  // tapered tower: lit right side, shaded left
+  for (let y = base - 30; y < base; y++) {
+    const half = 4 + ((y - (base - 30)) / 30) * 3;
+    for (let x = Math.round(cx - half); x <= Math.round(cx + half); x++) L.set(x, y, x < cx - half / 3 ? 8 : 7);
+  }
+  L.poly([[cx - 6, base - 30], [cx, base - 38], [cx + 6, base - 30]], 9);
+  L.rect(cx - 1, base - 8, 3, 8, 8);
+  L.rect(cx + 1, base - 22, 2, 3, 8);
+  // sails around the hub
+  const hx = cx + 1;
+  const hy = base - 31;
+  for (let k = 0; k < 4; k++) {
+    const a = (k / 4) * Math.PI * 2 + 0.35;
+    const ex = hx + Math.cos(a) * 17;
+    const ey = hy + Math.sin(a) * 17;
+    L.line(hx, hy, ex, ey, 10);
+    const nx = -Math.sin(a);
+    const ny = Math.cos(a);
+    for (let t = 0.35; t <= 1; t += 0.08) {
+      const px = hx + Math.cos(a) * 17 * t;
+      const py = hy + Math.sin(a) * 17 * t;
+      L.line(px, py, px + nx * 3, py + ny * 3, 10);
+    }
+  }
 }
 
 /** Round-crowned tree: trunk plus cel-shaded lobes (base, shadow and light materials). */
@@ -136,7 +197,7 @@ function tree(L: MatLayer, r: Rng, x: number, base: number, size: number, leaf: 
   for (const [lx, ly, lr] of lobes) shadedBlob(L, lx, ly, lr, leaf[0], leaf[1], leaf[2]);
 }
 
-function hills(o: { seed: number; base: number; amp: number; cells: number; trees: number; treeSize: [number, number]; mats: Record<number, Material>; flowers?: boolean }): Canvas {
+function hills(o: { seed: number; base: number; amp: number; cells: number; trees: number; treeSize: [number, number]; mats: Record<number, Material>; flowers?: boolean; extra?: (L: MatLayer, top: (x: number) => number) => void }): Canvas {
   const r = rng(o.seed);
   const L = new MatLayer(W, H);
   const top = (x: number) => o.base - fbm(x, 0, { w: W, h: H, cells: o.cells, octaves: 3, seed: o.seed, wrapX: true }) * o.amp;
@@ -149,6 +210,7 @@ function hills(o: { seed: number; base: number; amp: number; cells: number; tree
       tree(L, r, tx, top(tx) + 3, r.int(...o.treeSize), [2, 5, 6], 3);
     }
   }
+  o.extra?.(L, top);
   if (o.flowers) for (let x = 0; x < W; x++) if (px01(x, 0, o.seed) > 0.8) L.set(x, Math.round(top(x)) + r.int(2, 18), 4);
   return L.paint(o.mats, o.seed);
 }
@@ -207,12 +269,17 @@ function layers(): ParallaxLayer[] {
         cells: 4,
         trees: 26,
         treeSize: [5, 9],
+        extra: (L, top) => windmill(L, 300, Math.round(top(300)) + 2),
         mats: {
           1: { base: '#79b98a', dark: '#73b386', rim: '#9dd29c', grain: 30, dither: true, fadeTo: '#b9dcf2', fadeFrom: 0.85, fadeAmt: 0.6 },
           2: { base: '#5d9f7a' },
           3: { base: '#5d7f75' },
           5: { base: '#4f8a70' },
           6: { base: '#7fbb8a' },
+          7: { base: '#f3ecdc', rim: '#ffffff', rimDir: [1, 0] },
+          8: { base: '#cfc5b2' },
+          9: { base: '#b46a4a', rim: '#d88a5e', rimDir: [1, -1] },
+          10: { base: '#e8dfcc' },
         },
       }).toRaster(),
       factor: 0.22,
@@ -311,6 +378,7 @@ function meadowTiles(): ArtTheme['tiles'] {
   const G = C.grass;
   const fill = soil(5);
   const fill2 = soil(6);
+  const fill3 = soil(10);
   const ground = grassy(soil(7), 1);
   const ground2 = grassy(soil(8), 2);
   const ground3 = grassy(soil(9), 3);
@@ -365,68 +433,97 @@ function meadowTiles(): ArtTheme['tiles'] {
     platform: t(plat),
     platformLeft: t(platformLeft),
     platformRight: t(platformRight),
+    fill3: t(fill3),
+    ...(() => {
+      const back = backWall(fill2, '#3a1f2a', 0.45);
+      const e = backEdges(back, C.dirt[3]!, '#2a1520');
+      return { back: t(back), backTop: t(e.backTop), backBottom: t(e.backBottom), backLeft: t(e.backLeft), backRight: t(e.backRight) };
+    })(),
     spike: spikeStrip([C.stone[0]!, C.stone[1]!, C.stone[2]!, C.stone[3]!], '#2a1a2e', G[1]),
   };
 }
 
 // ── Creatures ───────────────────────────────────────────────────────────────
 
-/** A jelly slime that hops with squash and stretch. */
+/**
+ * A jelly slime that hops with real squash and stretch: anticipation, launch, peak, fall, splat
+ * and a wobbly rebound. Glinting eyes squint on impact; a bubble floats in its jelly; idle blinks.
+ */
 function slimeSheet(): SpriteSheet {
-  const FW = 22;
-  const FH = 20;
+  const FW = 30;
+  const FH = 26;
   const pal = new Palette();
   const [ol, olLit] = pal.ramp(['#24164a', '#4a2f8a']);
-  const body = pal.ramp(['#4a2f9e', '#6f52d8', '#9a80f2', '#c9b8ff']);
+  const body = pal.ramp(['#3e2690', '#6248d0', '#8f74f0', '#bba6ff', '#e6dcff']);
+  const [core] = pal.ramp(['#a48cfa']);
   const [shine] = pal.ramp(['#ffffff']);
   const [eye] = pal.ramp(['#1b1035']);
+  const [mouth] = pal.ramp(['#2e1a5a']);
   const [flash] = pal.ramp(['#ffffff']);
-  // [width radius, height radius, lift]
-  const poses: [number, number, number][] = [
-    [8, 6, 0], // rest
-    [9.5, 5, 0], // anticipation squash
-    [6.5, 8, 2], // launch stretch
-    [7, 7, 6], // airborne
-    [7.5, 6.5, 3], // falling
-    [10, 4.5, 0], // land squash
+  // [half width, half height, lift above ground, eyes: 0 open / 1 squint / 2 closed]
+  const poses: [number, number, number, number][] = [
+    [10, 7.5, 0, 0], // rest
+    [12, 6, 0, 1], // anticipation squash
+    [7.5, 10, 2, 0], // launch stretch
+    [8.5, 9, 7, 0], // rising
+    [9.5, 8, 9, 0], // peak, round
+    [8, 9.5, 5, 0], // falling, stretched
+    [13, 5, 0, 1], // splat
+    [9, 8.5, 0, 0], // rebound wobble
+    [10, 7.5, 0, 2], // idle blink
   ];
   const frames: Raster[] = [];
-  const draw = ([rx, ry, lift]: [number, number, number], hurt = false) => {
+  const draw = ([rx, ry, lift, eyes]: [number, number, number, number], hurt = false) => {
     const c = new Ix(FW, FH, pal);
-    const cx = 11;
+    const cx = 15;
     const base = FH - 2 - lift;
+    const top = base - ry * 2 + 1;
     c.ellipse(cx, base - ry + 1, rx, ry, (x, y, nx, ny) => {
       const l = -ny * 0.9 - nx * 0.35;
-      return body[Math.max(0, Math.min(3, Math.round(1.5 + l * 1.3)))]!;
+      return body[Math.max(0, Math.min(4, Math.round(1.8 + l * 1.6)))]!;
     });
-    // flatten the bottom
     for (let x = 0; x < FW; x++) for (let y = base + 1; y < FH; y++) c.set(x, y, 0);
+    // flat, darker base where it meets the ground (or the underside in the air)
     for (let x = 0; x < FW; x++) if (c.get(x, base)) c.set(x, base, body[0]!);
-    c.set(cx - Math.round(rx * 0.45), base - Math.round(ry * 1.4), shine!);
-    c.set(cx - Math.round(rx * 0.45) + 1, base - Math.round(ry * 1.4), shine!);
-    c.set(cx - Math.round(rx * 0.45), base - Math.round(ry * 1.4) + 1, shine!);
-    const ey = base - Math.round(ry * 0.9);
-    c.set(cx + 1, ey, eye!);
-    c.set(cx + 1, ey + 1, eye!);
-    c.set(cx + 4, ey, eye!);
-    c.set(cx + 4, ey + 1, eye!);
+    // jelly core and a floating bubble
+    c.ellipse(cx + 1, base - ry * 0.8, rx * 0.45, ry * 0.4, core!);
+    c.set(cx - Math.round(rx * 0.3), base - Math.round(ry * 0.6), body[4]!);
+    // shine: a curved highlight on the upper left
+    const sx = cx - Math.round(rx * 0.55);
+    const sy = Math.round(top + ry * 0.45);
+    c.set(sx, sy, shine!);
+    c.set(sx + 1, sy - 1, shine!);
+    c.set(sx, sy + 1, shine!);
+    c.set(sx + 2, sy - 1, body[4]!);
+    // face looks the way it moves (right)
+    const ey = Math.round(base - ry * 1.05);
+    for (const ex of [cx + 2, cx + 6]) {
+      if (eyes === 2) c.set(ex, ey + 1, eye!), c.set(ex + 1, ey + 1, eye!);
+      else if (eyes === 1) c.set(ex, ey + 1, eye!), c.set(ex + 1, ey, eye!);
+      else {
+        c.rect(ex, ey, 2, 3, eye!);
+        c.set(ex + 1, ey, shine!);
+      }
+    }
+    c.set(cx + 4, ey + 3, mouth!);
+    c.set(cx + 5, ey + 3, mouth!);
     c.outline(ol!, olLit!);
     if (hurt) for (let i = 0; i < c.px.length; i++) if (c.px[i] && c.px[i] !== ol) c.px[i] = flash!;
     frames.push(c.toRaster());
   };
   poses.forEach((p) => draw(p));
-  draw(poses[0]!, true);
+  draw(poses[6]!, true);
   return {
     raster: sheetOf(frames),
     frameWidth: FW,
     frameHeight: FH,
     animations: {
-      walk: { frames: [0, 1, 2, 3, 4, 5], fps: 9, loop: true },
-      idle: { frames: [0, 0, 1, 0], fps: 4, loop: true },
-      hurt: { frames: [6, 0], fps: 10, loop: false },
+      walk: { frames: [0, 1, 2, 3, 4, 5, 6, 7], fps: 11, loop: true },
+      idle: { frames: [0, 0, 7, 0, 0, 0, 8, 0], fps: 5, loop: true },
+      hurt: { frames: [9, 6, 9, 0], fps: 14, loop: false },
     },
-    hitbox: { x: 3, y: 8, w: 16, h: 11 },
-    anchor: { x: 11, y: 19 },
+    hitbox: { x: 5, y: 10, w: 20, h: 15 },
+    anchor: { x: 15, y: 25 },
   };
 }
 
@@ -648,6 +745,16 @@ function props(): { props: Record<string, Raster>; info: Record<string, PropInfo
   return { props: out, info };
 }
 
+function decals(): Record<string, Raster> {
+  return {
+    stones: stonesDecal(C.stone.slice(0, 3), 3),
+    stones2: stonesDecal([C.dirt[1]!, C.dirt[3]!, C.dirt[4]!], 8),
+    fossil: fossilDecal(16, [C.dirt[1]!, C.dirt[4]!, C.dirt[5]!]),
+    roots: rootsDecal(28, 22, [C.dirt[0]!, C.dirt[1]!, C.dirt[2]!], 4),
+    bone: bonesDecal('ribs', [C.dirt[3]!, '#e8d6b0', '#fff4dc'], C.dirt[1]!),
+  };
+}
+
 export const SUNLIT_MEADOW_META = {
   id: 'sunlit-meadow',
   name: 'Sunlit Meadow',
@@ -664,7 +771,8 @@ export function sunlitMeadow(): ArtTheme {
     layers: layers(),
     tiles: meadowTiles(),
     sprites: {
-      hero: heroSheet(meadowHeroCostume()),
+      hero: bigHeroSheet(meadowBig()),
+      heroSmall: heroSheet(meadowHeroCostume()),
       enemy: slimeSheet(),
       pickup: berrySheet(),
       goal: flagSheet(),
@@ -673,6 +781,7 @@ export function sunlitMeadow(): ArtTheme {
     },
     props: p,
     propInfo: info,
+    decals: decals(),
     tileSize: TILE,
     lights: {
       pickup: { color: '#ffd0c0', radius: 24, intensity: 0.25 },

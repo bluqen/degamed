@@ -20,7 +20,7 @@ import type { ProjectFiles } from '@degamed/shared';
 import { LogoMark } from '../components/Logo';
 import { Stage, type StageHandle } from '../components/Stage';
 import { themes } from '../lib/game';
-import { themePreview } from '../lib/game/preview';
+import { themeThumb } from '../lib/game/preview';
 import {
   Button,
   ButtonLink,
@@ -79,7 +79,7 @@ function Studio({ id, initial, title }: { id: string; initial: ProjectFiles; tit
 
   const allThemes = useMemo(themes, []);
   const theme = allThemes.find((t) => t.id === studio.spec?.theme);
-  const poster = useMemo(() => (theme ? themePreview(theme, 480, 270) : undefined), [theme]);
+  const poster = useMemo(() => (theme ? themeThumb(theme.id) : undefined), [theme]);
 
   useEffect(() => {
     document.title = `${studio.title} · Degamed`;

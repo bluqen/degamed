@@ -341,6 +341,10 @@ export interface BigCostume {
   tail?: { ramp: number[]; len: number };
   /** Weapon length in pixels. */
   weaponLen?: number;
+  /** Rows cut off the cloak hem (a jacket instead of a long cloak). */
+  hemCut?: number;
+  /** Wrap the scarf around the neck. */
+  knot?: boolean;
 }
 
 /** One hand-keyed animation frame. */
@@ -407,8 +411,8 @@ export const BIG_KEYS: BigKey[] = [
   { cloak: 'crouch', legs: 'crouch', hy: 4, headY: 1, scarf: [B * 0.7, 0.25, 0] },
   { cloak: 'air', legs: 'tuck', hy: -2, bx: 1, scarf: [-B * 0.55, 0.3, 1] },
   // 26..28 dash: stretch forward, streaming cloak and scarf, speed lines
-  { cloak: 'dash', legs: 'dash', hy: 2, hx: 1, headX: 1, streak: true, scarf: [B * 1.0, 0.15, 0] },
-  { cloak: 'dash', legs: 'dash', swap: true, hy: 2, hx: 1, headX: 1, streak: true, scarf: [B * 1.0, 0.2, 1.5] },
+  { cloak: 'dash', legs: 'dash', hy: -1, hx: 1, headX: 1, streak: true, scarf: [B * 1.0, 0.15, 0] },
+  { cloak: 'dash', legs: 'dash', swap: true, hy: -1, hx: 1, headX: 1, streak: true, scarf: [B * 1.0, 0.2, 1.5] },
   { cloak: 'runB', legs: 'contact', hx: 1, hy: 1, scarf: [B * 0.98, 0.4, 3] },
   // 29..30 turn: skid to a stop, then straighten up
   { cloak: 'skid', legs: 'skid', hx: -1, headX: -1, scarf: [B * 0.25, 0.4, 0] },
@@ -447,7 +451,10 @@ export function drawBigHero(cos: BigCostume, key: BigKey): Ix {
   const cloakMap: Record<string, number> = { K, k, c: cc, C, '+': cc, '%': k, a: cos.hand, '&': cos.hand };
   const legMap: Record<string, number> = { l: cos.legs[0], L: cos.legs[1], b: cos.boots[0], B: cos.boots[1] };
 
-  const cloak = CLOAK[key.cloak];
+  const fullCloak = CLOAK[key.cloak];
+  const plusRow = find(fullCloak, '+')![1];
+  const cut = Math.max(0, Math.min(cos.hemCut ?? 0, fullCloak.length - plusRow - 3));
+  const cloak = fullCloak.slice(0, fullCloak.length - cut);
   const legs = key.swap ? swapLegs(LEGS[key.legs]) : [...LEGS[key.legs]];
   const hipX = 22 + (key.hx ?? 0);
   const hipY = GROUND - 9 + (key.hy ?? 0);
@@ -456,7 +463,8 @@ export function drawBigHero(cos: BigCostume, key: BigKey): Ix {
   const pct = find(cloak, '%')!;
   const hand = find(cloak, '&');
   const cx = hipX - plus[0] + (key.bx ?? 0);
-  const cy = hipY - plus[1] + (key.by ?? 0);
+  // the cloak rides 3 px above the hip so the legs read clearly below the hem
+  const cy = hipY - plus[1] - 3 + (key.by ?? 0);
 
   const head = cos.head.rows.map((r, i) => (key.blink && cos.blink?.[i]) || (key.hurt && cos.hurtFace?.[i]) || r);
   const hx = cx + at[0] - cos.head.anchorX + (key.headX ?? 0);
@@ -498,6 +506,17 @@ export function drawBigHero(cos: BigCostume, key: BigKey): Ix {
     const y = hy + head.length;
     const v = c.get(x, y);
     if (v === cc || v === C) c.set(x, y, k);
+  }
+
+  if (cos.knot) {
+    const ny = hy + head.length - 1;
+    const nx = cx + at[0];
+    for (let x = nx - 4; x <= nx + 3; x++) {
+      c.set(x, ny, cos.scarf[2]!);
+      c.set(x, ny + 1, cos.scarf[1]!);
+    }
+    c.set(nx - 4, ny + 2, cos.scarf[1]!);
+    c.set(nx - 5, ny + 2, cos.scarf[0]!);
   }
 
   // weapon from the hand
@@ -551,7 +570,7 @@ export function bigHeroSheet(cos: BigCostume): SpriteSheet {
     animations: BIG_ANIMS,
     // The body is about 34 px tall; the hitbox is a little smaller than the art (head and hem
     // overlap scenery a touch, as in most platformers) so it fits through 2-tile gaps.
-    hitbox: { x: 17, y: 18, w: 13, h: 29 },
+    hitbox: { x: 17, y: 16, w: 13, h: 31 },
     anchor: { x: 23, y: 46 },
   };
 }

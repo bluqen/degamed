@@ -5,8 +5,12 @@
  */
 import { Canvas, fbm, gradient, Ix, MatLayer, Palette, rng, bayer, type Material, type Rng } from '../core';
 import { heroSheet } from '../hero';
+import { bigHeroSheet } from '../hero2';
+import { hollowBig } from './big-heroes';
 import { hangingChain, lightShafts, mistBand, speckle } from '../scenery';
 import { derive, px01, tileCells, tileNoise, TILE } from '../tiles';
+import { backEdges, backWall } from '../tiles';
+import { bonesDecal, crackDecal, fossilDecal, rootsDecal, veinDecal } from '../decals';
 import { sheetOf, type Raster } from '../../pixel';
 import type { ArtTheme, ParallaxLayer, PropInfo, SpriteSheet } from '../types';
 import { hollowHeroCostume } from './hollow-hero';
@@ -137,6 +141,42 @@ function farCity(): Canvas {
   return L.paint(mats, 5);
 }
 
+/** Where the great statue stands in the far cave layer (centre x, ground y). */
+const STATUE: [number, number] = [178, 240];
+
+/** A colossal statue of a masked, horned knight leaning on a nail, carved from the cave rock. */
+function statue(L: MatLayer, cx: number, base: number): void {
+  // stepped pedestal
+  L.rect(cx - 40, base - 8, 80, 8, 2);
+  L.rect(cx - 34, base - 16, 68, 8, 2);
+  // cloak: a broad bell with a ragged hem
+  L.poly([[cx - 18, base - 104], [cx + 18, base - 104], [cx + 32, base - 16], [cx - 32, base - 16]], 2);
+  for (let x = cx - 32; x < cx + 32; x += 6) L.poly([[x, base - 17], [x + 6, base - 17], [x + 3, base - 12]], 2);
+  // the mask
+  L.ellipse(cx, base - 124, 23, 20, 2);
+  // horns sweeping up and out
+  const horn = (dir: number) => {
+    const pts: [number, number][] = [];
+    for (let i = 0; i <= 10; i++) {
+      const t = i / 10;
+      pts.push([cx + dir * (12 + t * 14 + Math.sin(t * Math.PI) * 4), base - 138 - t * 62]);
+    }
+    for (let i = 10; i >= 0; i--) {
+      const t = i / 10;
+      pts.push([cx + dir * (4 + t * 20 + Math.sin(t * Math.PI) * 4) + dir * (1 - t) * 2, base - 136 - t * 60]);
+    }
+    L.poly(pts, 2);
+  };
+  horn(-1);
+  horn(1);
+  // hollow eyes
+  L.ellipse(cx - 9, base - 120, 5, 7.5, 3);
+  L.ellipse(cx + 9, base - 120, 5, 7.5, 3);
+  // the nail it leans on
+  L.line(cx + 26, base - 16, cx + 40, base - 150, 2, 3);
+  L.rect(cx + 34, base - 98, 12, 3, 2);
+}
+
 function farCave(): Canvas {
   const r = rng(21);
   const L = new MatLayer(W, H);
@@ -149,8 +189,11 @@ function farCave(): Canvas {
       L.rect(cx - w / 2, y, w, 1, 1);
     }
   }
+  statue(L, STATUE[0], STATUE[1]);
   const mats: Record<number, Material> = {
     1: { base: '#131f38', dark: '#111b32', light: '#16233f', rim: '#2b4473', rimWidth: 1, grain: 18, dither: true, fadeTo: C.fog, fadeFrom: 0.7, fadeAmt: 0.6 },
+    2: { base: '#23385f', dark: '#203459', light: '#283f68', rim: '#6a92d0', rimWidth: 1, grain: 22, dither: true, fadeTo: C.fog, fadeFrom: 0.8, fadeAmt: 0.5 },
+    3: { base: '#070b16' },
   };
   return L.paint(mats, 7);
 }
@@ -241,7 +284,7 @@ function layers(): ParallaxLayer[] {
   return [
     { name: 'backdrop', raster: backdrop().toRaster(), factor: 0, tiled: true },
     { name: 'far city', raster: farCity().toRaster(), factor: 0.07, tiled: true },
-    { name: 'far cave', raster: farCave().toRaster(), factor: 0.18, tiled: true },
+    { name: 'far cave', raster: farCave().toRaster(), factor: 0.18, tiled: true, glows: [{ x: STATUE[0] - 38, y: STATUE[1] - 24, color: '#8fdcff', radius: 6, intensity: 0.8, flicker: 0.2 }, { x: STATUE[0] + 38, y: STATUE[1] - 24, color: '#8fdcff', radius: 6, intensity: 0.8, flicker: 0.2 }] },
     { name: 'glow mist', raster: glowMist().toRaster(), factor: 0.3, tiled: true },
     { name: 'mid cave', raster: midCave().toRaster(), factor: 0.45, tiled: true },
     { name: 'near cave', raster: nearCave().toRaster(), factor: 0.7, tiled: true },
@@ -292,6 +335,7 @@ function caveTiles(): ArtTheme['tiles'] {
   const S = C.stone;
   const fill = cobbles(5);
   const fill2 = cobbles(6);
+  const fill3 = cobbles(10);
   const ground = crust(cobbles(7, 1), 21);
   const ground2 = crust(cobbles(8, 1), 22);
   const ground3 = crust(cobbles(9, 1), 23);
@@ -351,56 +395,81 @@ function caveTiles(): ArtTheme['tiles'] {
     platform: t(plat),
     platformLeft: t(platformLeft),
     platformRight: t(platformRight),
+    fill3: t(fill3),
+    ...(() => {
+      const back = backWall(fill2, '#04070e', 0.6);
+      const e = backEdges(back, C.stone[4]!, '#020308');
+      return { back: t(back), backTop: t(e.backTop), backBottom: t(e.backBottom), backLeft: t(e.backLeft), backRight: t(e.backRight) };
+    })(),
     spike: spikeStrip(['#5c6680', '#9aa4bf', '#d5dbea', '#ffffff'], '#03040a', S[2]),
   };
 }
 
 // ── Creatures ───────────────────────────────────────────────────────────────
 
-/** A shell crawler: amber banded dome, pale face plate, scuttling legs. */
+/**
+ * A shell crawler: an amber banded dome on six scuttling legs, a pale face plate with two dark
+ * eyes and twitching antennae. The shell bounces on every other step; idle peeks out and back.
+ */
 function crawlerSheet(): SpriteSheet {
-  const FW = 26;
-  const FH = 18;
+  const FW = 34;
+  const FH = 24;
   const pal = new Palette();
-  const [ol, olLit] = pal.ramp(['#05030a', '#2a1a1a']);
-  const shell = pal.ramp(C.amber);
-  const [band] = pal.ramp(['#4a200c']);
-  const [leg] = pal.ramp(['#1a1018']);
-  const face = pal.ramp(['#8d8ea8', '#e4e6f2']);
-  const [eye] = pal.ramp(['#05030a']);
+  const [ol, olLit] = pal.ramp(['#05030a', '#3a2214']);
+  const shell = pal.ramp(['#5a2610', '#9c4a1a', '#d8802e', '#ffbf62', '#ffe2a0']);
+  const [band, bandLit] = pal.ramp(['#4a1e0a', '#7a3412']);
+  const [leg, legLit] = pal.ramp(['#140c12', '#2e1e22']);
+  const face = pal.ramp(['#7d7f9a', '#c9cbdc', '#f1f2fa']);
+  const [eye, glint] = pal.ramp(['#05030a', '#8fe3ff']);
   const [flash] = pal.ramp(['#ffffff']);
   const frames: Raster[] = [];
   const draw = (f: number, mode: 'walk' | 'idle' | 'hurt') => {
     const c = new Ix(FW, FH, pal);
-    const bob = mode === 'walk' ? [0, 1, 0, 1][f % 4]! : 0;
-    const base = 14 + bob;
-    // legs
-    for (let k = 0; k < 3; k++) {
-      const lx = 7 + k * 5;
-      const off = mode === 'walk' ? ((f + k) % 2 ? 1 : -1) : 0;
-      c.line(lx, base - 1, lx + off, FH - 2, leg!);
-      c.set(lx + off + 1, FH - 2, leg!);
-    }
-    // shell dome
-    const cx = 12;
+    const walk = mode === 'walk';
+    const bob = walk ? [0, 1, 1, 0, 0, 1, 1, 0][f % 8]! : 0;
+    const tilt = walk ? [0, 0, 1, 1, 0, 0, -1, -1][f % 8]! : 0;
+    const base = 18 + bob;
+    const cx = 15;
+    // shell dome with bands
     const squash = mode === 'idle' && f % 2 ? 1 : 0;
-    c.ellipse(cx, base, 10, 9 - squash, (x, y, nx, ny) => {
-      if (y > base) return 0;
-      const light = -ny * 0.8 + nx * 0.3;
-      return shell[Math.max(0, Math.min(3, Math.round(1.4 + light * 1.6)))]!;
+    c.ellipse(cx, base, 13, 12 - squash, (x, y, nx, ny) => {
+      const light = -ny * 0.85 + nx * 0.35;
+      return shell[Math.max(0, Math.min(4, Math.round(1.6 + light * 2)))]!;
     });
-    for (let y = 0; y < FH; y++) for (let x = 0; x < FW; x++) if (y > base) c.set(x, y, c.get(x, y) && c.get(x, y) !== leg ? 0 : c.get(x, y));
-    // bands
-    for (const bx of [7, 12, 17]) for (let y = base - 8; y <= base; y++) if (c.get(bx, y) && c.get(bx, y) !== leg) c.set(bx, y, band!);
-    for (let x = 2; x < 23; x++) if (c.get(x, base)) c.set(x, base, shell[0]!);
-    // face plate peeking out the front
-    c.grid(['.ff.', 'fFFf', 'FeFe', 'FFFF', '.FF.'], { f: face[0]!, F: face[1]!, e: eye! }, 20, base - 5);
+    for (let y = base + 1; y < FH; y++) for (let x = 0; x < FW; x++) if (c.get(x, y) && c.get(x, y) !== leg && c.get(x, y) !== legLit) c.set(x, y, 0);
+    // legs: three pairs, alternating tripod gait (far legs darker, behind the shell)
+    for (let k = 0; k < 3; k++) {
+      for (const far of [true, false]) {
+        const lx = 8 + k * 7 + (far ? -1 : 1);
+        const ph = (f + k * 3 + (far ? 4 : 0)) % 8;
+        const step = walk ? Math.round(Math.sin((ph / 8) * Math.PI * 2) * 2) : 0;
+        const lift = walk && ph < 4 ? 1 : 0;
+        const col = far ? leg! : legLit!;
+        c.line(lx, base - 1, lx + step - 1, base + 2 - lift, col);
+        c.line(lx + step - 1, base + 2 - lift, lx + step, FH - 2 - lift, col);
+        c.set(lx + step + 1, FH - 2 - lift, col);
+      }
+    }
+    for (const bx of [8 + tilt, 15 + tilt, 22 + tilt])
+      for (let y = 0; y <= base; y++) if (c.get(bx, y) && shell.includes(c.get(bx, y))) c.set(bx, y, y < base - 7 ? bandLit! : band!);
+    for (let x = 0; x < FW; x++) if (c.get(x, base) && shell.includes(c.get(x, base))) c.set(x, base, shell[0]!);
+    // face plate, peeking out further when idle
+    const peek = mode === 'idle' ? (f % 2 ? 2 : 0) : 0;
+    const fx = 25 + peek;
+    const fy = base - 7;
+    c.grid(['.fFF.', 'fFFFF', 'FeFFe', 'FeFFe', 'FFFFF', '.fff.'], { f: face[0]!, F: face[1]!, e: eye! }, fx, fy);
+    c.set(fx + 1, fy + 2, glint!);
+    c.set(fx + 4, fy + 2, glint!);
+    // antennae twitch
+    const tw = walk ? [0, 1, 0, -1, 0, 1, 0, -1][f % 8]! : f % 2;
+    c.line(fx + 2, fy, fx + 4, fy - 4 + tw, face[0]!);
+    c.line(fx + 4, fy, fx + 7, fy - 3 - tw, face[0]!);
     c.rim(0, -1, new Set(shell));
     c.outline(ol!, olLit!);
     if (mode === 'hurt') for (let i = 0; i < c.px.length; i++) if (c.px[i] && c.px[i] !== ol) c.px[i] = flash!;
     frames.push(c.toRaster());
   };
-  for (let f = 0; f < 4; f++) draw(f, 'walk');
+  for (let f = 0; f < 8; f++) draw(f, 'walk');
   draw(0, 'idle');
   draw(1, 'idle');
   draw(0, 'hurt');
@@ -409,12 +478,12 @@ function crawlerSheet(): SpriteSheet {
     frameWidth: FW,
     frameHeight: FH,
     animations: {
-      walk: { frames: [0, 1, 2, 3], fps: 8, loop: true },
-      idle: { frames: [4, 5], fps: 2, loop: true },
-      hurt: { frames: [6, 0], fps: 10, loop: false },
+      walk: { frames: [0, 1, 2, 3, 4, 5, 6, 7], fps: 12, loop: true },
+      idle: { frames: [8, 8, 9, 9, 9, 8], fps: 3, loop: true },
+      hurt: { frames: [10, 0, 10, 0], fps: 14, loop: false },
     },
-    hitbox: { x: 2, y: 6, w: 23, h: 12 },
-    anchor: { x: 13, y: 17 },
+    hitbox: { x: 3, y: 8, w: 28, h: 15 },
+    anchor: { x: 16, y: 23 },
   };
 }
 
@@ -630,6 +699,16 @@ function props(): { props: Record<string, Raster>; info: Record<string, PropInfo
   return { props: out, info };
 }
 
+function decals(): Record<string, Raster> {
+  return {
+    fossil: fossilDecal(22, ['#1e2a44', '#34466b', '#55688f']),
+    ribs: bonesDecal('ribs', ['#2c3755', '#56658a', '#8e9cc0'], '#05060c'),
+    vein: veinDecal(36, 14, ['#1c4a7a', '#4fa6e8', '#9fe2ff'], 4),
+    roots: rootsDecal(26, 24, C.teal.slice(0, 3), 7, C.blue[2]),
+    crack: crackDecal(30, 20, C.stone[0]!, '#020308', C.stone[3]!, 11),
+  };
+}
+
 export const HOLLOW_CAVERNS_META = {
   id: 'hollow-caverns',
   name: 'Hollow Caverns',
@@ -646,7 +725,8 @@ export function hollowCaverns(): ArtTheme {
     layers: layers(),
     tiles: caveTiles(),
     sprites: {
-      hero: heroSheet(hollowHeroCostume()),
+      hero: bigHeroSheet(hollowBig()),
+      heroSmall: heroSheet(hollowHeroCostume()),
       enemy: crawlerSheet(),
       pickup: shardSheet(),
       goal: archSheet(),
@@ -655,6 +735,7 @@ export function hollowCaverns(): ArtTheme {
     },
     props: p,
     propInfo: info,
+    decals: decals(),
     tileSize: TILE,
     lights: {
       hero: { color: '#cfe0ff', radius: 64, intensity: 0.55 },

@@ -28,7 +28,7 @@ export const Stage = forwardRef<
   StageHandle,
   {
     /** The game. A function is only called once the game starts (keeps the landing page light). */
-    files: ProjectFiles | null | (() => ProjectFiles);
+    files: ProjectFiles | null | (() => ProjectFiles | Promise<ProjectFiles>);
     title: string;
     /** Image shown before the game starts and while it loads. */
     poster?: string;
@@ -56,10 +56,20 @@ export const Stage = forwardRef<
   ref,
 ) {
   const [started, setStarted] = useState(autoStart);
-  const files = useMemo(
-    () => (typeof filesProp === 'function' ? (started ? filesProp() : null) : filesProp),
-    [filesProp, started],
-  );
+  const [loaded, setLoaded] = useState<ProjectFiles | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
+  useEffect(() => {
+    if (typeof filesProp !== 'function' || !started) return;
+    let live = true;
+    Promise.resolve()
+      .then(filesProp)
+      .then((f) => live && setLoaded(f))
+      .catch(() => live && setLoadFailed(true));
+    return () => {
+      live = false;
+    };
+  }, [filesProp, started]);
+  const files = typeof filesProp === 'function' ? loaded : filesProp;
   const [focused, setFocused] = useState(false);
   const [hinted, setHinted] = useState(false);
   const box = useRef<HTMLDivElement>(null);

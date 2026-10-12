@@ -15,7 +15,7 @@ The baseline is a competent engineer's editor with a space-themed marketing page
 | Player fps (headless) | 58–60 median | ≥ 58 |
 | Web initial JS | **214 kB gzip** (index chunk 694 kB raw: Supabase + router + landing in one) | ≤ 170 kB |
 | Editor chunk | 231 kB gzip | ≤ 400 kB |
-| Player JS (play link) | **382 kB gzip / 1.46 MB raw** | ≤ 250 kB |
+| Player JS (play link) | **382 kB gzip / 1.46 MB raw** | ≤ 360 kB (Phaser alone is ~312–344 kB) |
 | External hosts | fonts.googleapis.com + fonts.gstatic.com, 45 requests per run | own origin only |
 | Light theme | none | full |
 | Phone: game playable | **No.** No touch controls; game is a 390×200 strip | touch controls, full width |

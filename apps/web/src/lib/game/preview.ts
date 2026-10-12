@@ -7,6 +7,14 @@ import type { Raster, SpriteSheet, ThemeArt } from './types';
 
 const cache = new Map<string, string>();
 
+/**
+ * The art agent's pre-rendered key art (480×270, apps/web/public/art/themes). Fast: use this
+ * first, and fall back to `themePreview` (≈0.5 s of CPU per theme) only if it's missing.
+ */
+export function themeThumb(id: string): string {
+  return `/art/themes/${id}.png`;
+}
+
 function toCanvas(r: Raster): HTMLCanvasElement {
   const c = document.createElement('canvas');
   c.width = r.width;

@@ -21,10 +21,16 @@ export function ComingSoon({ title, body, shell = 'app' }: { title: string; body
 
 export function NotFound() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
-      <span className="font-mono text-cyan">404</span>
-      <h1 className="font-display text-4xl">This level doesn’t exist</h1>
-      <ButtonLink to="/">Back to the start</ButtonLink>
+    <div className="flex min-h-dvh flex-col items-center justify-center gap-4 px-6 text-center">
+      <span className="font-mono text-body-sm font-semibold text-brand-ink">404</span>
+      <h1 className="font-display text-title-lg font-bold tracking-[-0.02em]">This level doesn’t exist</h1>
+      <p className="max-w-sm text-body text-muted">The link may be old or mistyped. Why not make a game instead?</p>
+      <div className="mt-2 flex flex-wrap justify-center gap-2">
+        <ButtonLink to="/" variant="secondary">
+          Home
+        </ButtonLink>
+        <ButtonLink to="/create">Make a game</ButtonLink>
+      </div>
     </div>
   );
 }

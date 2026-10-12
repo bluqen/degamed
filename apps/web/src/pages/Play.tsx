@@ -5,7 +5,7 @@ import type { ProjectFiles } from '@degamed/shared';
 import { LogoMark } from '../components/Logo';
 import { Stage } from '../components/Stage';
 import { buildGame, encode, readSpec, themes, type GameSpec } from '../lib/game';
-import { themePreview } from '../lib/game/preview';
+import { themeThumb } from '../lib/game/preview';
 import { decodeSpec } from '../lib/share';
 import { newGameId, saveGame } from '../lib/library';
 import { loadForStudio } from '../studio/useStudio';
@@ -47,7 +47,7 @@ export function PlayPage() {
         : undefined,
     [game],
   );
-  const poster = useMemo(() => (theme ? themePreview(theme, 480, 270) : undefined), [theme]);
+  const poster = useMemo(() => (theme ? themeThumb(theme.id) : undefined), [theme]);
 
   useEffect(() => {
     if (game && game !== 'missing') document.title = `${game.title} · Play on Degamed`;

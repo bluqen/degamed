@@ -10,6 +10,7 @@ import * as Phaser from 'phaser';
 import type { Environment, Light, ParticleType } from '@degamed/shared';
 import {
   ambientColor,
+  applyMatrix,
   flickerAt,
   fogVeilAlphas,
   gradeMatrix,
@@ -71,30 +72,53 @@ function canvasTexture(scene: Phaser.Scene, key: string, w: number, h: number, d
 const LM = 2;
 
 /**
- * Paints fog into a parallax layer's texture (a copy), thicker towards the bottom of the screen.
+ * Paints fog (thicker towards the bottom of the screen) and the colour grade into a copy of a
+ * parallax layer's texture, once at load. Background layers sit behind the lightmap and the
+ * camera filters, so this is how they get the same atmosphere for free.
  * `amount` 0..1 is how far the layer fades into the fog colour.
  */
-function bakeFog(scene: Phaser.Scene, layer: Phaser.GameObjects.Image | Phaser.GameObjects.TileSprite, color: string, amount: number, height: number, screenH: number) {
-  if (amount <= 0.01) return;
+function bakeLayer(
+  scene: Phaser.Scene,
+  layer: Phaser.GameObjects.Image | Phaser.GameObjects.TileSprite,
+  fog: { color: string; amount: number; height: number } | null,
+  grade: number[] | null,
+  screenH: number,
+) {
+  if ((!fog || fog.amount <= 0.01) && !grade) return;
   const key = layer.texture.key;
-  const baked = `${key}__fog_${color}_${amount.toFixed(3)}_${height}`;
+  const baked = `${key}__bake_${fog ? `${fog.color}_${fog.amount.toFixed(3)}_${fog.height}` : ''}_${grade ? grade.map((v) => v.toFixed(3)).join(',') : ''}`;
   if (!scene.textures.exists(baked)) {
     const src = scene.textures.get(key).getSourceImage() as HTMLImageElement | HTMLCanvasElement;
     const tex = scene.textures.createCanvas(baked, src.width, src.height);
     if (!tex) return;
     const ctx = tex.context;
     ctx.drawImage(src, 0, 0);
-    ctx.globalCompositeOperation = 'source-atop';
-    const top = layer.y;
-    const start = screenH * (1 - height);
-    const g = ctx.createLinearGradient(0, -top, 0, screenH - top);
-    const [r, gg, b] = hexToRgb01(color).map((v) => Math.round(v * 255));
-    const rgba = (a: number) => `rgba(${r},${gg},${b},${Math.min(1, a).toFixed(3)})`;
-    g.addColorStop(0, rgba(amount * 0.55));
-    g.addColorStop(Math.max(0, Math.min(1, start / screenH)), rgba(amount * 0.6));
-    g.addColorStop(1, rgba(amount));
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, src.width, src.height);
+    if (fog && fog.amount > 0.01) {
+      ctx.globalCompositeOperation = 'source-atop';
+      const top = layer.y;
+      const start = screenH * (1 - fog.height);
+      const g = ctx.createLinearGradient(0, -top, 0, screenH - top);
+      const [r, gg, b] = hexToRgb01(fog.color).map((v) => Math.round(v * 255));
+      const rgba = (a: number) => `rgba(${r},${gg},${b},${Math.min(1, a).toFixed(3)})`;
+      g.addColorStop(0, rgba(fog.amount * 0.55));
+      g.addColorStop(Math.max(0, Math.min(1, start / screenH)), rgba(fog.amount * 0.6));
+      g.addColorStop(1, rgba(fog.amount));
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, src.width, src.height);
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    if (grade) {
+      const img = ctx.getImageData(0, 0, src.width, src.height);
+      const d = img.data;
+      for (let i = 0; i < d.length; i += 4) {
+        if (!d[i + 3]) continue;
+        const [r, g, b] = applyMatrix(grade, [d[i]! / 255, d[i + 1]! / 255, d[i + 2]! / 255]);
+        d[i] = r * 255;
+        d[i + 1] = g * 255;
+        d[i + 2] = b * 255;
+      }
+      ctx.putImageData(img, 0, 0);
+    }
     tex.refresh();
   }
   layer.setTexture(baked);
@@ -238,6 +262,7 @@ export class Atmosphere {
   /** 2 = everything, 1 = no bloom and fewer particles, 0 = also no mist and halos. */
   quality = 2;
   private frameTimes: number[] = [];
+  private fogAmounts: { color: string; amount: number; height: number }[] = [];
   private settle = 2;
 
   constructor(
@@ -252,6 +277,10 @@ export class Atmosphere {
     this.darkness = 1 - Math.max(...amb);
     if (!env) return;
     this.buildFog(env);
+    const grade = env.grade && (env.grade.contrast !== undefined || env.grade.saturation !== undefined || env.grade.tint) ? gradeMatrix(env.grade) : null;
+    opts.parallax.forEach((layer, i) =>
+      bakeLayer(scene, layer as unknown as Phaser.GameObjects.Image, this.fogAmounts[i] ?? null, grade, opts.height),
+    );
     if (needsLightmap(env)) {
       // The lightmap is half resolution: light is soft anyway, and it's 4× cheaper.
       this.lightmap = scene.add
@@ -276,10 +305,10 @@ export class Atmosphere {
     // nothing per frame. Each layer gets the veils of every layer in front of it.
     const alphas = fogVeilAlphas(this.opts.parallax.length, fog.density);
     const height = fog.height ?? 0.6;
-    this.opts.parallax.forEach((layer, i) => {
+    this.fogAmounts = this.opts.parallax.map((_, i) => {
       let keep = 1;
       for (let j = i; j < alphas.length; j++) keep *= 1 - alphas[j]!;
-      bakeFog(this.scene, layer as unknown as Phaser.GameObjects.Image, fog.color, 1 - keep, height, H);
+      return { color: fog.color, amount: 1 - keep, height };
     });
     // Drifting mist: one band between the background and the world, one in front of everything.
     const band = (depth: number, alpha: number, speed: number, factor: number, y: number, h: number) => {
@@ -453,6 +482,7 @@ export class Atmosphere {
 
   private buildPost(env: Environment) {
     const filters = this.cam.filters.external;
+    const hasGrade = !!env.grade && (env.grade.contrast !== undefined || env.grade.saturation !== undefined || !!env.grade.tint);
     if (env.bloom && env.bloom.strength > 0) {
       this.bloom = Phaser.Actions.AddEffectBloom(this.cam, {
         threshold: env.bloom.threshold ?? 0.7,
@@ -466,6 +496,10 @@ export class Atmosphere {
       const cm = filters.addColorMatrix();
       cm.colorMatrix.set(gradeMatrix(env.grade));
     }
+    // The lightmap must only darken the world, not the (pre-lit) background, which a separate
+    // camera draws underneath. A camera with a filter renders into its own transparent buffer,
+    // where MULTIPLY leaves empty pixels empty, so make sure there is at least one.
+    if (this.lightmap && !hasGrade) filters.addColorMatrix();
     if (env.vignette && env.vignette > 0) {
       // A soft dark frame as one overlay quad (cheaper than a filter pass, and a nicer curve).
       const v = env.vignette;

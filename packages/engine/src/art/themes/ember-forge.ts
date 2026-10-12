@@ -5,8 +5,12 @@
  */
 import { Canvas, fbm, gradient, Ix, MatLayer, Palette, rng, bayer, type Material } from '../core';
 import { heroSheet } from '../hero';
+import { bigHeroSheet } from '../hero2';
+import { emberBig } from './big-heroes';
 import { arcade, gear, hangingChain, lightShafts, mistBand, overgrow, pipe, tower } from '../scenery';
 import { derive, px01, tileNoise, TILE } from '../tiles';
+import { backEdges, backWall } from '../tiles';
+import { bonesDecal, crackDecal, grateDecal, veinDecal } from '../decals';
 import { sheetOf, type Raster } from '../../pixel';
 import type { ArtTheme, ParallaxLayer, PropInfo, SpriteSheet } from '../types';
 import { emberHeroCostume } from './ember-hero';
@@ -244,6 +248,7 @@ function forgeTiles(): ArtTheme['tiles'] {
   const S = C.stone;
   const fill = bricks(3);
   const fill2 = bricks(4);
+  const fill3 = bricks(8);
   const ground = ledge(bricks(5, 1), 21);
   const ground2 = ledge(bricks(6, 1), 22);
   const ground3 = ledge(bricks(7, 1), 23);
@@ -278,57 +283,91 @@ function forgeTiles(): ArtTheme['tiles'] {
     platform: t(plat),
     platformLeft: t(derive(plat, (x, y) => (x === 0 && y < 7 ? I[1] : null))),
     platformRight: t(derive(plat, (x, y) => (x === 15 && y < 7 ? I[1] : null))),
+    fill3: t(fill3),
+    ...(() => {
+      const back = backWall(fill2, '#0b0509', 0.5);
+      const e = backEdges(back, C.stone[5]!, '#050204');
+      return { back: t(back), backTop: t(e.backTop), backBottom: t(e.backBottom), backLeft: t(e.backLeft), backRight: t(e.backRight) };
+    })(),
     spike: spikeStrip([I[1]!, I[2]!, I[3]!, I[4]!], '#0a0508', S[2]),
   };
 }
 
 // ── Creatures ───────────────────────────────────────────────────────────────
 
-/** A magma slug: charred plates over a molten body that glows through the seams. */
+/**
+ * A magma slug: charred plates over a molten body that glows through the seams. It inches along
+ * (a wave of compression runs from tail to head), its glowing eye stalks sway, and now and then a
+ * drop of lava drips from its belly.
+ */
 function slugSheet(): SpriteSheet {
-  const FW = 30;
-  const FH = 16;
+  const FW = 38;
+  const FH = 22;
   const pal = new Palette();
-  const [ol, olLit] = pal.ramp(['#0a0508', '#3a1410']);
-  const rock = pal.ramp(['#1a0e10', '#33201f', '#553530', '#7a5040']);
+  const [ol, olLit] = pal.ramp(['#0a0508', '#4a1a10']);
+  const rock = pal.ramp(['#1a0e10', '#33201f', '#553530', '#7a5040', '#a07050']);
   const lava = pal.ramp(C.lava.slice(1));
-  const [eye] = pal.ramp(['#fff6c0']);
+  const [eye, eyeCore] = pal.ramp(['#ffb040', '#fff6c0']);
+  const [stalk] = pal.ramp(['#33201f']);
   const [flash] = pal.ramp(['#ffffff']);
   const frames: Raster[] = [];
-  const draw = (f: number, mode: 'walk' | 'hurt') => {
+  const draw = (f: number, mode: 'walk' | 'idle' | 'hurt') => {
     const c = new Ix(FW, FH, pal);
-    const ph = (f / 6) * Math.PI * 2;
-    const segs = 5;
+    const ph = (f / 8) * Math.PI * 2;
+    const segs = 6;
+    const walk = mode === 'walk';
+    const xs: number[] = [];
+    let headTop = 0;
     for (let i = 0; i < segs; i++) {
       const t = i / (segs - 1);
-      const x = 5 + t * 18 + Math.sin(ph - i) * 0.8;
-      const rad = 3 + Math.sin(t * Math.PI) * 2.2 + (i === segs - 1 ? 0.5 : 0);
-      const hump = mode === 'walk' ? Math.max(0, Math.sin(ph - i * 1.1)) * 1.6 : 0;
+      // the compression wave travels forward along the body
+      const squeeze = walk ? Math.sin(ph - i * 1.05) : 0;
+      const x = 5 + t * 23 + squeeze * 1.2;
+      const rad = 3.6 + Math.sin(t * Math.PI * 0.85) * 2.6 + (i === segs - 1 ? 0.6 : 0);
+      const hump = walk ? Math.max(0, squeeze) * 2.2 : mode === 'idle' ? Math.sin(ph + i) * 0.4 : 0;
       const y = FH - 1 - rad - hump;
-      c.ellipse(x, y, rad + 0.8, rad, (xx, yy, nx, ny) => (ny < -0.45 ? rock[3]! : ny < 0.25 ? rock[2]! : rock[1]!));
+      xs.push(x);
+      if (i === segs - 1) headTop = y - rad;
+      c.ellipse(x, y, rad + 0.9, rad, (xx, yy, nx, ny) => rock[Math.max(0, Math.min(4, Math.round(2 - ny * 1.6 + nx * 0.3)))]!);
     }
-    // molten seams between plates
+    // molten seams between plates, brighter at the top of each seam
     for (let i = 1; i < segs; i++) {
-      const sx = Math.round(5 + (i / (segs - 1)) * 18 - 2 + Math.sin(ph - i) * 0.8);
-      for (let y = 2; y < FH - 1; y++) if (c.get(sx, y)) c.set(sx, y, y < 9 ? lava[2]! : lava[1]!);
+      const sx = Math.round((xs[i]! + xs[i - 1]!) / 2 + 1);
+      for (let y = 1; y < FH - 1; y++) if (c.get(sx, y)) c.set(sx, y, y < FH - 8 ? lava[2]! : lava[1]!);
     }
     for (let x = 0; x < FW; x++) if (c.get(x, FH - 1)) c.set(x, FH - 1, lava[0]!);
-    // head and glowing eyes
-    c.set(26, 9, eye!);
-    c.set(24, 9, eye!);
+    // eye stalks sway; eyes glow
+    const hx = Math.round(xs[segs - 1]!);
+    for (const [k, off] of [[0, 1], [1, 4]] as const) {
+      const sway = Math.round(Math.sin(ph + k * 1.7) * 1.2);
+      const bx = hx + off - 1;
+      const by = Math.round(headTop) + 1;
+      c.line(bx, by, bx + 1 + sway, by - 4, stalk!);
+      c.set(bx + 1 + sway, by - 5, eye!);
+      c.set(bx + 2 + sway, by - 5, eyeCore!);
+    }
+    // a lava drip on one frame of the cycle
+    if (walk && f === 5) c.set(Math.round(xs[2]!), FH - 1, lava[3]!);
+    c.rim(0, -1, new Set(rock));
     c.outline(ol!, olLit!);
     if (mode === 'hurt') for (let i = 0; i < c.px.length; i++) if (c.px[i] && c.px[i] !== ol) c.px[i] = flash!;
     frames.push(c.toRaster());
   };
-  for (let f = 0; f < 6; f++) draw(f, 'walk');
+  for (let f = 0; f < 8; f++) draw(f, 'walk');
+  draw(0, 'idle');
+  draw(3, 'idle');
   draw(0, 'hurt');
   return {
     raster: sheetOf(frames),
     frameWidth: FW,
     frameHeight: FH,
-    animations: { walk: { frames: [0, 1, 2, 3, 4, 5], fps: 8, loop: true }, idle: { frames: [0, 1], fps: 3, loop: true }, hurt: { frames: [6, 0], fps: 10, loop: false } },
-    hitbox: { x: 2, y: 5, w: 26, h: 11 },
-    anchor: { x: 15, y: 15 },
+    animations: {
+      walk: { frames: [0, 1, 2, 3, 4, 5, 6, 7], fps: 9, loop: true },
+      idle: { frames: [8, 9], fps: 3, loop: true },
+      hurt: { frames: [10, 0, 10, 0], fps: 14, loop: false },
+    },
+    hitbox: { x: 3, y: 8, w: 32, h: 14 },
+    anchor: { x: 19, y: 21 },
   };
 }
 
@@ -497,6 +536,15 @@ function props(): { props: Record<string, Raster>; info: Record<string, PropInfo
   return { props: out, info };
 }
 
+function decals(): Record<string, Raster> {
+  return {
+    lava: veinDecal(36, 14, [C.lava[0]!, C.lava[2]!, C.lava[3]!], 6),
+    skull: bonesDecal('skull', ['#7a6458', '#bfa894', '#eadccb'], '#140a0c'),
+    grate: grateDecal(C.iron.slice(0, 3), C.lava[1]!),
+    crack: crackDecal(30, 20, C.stone[0]!, '#050204', C.stone[4]!, 5),
+  };
+}
+
 export const EMBER_FORGE_META = {
   id: 'ember-forge',
   name: 'Ember Forge',
@@ -513,7 +561,8 @@ export function emberForge(): ArtTheme {
     layers: layers(),
     tiles: forgeTiles(),
     sprites: {
-      hero: heroSheet(emberHeroCostume()),
+      hero: bigHeroSheet(emberBig()),
+      heroSmall: heroSheet(emberHeroCostume()),
       enemy: slugSheet(),
       pickup: wispSheet(),
       goal: forgeGateSheet(),
@@ -522,6 +571,7 @@ export function emberForge(): ArtTheme {
     },
     props: p,
     propInfo: info,
+    decals: decals(),
     tileSize: TILE,
     lights: {
       hero: { color: '#ffb070', radius: 54, intensity: 0.45, flicker: 0.1 },

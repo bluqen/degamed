@@ -316,3 +316,37 @@ export function gear(L: MatLayer, cx: number, cy: number, r: number, teeth: numb
     }
   }
 }
+
+/** A tapering lattice mast (radio tower) with platforms, a dish and antennas. Returns its tip. */
+export function mast(L: MatLayer, cx: number, base: number, top: number, wBase: number, wTop: number, id: number): [number, number] {
+  const at = (y: number) => wTop + ((wBase - wTop) * (y - top)) / (base - top);
+  L.line(cx - wBase / 2, base, cx - wTop / 2, top, id, 2);
+  L.line(cx + wBase / 2, base, cx + wTop / 2, top, id, 2);
+  // X bracing, segments get shorter toward the top
+  let y = base;
+  while (y > top + 4) {
+    const seg = Math.max(6, (at(y) * 0.9) | 0);
+    const y2 = Math.max(top, y - seg);
+    L.line(cx - at(y) / 2, y, cx + at(y2) / 2, y2, id);
+    L.line(cx + at(y) / 2, y, cx - at(y2) / 2, y2, id);
+    L.rect(cx - at(y2) / 2, y2, at(y2) + 1, 1, id);
+    y = y2;
+  }
+  // service platforms with railings
+  for (const t of [0.35, 0.62]) {
+    const py = Math.round(base - (base - top) * t);
+    const w = at(py) + 10;
+    L.rect(cx - w / 2, py, w, 2, id);
+    for (let x = Math.round(cx - w / 2); x < cx + w / 2; x += 3) L.rect(x, py - 3, 1, 3, id);
+    L.rect(cx - w / 2, py - 3, w, 1, id);
+  }
+  // a dish on one side
+  const dy = Math.round(base - (base - top) * 0.5);
+  for (let a = -1.2; a <= 1.2; a += 0.05) L.set(Math.round(cx + at(dy) / 2 + 8 + Math.cos(a) * -4), Math.round(dy + Math.sin(a) * 8), id);
+  L.line(cx + at(dy) / 2, dy, cx + at(dy) / 2 + 6, dy, id);
+  // antennas on top
+  L.rect(cx, top - 18, 1, 18, id);
+  L.rect(cx - 4, top - 10, 9, 1, id);
+  L.rect(cx - 2, top - 15, 5, 1, id);
+  return [cx, top - 18];
+}

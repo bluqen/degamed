@@ -702,6 +702,8 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
     world!: World;
     atmosphere: Atmosphere | null = null;
     uiCamera!: Phaser.Cameras.Scene2D.Camera;
+    bgCamera!: Phaser.Cameras.Scene2D.Camera;
+    private readonly bgObjects = new WeakSet<Phaser.GameObjects.GameObject>();
     followTarget: EntityHandle | null = null;
     lookX = 0;
     lookY = 0;
@@ -796,7 +798,14 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
         this.cache.bitmapFont.add(FONT_KEY, entry);
       }
 
-      if (scene.background) this.cameras.main.setBackgroundColor(scene.background);
+      // The background (colour and parallax layers) has its own camera underneath the world, so
+      // the lightmap and camera filters only touch the world: art backgrounds are pre-lit.
+      this.bgCamera = this.cameras.add(0, 0, W, H, false, 'background');
+      const list = this.cameras.cameras;
+      list.splice(list.indexOf(this.bgCamera), 1);
+      list.unshift(this.bgCamera);
+      this.bgCamera.setRoundPixels(pixelArt);
+      if (scene.background) this.bgCamera.setBackgroundColor(scene.background);
       const parallaxObjects: Phaser.GameObjects.GameObject[] = [];
       this.parallaxSprites = [];
       scene.parallax.forEach((layer, i) => {
@@ -808,7 +817,10 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
         // Layers faster than the world are foreground: drawn in front of everything but the UI.
         const front = layer.factor > 1;
         sprite.setOrigin(0, 0).setScrollFactor(0).setDepth(front ? DEPTH.foreground + i : -100 + i);
-        if (!front) parallaxObjects.push(sprite);
+        if (!front) {
+          parallaxObjects.push(sprite);
+          this.bgObjects.add(sprite);
+        }
         if (layer.tiled && sprite instanceof Phaser.GameObjects.TileSprite) this.parallaxSprites.push({ sprite, factor: layer.factor });
       });
 
@@ -937,7 +949,7 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
               // A background wall: the fill tile pushed back into the dark.
               ctx.save();
               ctx.globalCompositeOperation = 'source-atop';
-              ctx.fillStyle = 'rgba(6,8,14,0.62)';
+              ctx.fillStyle = 'rgba(6,8,14,0.5)';
               ctx.fillRect(i * T, 0, T, T);
               ctx.restore();
             }
@@ -968,17 +980,20 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
 
 
     private route(go: Phaser.GameObjects.GameObject) {
-      const isUi = this.uiObjects.has(go) || (this.world.byObject.get(go)?.hasTag('ui') ?? false);
-      if (isUi) {
-        this.cameras.main.ignore(go);
-      } else this.uiCamera.ignore(go);
+      const main = this.cameras.main.id;
+      const ui = this.uiCamera.id;
+      const bg = this.bgCamera.id;
+      // cameraFilter is a bit mask of the cameras that skip this object.
+      if (this.bgObjects.has(go)) go.cameraFilter = main | ui;
+      else if (this.uiObjects.has(go) || (this.world.byObject.get(go)?.hasTag('ui') ?? false)) go.cameraFilter = main | bg;
+      else go.cameraFilter = ui | bg;
     }
 
     /** Moves an object onto the UI layer (fixed on screen, unaffected by lighting and filters). */
     toUi(go: Phaser.GameObjects.GameObject) {
       this.uiObjects.add(go);
       (go as unknown as Phaser.GameObjects.Components.ScrollFactor).setScrollFactor?.(0);
-      go.cameraFilter = this.cameras.main.id;
+      go.cameraFilter = this.cameras.main.id | this.bgCamera.id;
     }
 
     applyTimeScale() {

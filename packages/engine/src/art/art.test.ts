@@ -147,7 +147,12 @@ describe.each(THEME_IDS)('theme %s', (id) => {
     expect(rectangular(h.raster)).toBe(true);
     expect(h.raster.width % h.frameWidth).toBe(0);
     expect(h.raster.height).toBe(h.frameHeight);
-    for (const a of ['idle', 'run', 'jump', 'fall', 'attack', 'hurt']) expect(h.animations[a], a).toBeDefined();
+    for (const a of ['idle', 'run', 'jump', 'fall', 'attack', 'hurt', 'dash', 'turn']) expect(h.animations[a], a).toBeDefined();
+    // heroes are big enough to read: 32-40 px of body in the frame
+    let top = h.frameHeight;
+    let bottom = 0;
+    for (let y = 0; y < h.frameHeight; y++) for (let x = 0; x < h.frameWidth; x++) if (px(h.raster, x, y)[3] > 0) { top = Math.min(top, y); bottom = Math.max(bottom, y); }
+    expect(bottom - top + 1).toBeGreaterThanOrEqual(32);
     expect(h.animations.run!.frames.length).toBeGreaterThanOrEqual(6);
     const n = frameCount(h);
     for (const a of Object.values(h.animations)) {
@@ -168,6 +173,7 @@ describe.each(THEME_IDS)('theme %s', (id) => {
     const S = t.sprites;
     const need: [string, string[]][] = [
       ['enemy', ['walk', 'hurt']],
+      ['heroSmall', ['idle', 'run']],
       ['pickup', ['idle']],
       ['goal', ['idle']],
       ['checkpoint', ['idle', 'lit']],
@@ -181,6 +187,23 @@ describe.each(THEME_IDS)('theme %s', (id) => {
       for (const a of anims) expect(s!.animations[a], `${k}.${a}`).toBeDefined();
       for (const a of Object.values(s!.animations)) for (const f of a.frames) expect(f).toBeLessThan(frameCount(s!));
     }
+  });
+
+  it('enemies walk with at least 6 frames and flash when hurt', () => {
+    const e = t.sprites.enemy;
+    expect(e.animations.walk!.frames.length).toBeGreaterThanOrEqual(6);
+    const hurt = e.animations.hurt!.frames[0]!;
+    // the hurt flash frame is mostly white
+    let white = 0;
+    let solid = 0;
+    for (let y = 0; y < e.frameHeight; y++)
+      for (let x = 0; x < e.frameWidth; x++) {
+        const p = px(e.raster, hurt * e.frameWidth + x, y);
+        if (p[3] === 0) continue;
+        solid++;
+        if (p[0] > 240 && p[1] > 240 && p[2] > 240) white++;
+      }
+    expect(white / solid).toBeGreaterThan(0.5);
   });
 
   it('has props with valid placement info', () => {

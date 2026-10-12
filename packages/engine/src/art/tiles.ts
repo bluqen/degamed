@@ -2,7 +2,7 @@
  * Tile helpers: 16×16 textures from periodic noise (so they tile seamlessly in both directions),
  * plus edge treatments (caps, ceilings) built from the same texture so neighbours line up.
  */
-import { Canvas, fbm, hash2, type Rng } from './core';
+import { Canvas, fbm, hash2, rgb, type Rng } from './core';
 
 export const TILE = 16;
 
@@ -74,5 +74,39 @@ export function tileCells(seed: number, n: number) {
         }
     });
     return { id, d1, gap: d2 - d1, dx: cx, dy: cy };
+  };
+}
+
+/**
+ * A background-wall tile from a fill tile: pulled toward a dark, desaturated colour and given a
+ * soft pattern so it reads as "behind" the playable terrain without competing with it.
+ */
+export function backWall(src: Canvas, toward: string, amt: number, pattern?: (x: number, y: number) => number): Canvas {
+  const t = rgb(toward);
+  const c = new Canvas(src.w, src.h);
+  for (let y = 0; y < src.h; y++)
+    for (let x = 0; x < src.w; x++) {
+      const [r, g, b, a] = src.get(x, y);
+      if (!a) continue;
+      const l = (r + g + b) / 3;
+      const k = Math.min(1, amt + (pattern ? pattern(x, y) : 0));
+      // desaturate a little, then pull toward the wall colour
+      const d = [r * 0.6 + l * 0.4, g * 0.6 + l * 0.4, b * 0.6 + l * 0.4];
+      c.set(x, y, [d[0]! + (t[0] - d[0]!) * k, d[1]! + (t[1] - d[1]!) * k, d[2]! + (t[2] - d[2]!) * k]);
+    }
+  return c;
+}
+
+/**
+ * Bevelled edges for a back-wall area so it reads as a recessed alcove: a lit lip along the
+ * bottom (light from above falls on the sill), an inner shadow under the top and left edges.
+ */
+export function backEdges(back: Canvas, lit: string, dark: string): Record<'backTop' | 'backBottom' | 'backLeft' | 'backRight', Canvas> {
+  const edge = (fn: (x: number, y: number) => string | null) => derive(back, (x, y) => fn(x, y));
+  return {
+    backTop: edge((x, y) => (y === 0 ? dark : y === 1 ? dark : y === 2 && (x + y) % 2 === 0 ? dark : null)),
+    backBottom: edge((x, y) => (y === 15 ? lit : y === 14 && x % 3 !== 0 ? lit : null)),
+    backLeft: edge((x, y) => (x === 0 || x === 1 ? dark : x === 2 && (x + y) % 2 === 0 ? dark : null)),
+    backRight: edge((x, y) => (x === 15 ? lit : null)),
   };
 }

@@ -247,7 +247,7 @@
       "loadMs": 1163,
       "finalUrl": "/create",
       "audit": {
-        "title": "Make a game · Degamed",
+        "title": "Make a game \u00b7 Degamed",
         "lang": "en",
         "h1": 1,
         "interactive": 16,
@@ -301,7 +301,7 @@
       "loadMs": 1184,
       "finalUrl": "/create",
       "audit": {
-        "title": "Make a game · Degamed",
+        "title": "Make a game \u00b7 Degamed",
         "lang": "en",
         "h1": 1,
         "interactive": 16,
@@ -355,7 +355,7 @@
       "loadMs": 1027,
       "finalUrl": "/create",
       "audit": {
-        "title": "Make a game · Degamed",
+        "title": "Make a game \u00b7 Degamed",
         "lang": "en",
         "h1": 1,
         "interactive": 15,
@@ -409,7 +409,7 @@
       "loadMs": 997,
       "finalUrl": "/create",
       "audit": {
-        "title": "Make a game · Degamed",
+        "title": "Make a game \u00b7 Degamed",
         "lang": "en",
         "h1": 1,
         "interactive": 15,
@@ -1319,7 +1319,7 @@
       "loadMs": 1002,
       "finalUrl": "/editor/demo",
       "audit": {
-        "title": "Demo game · Degamed",
+        "title": "Demo game \u00b7 Degamed",
         "lang": "en",
         "h1": 1,
         "interactive": 17,
@@ -1401,7 +1401,7 @@
       "loadMs": 1095,
       "finalUrl": "/editor/demo",
       "audit": {
-        "title": "Demo game · Degamed",
+        "title": "Demo game \u00b7 Degamed",
         "lang": "en",
         "h1": 1,
         "interactive": 19,
@@ -1478,7 +1478,7 @@
       "loadMs": 1886,
       "finalUrl": "/editor/demo",
       "audit": {
-        "title": "Demo game · Degamed",
+        "title": "Demo game \u00b7 Degamed",
         "lang": "en",
         "h1": 1,
         "interactive": 17,
@@ -1548,7 +1548,7 @@
       "loadMs": 1390,
       "finalUrl": "/editor/demo",
       "audit": {
-        "title": "Demo game · Degamed",
+        "title": "Demo game \u00b7 Degamed",
         "lang": "en",
         "h1": 1,
         "interactive": 17,
@@ -1618,7 +1618,7 @@
       "loadMs": 2123,
       "finalUrl": "/editor/demo/advanced",
       "audit": {
-        "title": "Demo game · Advanced · Degamed",
+        "title": "Demo game \u00b7 Advanced \u00b7 Degamed",
         "lang": "en",
         "h1": 0,
         "interactive": 208,
@@ -1693,7 +1693,7 @@
       "loadMs": 1637,
       "finalUrl": "/editor/demo/advanced",
       "audit": {
-        "title": "Demo game · Advanced · Degamed",
+        "title": "Demo game \u00b7 Advanced \u00b7 Degamed",
         "lang": "en",
         "h1": 0,
         "interactive": 208,
@@ -1766,7 +1766,7 @@
       "loadMs": 1371,
       "finalUrl": "/editor/demo/advanced",
       "audit": {
-        "title": "Demo game · Advanced · Degamed",
+        "title": "Demo game \u00b7 Advanced \u00b7 Degamed",
         "lang": "en",
         "h1": 1,
         "interactive": 1,
@@ -1817,7 +1817,7 @@
       "loadMs": 2024,
       "finalUrl": "/editor/demo/advanced",
       "audit": {
-        "title": "Demo game · Advanced · Degamed",
+        "title": "Demo game \u00b7 Advanced \u00b7 Degamed",
         "lang": "en",
         "h1": 1,
         "interactive": 1,
@@ -1870,7 +1870,7 @@
       "loadMs": 1118,
       "finalUrl": "/play/demo",
       "audit": {
-        "title": "Demo game · Play on Degamed",
+        "title": "Demo game \u00b7 Play on Degamed",
         "lang": "en",
         "h1": 1,
         "interactive": 3,
@@ -1936,7 +1936,7 @@
       "loadMs": 1250,
       "finalUrl": "/play/demo",
       "audit": {
-        "title": "Demo game · Play on Degamed",
+        "title": "Demo game \u00b7 Play on Degamed",
         "lang": "en",
         "h1": 1,
         "interactive": 1,
@@ -2002,7 +2002,7 @@
       "loadMs": 1228,
       "finalUrl": "/play/demo",
       "audit": {
-        "title": "Demo game · Play on Degamed",
+        "title": "Demo game \u00b7 Play on Degamed",
         "lang": "en",
         "h1": 1,
         "interactive": 3,
@@ -2068,7 +2068,7 @@
       "loadMs": 1327,
       "finalUrl": "/play/demo",
       "audit": {
-        "title": "Demo game · Play on Degamed",
+        "title": "Demo game \u00b7 Play on Degamed",
         "lang": "en",
         "h1": 1,
         "interactive": 3,
@@ -2527,32 +2527,26 @@
     {
       "viewport": "desktop",
       "reachedPlay": true,
-      "seconds": 12,
-      "clicks": 3,
+      "seconds": 12.1,
+      "clicks": 2,
       "typed": true,
-      "finalUrl": "/play/gmv4l88n593q4k3",
+      "finalUrl": "/editor/gmv4xb0vjgu0t5h",
       "steps": [
         {
           "at": 0,
           "what": "landing",
-          "shot": "docs/team/shots/critic/round-1/journey--desktop-00-landing.png"
+          "shot": "docs/team/shots/critic/round-1/journey/journey--desktop-00-landing.png"
         },
         {
-          "at": 3829,
+          "at": 4698,
           "what": "typed prompt",
-          "shot": "docs/team/shots/critic/round-1/journey--desktop-01-typed.png"
+          "shot": "docs/team/shots/critic/round-1/journey/journey--desktop-01-typed.png"
         },
         {
-          "at": 4307,
+          "at": 5269,
           "what": "clicked \"Make my game\"",
-          "url": "/editor/gmv4l88n593q4k3",
-          "shot": "docs/team/shots/critic/round-1/journey--desktop-03-step.png"
-        },
-        {
-          "at": 10918,
-          "what": "clicked \"Play\"",
-          "url": "/play/gmv4l88n593q4k3",
-          "shot": "docs/team/shots/critic/round-1/journey--desktop-04-step.png"
+          "url": "/editor/gmv4xb0vjgu0t5h",
+          "shot": "docs/team/shots/critic/round-1/journey/journey--desktop-03-step.png"
         }
       ],
       "consoleErrors": [],
@@ -2560,35 +2554,35 @@
       "pageErrors": [],
       "failedRequests": [],
       "hosts": {
-        "localhost:5173": 112,
-        "localhost:5174": 150
+        "localhost:5173": 116,
+        "localhost:5174": 50
       },
       "apiRequests": [],
-      "finalShot": "docs/team/shots/critic/round-1/journey--desktop-04-playing.png"
+      "finalShot": "docs/team/shots/critic/round-1/journey/journey--desktop-03-playing.png"
     },
     {
       "viewport": "phone",
       "reachedPlay": true,
-      "seconds": 11.8,
+      "seconds": 7.7,
       "clicks": 2,
       "typed": true,
-      "finalUrl": "/editor/gmv4l8kxkesv1t0",
+      "finalUrl": "/editor/gmv4xb8u6ueo4c7",
       "steps": [
         {
           "at": 0,
           "what": "landing",
-          "shot": "docs/team/shots/critic/round-1/journey--phone-00-landing.png"
+          "shot": "docs/team/shots/critic/round-1/journey/journey--phone-00-landing.png"
         },
         {
-          "at": 5440,
+          "at": 1997,
           "what": "typed prompt",
-          "shot": "docs/team/shots/critic/round-1/journey--phone-01-typed.png"
+          "shot": "docs/team/shots/critic/round-1/journey/journey--phone-01-typed.png"
         },
         {
-          "at": 6097,
+          "at": 2503,
           "what": "clicked \"Make my game\"",
-          "url": "/editor/gmv4l8kxkesv1t0",
-          "shot": "docs/team/shots/critic/round-1/journey--phone-03-step.png"
+          "url": "/editor/gmv4xb8u6ueo4c7",
+          "shot": "docs/team/shots/critic/round-1/journey/journey--phone-03-step.png"
         }
       ],
       "consoleErrors": [],
@@ -2596,11 +2590,11 @@
       "pageErrors": [],
       "failedRequests": [],
       "hosts": {
-        "localhost:5173": 112,
+        "localhost:5173": 116,
         "localhost:5174": 50
       },
       "apiRequests": [],
-      "finalShot": "docs/team/shots/critic/round-1/journey--phone-03-playing.png"
+      "finalShot": "docs/team/shots/critic/round-1/journey/journey--phone-03-playing.png"
     }
   ],
   "bundles": {
@@ -2742,17 +2736,17 @@
     {
       "ok": true,
       "owner": "design",
-      "what": "apps/web → @degamed/ai: imported and declared"
+      "what": "apps/web \u2192 @degamed/ai: imported and declared"
     },
     {
       "ok": true,
       "owner": "ai",
-      "what": "packages/ai → @degamed/engine: imported and declared"
+      "what": "packages/ai \u2192 @degamed/engine: imported and declared"
     },
     {
       "ok": true,
       "owner": "engine",
-      "what": "apps/play → @degamed/engine: imported and declared"
+      "what": "apps/play \u2192 @degamed/engine: imported and declared"
     }
   ],
   "checks": {
@@ -2761,7 +2755,7 @@
       "failing": [
         "packages/engine"
       ],
-      "tail": "packages/engine typecheck: src/kits/kits.test.ts(168,36): error TS2345: Argument of type '{ jumpHeight?: undefined; speed?: undefined; gravity?: undefined; difficulty?: undefined; length?: undefined; } | { jumpHeight: number; speed: number; gravity: number; difficulty?: undefined; length?: undefined; } | { ...; } | { ...; }' is not assignable to parameter of type 'Record<string, string | number | boolean> | undefined'.\npackages/engine typecheck: Failed\n ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @degamed/engine@0.0.0 typecheck: `tsc -p tsconfig.json`\n ELIFECYCLE  Command failed with exit code 1."
+      "tail": "packages/engine typecheck: src/kits/kits.test.ts(168,36): error TS2345: Argument of type '{ jumpHeight?: undefined; speed?: undefined; gravity?: undefined; difficulty?: undefined; length?: undefined; } | { jumpHeight: number; speed: number; gravity: number; difficulty?: undefined; length?: undefined; } | { ...; } | { ...; }' is not assignable to parameter of type 'Record<string, string | number | boolean> | undefined'.\npackages/engine typecheck: Failed\n\u2009ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL\u2009 @degamed/engine@0.0.0 typecheck: `tsc -p tsconfig.json`\n\u2009ELIFECYCLE\u2009 Command failed with exit code 1."
     },
     "test": {
       "ok": true,
@@ -2789,5 +2783,6 @@
     "play-demo/desktop/light: fps median 7 (headless)",
     "play-demo/phone/dark: fps median 10 (headless)",
     "play-demo/phone/light: fps median 10 (headless)"
-  ]
+  ],
+  "note": "journey re-measured in round-1/journey after a harness fix (it clicked Play before the studio game had started)"
 }

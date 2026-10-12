@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { Check } from 'lucide-react';
-import { themePreview } from '../lib/game/preview';
+import { themePreview, themeThumb } from '../lib/game/preview';
 import type { ThemeArt } from '../lib/game';
 import { cx } from '../ui';
 
@@ -16,10 +16,16 @@ export function ThemeArtImage({
   width?: number;
   height?: number;
 }) {
-  const src = useMemo(() => themePreview(theme, width, height), [theme, width, height]);
+  // Pre-rendered thumbnail first; render live from the theme only if it's missing.
+  const [src, setSrc] = useState(() => themeThumb(theme.id));
+  useEffect(() => setSrc(themeThumb(theme.id)), [theme.id]);
   return (
     <img
       src={src}
+      onError={() => {
+        if (src.startsWith('data:')) return;
+        window.setTimeout(() => setSrc(themePreview(theme, width, height)), 0);
+      }}
       alt=""
       width={width}
       height={height}
