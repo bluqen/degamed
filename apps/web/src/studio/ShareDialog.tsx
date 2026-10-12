@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { Check, Copy, ExternalLink } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Check, Copy, ExternalLink, Share2 } from 'lucide-react';
+import { KITS } from '../lib/game';
 import { shareUrl } from '../lib/share';
 import { Button, Dialog, Input, buttonClass } from '../ui';
 import type { Studio } from './useStudio';
@@ -14,7 +15,27 @@ export function ShareDialog({
   studio: Studio;
 }) {
   const [copied, setCopied] = useState(false);
-  const url = studio.spec ? shareUrl({ ...studio.spec, title: studio.title }) : null;
+  const [url, setUrl] = useState<string | null>(null);
+  const { spec, title } = studio;
+  useEffect(() => {
+    if (!open || !spec) return setUrl(null);
+    const kit = KITS.find((k) => k.id === spec.kit);
+    const defaults = Object.fromEntries((kit?.params ?? []).map((p) => [p.key, p.default]));
+    let live = true;
+    void shareUrl({ ...spec, title }, defaults).then((u) => live && setUrl(u));
+    return () => {
+      live = false;
+    };
+  }, [open, spec, title]);
+  const canNativeShare = typeof navigator !== 'undefined' && 'share' in navigator && window.matchMedia('(pointer: coarse)').matches;
+  const nativeShare = async () => {
+    if (!url) return;
+    try {
+      await navigator.share({ title, text: `Play “${title}”, a game I made with Degamed`, url });
+    } catch {
+      // Cancelled.
+    }
+  };
 
   const copy = async () => {
     if (!url) return;
@@ -34,21 +55,26 @@ export function ShareDialog({
       onClose={onClose}
       title={`Share “${studio.title}”`}
       description={
-        url
+        spec
           ? 'Anyone with the link can play it on a phone or a computer. No account needed.'
           : undefined
       }
       footer={
-        url ? (
+        spec ? (
           <>
             <a
-              href={url}
+              href={url ?? undefined}
               target="_blank"
               rel="noreferrer"
               className={buttonClass({ variant: 'secondary' })}
             >
               <ExternalLink size={16} aria-hidden="true" /> Open
             </a>
+            {canNativeShare && (
+              <Button variant="secondary" icon={<Share2 size={16} />} onClick={() => void nativeShare()}>
+                Share…
+              </Button>
+            )}
             <Button
               onClick={() => void copy()}
               icon={copied ? <Check size={16} /> : <Copy size={16} />}
@@ -61,7 +87,7 @@ export function ShareDialog({
         )
       }
     >
-      {url ? (
+      {spec ? (
         <div className="flex flex-col gap-3">
           <label htmlFor="share-url" className="text-body-sm font-semibold">
             Link
@@ -69,7 +95,7 @@ export function ShareDialog({
           <Input
             id="share-url"
             readOnly
-            value={url}
+            value={url ?? 'Making your link…'}
             onFocus={(e) => e.currentTarget.select()}
             className="font-mono text-body-sm"
           />

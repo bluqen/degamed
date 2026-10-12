@@ -11,9 +11,12 @@ type Outgoing = PlayToHost extends infer M ? (M extends unknown ? Omit<M, 'chann
 const container = document.getElementById('game')!;
 const status = document.getElementById('status')!;
 let game: GameHandle | null = null;
-// ?quality=high|low pins the visual quality (screenshots, testing); otherwise it adapts to the device.
+// ?quality=high|medium|low pins the visual quality (screenshots, testing); otherwise it adapts to the device.
 const q = new URLSearchParams(location.search).get('quality');
-const quality = q === 'high' || q === 'low' ? q : 'auto';
+const quality = q === 'high' || q === 'medium' || q === 'low' ? q : 'auto';
+// ?touch=overlay|external: where on-screen controls go ('external' = the host page draws them).
+const t = new URLSearchParams(location.search).get('touch');
+const touch = t === 'overlay' || t === 'external' ? t : 'auto';
 let loadToken = 0;
 
 function send(message: Outgoing) {
@@ -40,7 +43,7 @@ async function load(files: Record<string, string>) {
   container.replaceChildren();
   showStatus('Loading…');
   try {
-    const next = await startGame(container, files, hooks, { quality });
+    const next = await startGame(container, files, hooks, { quality, touch });
     if (token !== loadToken) return next.destroy();
     game = next;
     showStatus(null);
@@ -82,6 +85,13 @@ window.addEventListener('message', (event) => {
       game?.restart();
       container.focus();
       break;
+    case 'focus':
+      window.focus();
+      container.focus();
+      break;
+    case 'input':
+      game?.setAction(msg.action, msg.down);
+      break;
     case 'screenshot':
       void game?.screenshot().then((dataUrl) => {
         if (dataUrl.startsWith('data:image/')) send({ type: 'screenshot', requestId: msg.requestId, dataUrl });
@@ -100,7 +110,7 @@ let last = performance.now();
 const tick = (now: number) => {
   frames++;
   if (now - last >= 1000) {
-    if (game) send({ type: 'fps', fps: Math.round((frames * 1000) / (now - last)) });
+    if (game) send({ type: 'fps', fps: Math.round((frames * 1000) / (now - last)), ...game.stats() });
     frames = 0;
     last = now;
   }

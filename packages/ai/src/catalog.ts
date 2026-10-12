@@ -18,11 +18,19 @@ export interface KitInfo {
   params: KitParam[];
 }
 
+export interface ThemeHero {
+  id: string;
+  name: string;
+  keywords: string[];
+}
+
 export interface ThemeInfo {
   id: string;
   name: string;
   description: string;
   keywords: string[];
+  /** Hero variants the theme can draw (art's additive `ArtTheme.heroes`); the first is the default. */
+  heroes?: ThemeHero[];
 }
 
 export interface GameBackend {
@@ -138,7 +146,7 @@ export interface KitsModule {
   KITS: KitInfo[];
   buildGame(spec: GameSpec, encode: Encoder): ProjectFiles;
   readSpec(files: ProjectFiles): GameSpec | null;
-  listThemes?(): { id: string; name: string; description: string; keywords?: string[] }[];
+  listThemes?(): { id: string; name: string; description: string; keywords?: string[]; heroes?: ThemeHero[] }[];
 }
 
 /**
@@ -153,7 +161,15 @@ export function backendFromKits(mod: KitsModule): GameBackend {
     // Listing themes builds their art, so do it on first use, not on import.
     get themes() {
       if (!themes) {
-        const listed = mod.listThemes?.().map((t) => ({ id: t.id, name: t.name, description: t.description, keywords: t.keywords ?? [] }));
+        const listed = mod.listThemes?.().map(
+          (t): ThemeInfo => ({
+            id: t.id,
+            name: t.name,
+            description: t.description,
+            keywords: t.keywords ?? [],
+            ...(t.heroes?.length ? { heroes: t.heroes.map((h) => ({ id: h.id, name: h.name, keywords: h.keywords ?? [] })) } : {}),
+          }),
+        );
         themes = listed?.length ? listed : STUB_THEMES;
       }
       return themes;
@@ -167,6 +183,11 @@ export function backendFromKits(mod: KitsModule): GameBackend {
 export function catalogFor(backend: GameBackend = getBackend()): Catalog {
   return {
     kits: backend.kits.slice(0, 16).map((k) => ({ id: k.id, name: k.name, description: k.description.slice(0, 240), params: k.params.slice(0, 24) })),
-    themes: backend.themes.slice(0, 32).map((t) => ({ id: t.id, name: t.name, description: t.description.slice(0, 240) })),
+    themes: backend.themes.slice(0, 32).map((t) => ({
+      id: t.id,
+      name: t.name,
+      description: t.description.slice(0, 240),
+      ...(t.heroes?.length ? { heroes: t.heroes.slice(0, 8).map((h) => h.id) } : {}),
+    })),
   };
 }

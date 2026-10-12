@@ -74,6 +74,11 @@ export function touchGame(id: string, patch: Partial<Omit<GameEntry, 'id'>>) {
 
 export function removeGame(id: string) {
   clearDraft(id);
+  try {
+    localStorage.removeItem(`degamed.chat.v1.${id}`);
+  } catch {
+    // Storage blocked.
+  }
   writeList(listGames().filter((g) => g.id !== id));
 }
 

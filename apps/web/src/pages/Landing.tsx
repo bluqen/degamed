@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import { useNavigate } from 'react-router';
 import {
   ArrowRight,
@@ -13,9 +13,7 @@ import {
 } from 'lucide-react';
 import { SiteFooter, SiteHeader } from '../components/SiteHeader';
 import { Stage } from '../components/Stage';
-import { ThemeArtImage } from '../components/ThemeCard';
-import { demoGame, demoTheme as pickDemoTheme, themes } from '../lib/game';
-import { themeThumb } from '../lib/game/preview';
+import { SHOWCASE, ThemeThumb } from '../components/ThemeThumb';
 import { Button, ButtonLink, Card, Segmented, Slider, Switch, cx } from '../ui';
 
 const EXAMPLES = [
@@ -24,12 +22,14 @@ const EXAMPLES = [
   'A neon rooftop runner with a cat hacker',
 ];
 
+// The demo game (kits + art) only loads when someone presses Play.
+const loadDemo = () => import('../lib/game').then((m) => m.demoGame());
+const prefetchCreate = () => void import('./Create');
+
 export function Landing() {
   const navigate = useNavigate();
   const [idea, setIdea] = useState('');
-  const allThemes = useMemo(themes, []);
-  const demoTheme = useMemo(pickDemoTheme, []);
-  const poster = useMemo(() => themeThumb(demoTheme.id), [demoTheme]);
+  const allThemes = SHOWCASE;
 
   useEffect(() => {
     document.title = 'Degamed: describe a game, play it, share it';
@@ -43,7 +43,7 @@ export function Landing() {
 
   return (
     <div className="min-h-dvh">
-      <SiteHeader />
+      <SiteHeader quiet />
 
       {/* Hero */}
       <section className="relative isolate overflow-hidden">
@@ -81,6 +81,7 @@ export function Landing() {
             </label>
             <input
               id="hero-idea"
+              onFocus={prefetchCreate}
               value={idea}
               onChange={(e) => setIdea(e.target.value)}
               placeholder="A moody platformer about a lost robot"
@@ -96,7 +97,7 @@ export function Landing() {
                 key={ex}
                 type="button"
                 onClick={() => start(undefined, ex)}
-                className="h-8 rounded-full border border-line bg-surface/70 px-3 text-body-sm text-ink-2 backdrop-blur transition-colors hover:border-line-strong hover:text-ink"
+                className="h-10 rounded-full border border-line bg-surface/70 px-3.5 sm:h-8 sm:px-3 text-body-sm text-ink-2 backdrop-blur transition-colors hover:border-line-strong hover:text-ink"
               >
                 {ex}
               </button>
@@ -108,9 +109,9 @@ export function Landing() {
           <div className="relative mt-14 w-full max-w-[1040px] pb-16 sm:mt-20">
             <div className="rounded-[22px] border border-line bg-surface p-2 shadow-4">
               <Stage
-                files={demoGame}
+                files={loadDemo}
+                poster="/art/themes/sunlit-meadow.png"
                 title="Demo game"
-                poster={poster}
                 autoStart={false}
                 startLabel="Play the demo"
                 startHint="A real game, running right here. No download."
@@ -170,7 +171,7 @@ export function Landing() {
               body="In under a minute you’re playing: real pixel art, light, weather and game feel."
             >
               <div className="relative h-full">
-                <ThemeArtImage theme={allThemes[1] ?? demoTheme} />
+                <ThemeThumb id={allThemes[1]!.id} />
                 <span className="absolute inset-0 flex items-center justify-center">
                   <span className="flex size-12 items-center justify-center rounded-full bg-white/95 text-[#15141d] shadow-3">
                     <Gamepad2 size={22} aria-hidden="true" />
@@ -187,7 +188,7 @@ export function Landing() {
                 <div className="flex items-center gap-2 rounded-lg border border-line bg-surface p-2 pl-3 shadow-1">
                   <Link2 size={15} className="shrink-0 text-muted" aria-hidden="true" />
                   <span className="min-w-0 flex-1 truncate text-left font-mono text-caption text-ink-2">
-                    degamed.app/p/penguin-peak
+                    degamed.app/p/1q1VKS8sYW0lTi…
                   </span>
                   <span className="inline-flex h-7 items-center gap-1 rounded-sm bg-ok-tint px-2 text-caption font-semibold text-ok">
                     <Check size={13} aria-hidden="true" /> Copied
@@ -206,8 +207,8 @@ export function Landing() {
       <section className="mx-auto max-w-[1200px] px-4 py-20 sm:px-6 sm:py-28">
         <SectionIntro
           eyebrow="Looks like a real game"
-          title="Hand-made art styles, not clip art"
-          body="Every game is drawn in a crafted pixel-art style with layered backgrounds, light and atmosphere. Switch styles any time."
+          title="Crafted pixel-art styles, not clip art"
+          body="Every game is drawn in a detailed pixel-art style with layered backgrounds, light and atmosphere. Switch styles any time."
         />
         <ul className="mt-12 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-6">
           {allThemes.slice(0, 5).map((t, i) => {
@@ -231,16 +232,14 @@ export function Landing() {
                 )}
               >
                 <div className="aspect-video overflow-hidden bg-stage">
-                  <ThemeArtImage
-                    theme={t}
-                    width={big || n <= 3 ? 480 : 320}
-                    height={big || n <= 3 ? 270 : 180}
+                  <ThemeThumb
+                    id={t.id}
                     className="transition-transform duration-500 ease-standard group-hover:scale-[1.03]"
                   />
                 </div>
                 <div className="flex flex-col gap-0.5 px-4 py-3">
                   <span className="text-body font-semibold">{t.name}</span>
-                  <span className="line-clamp-1 text-body-sm text-muted">{t.description}</span>
+                  <span className="line-clamp-1 text-body-sm text-muted">{t.blurb}</span>
                 </div>
               </li>
             );
@@ -307,7 +306,7 @@ export function Landing() {
       <section className="mx-auto max-w-[1200px] px-4 pb-24 sm:px-6">
         <div className="relative flex flex-col items-center gap-6 overflow-hidden rounded-2xl bg-[#15121f] px-6 py-16 text-center text-white sm:py-20">
           <div aria-hidden="true" className="absolute inset-0">
-            <ThemeArtImage theme={allThemes[0] ?? demoTheme} width={640} height={200} />
+            <ThemeThumb id={allThemes[0]!.id} />
           </div>
           <div
             aria-hidden="true"

@@ -10,7 +10,8 @@ const navClass = ({ isActive }: { isActive: boolean }) =>
   );
 
 /** Marketing-site header: logo, a couple of links, appearance and one primary action. */
-export function SiteHeader({ overlay = false }: { overlay?: boolean }) {
+/** `quiet`: the page has its own primary action (the landing's prompt), so the header button steps back. */
+export function SiteHeader({ overlay = false, quiet = false }: { overlay?: boolean; quiet?: boolean }) {
   const { session } = useAuth();
   return (
     <header
@@ -28,9 +29,6 @@ export function SiteHeader({ overlay = false }: { overlay?: boolean }) {
           <NavLink to="/pricing" className={navClass}>
             Pricing
           </NavLink>
-          <a href="https://github.com/bluqen/degamed" className={navClass({ isActive: false })}>
-            Docs
-          </a>
         </nav>
         <div className="ml-auto flex items-center gap-2">
           <ThemeToggle />
@@ -42,7 +40,9 @@ export function SiteHeader({ overlay = false }: { overlay?: boolean }) {
               Log in
             </Link>
           )}
-          <ButtonLink to="/create">Start creating</ButtonLink>
+          <ButtonLink to="/create" variant={quiet ? 'secondary' : 'primary'}>
+            Start creating
+          </ButtonLink>
         </div>
       </div>
     </header>

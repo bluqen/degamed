@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Entity, ProjectManifest, Scene, findDuplicateEntityIds } from './project';
-import { parsePlayMessage } from './protocol';
+import { parseHostMessage, parsePlayMessage } from './protocol';
 
 const manifest = {
   engine: 'degamed',
@@ -160,5 +160,14 @@ describe('Tilemap component', () => {
     if (ok.success) expect(ok.data.components.Tilemap?.tileSize).toBe(16);
     const bad = Entity.safeParse({ id: 'map', name: 'Level', components: { Tilemap: { tiles: { ground: 'a.png' }, rows: ['#'] } } });
     expect(bad.success).toBe(false);
+  });
+});
+
+describe('player protocol additions', () => {
+  it('fps carries CPU ms and quality; host can send focus and input', () => {
+    expect(parsePlayMessage({ channel: 'degamed', type: 'fps', fps: 58, ms: 2.1, quality: 2 })).not.toBeNull();
+    expect(parsePlayMessage({ channel: 'degamed', type: 'fps', fps: 58 })).not.toBeNull();
+    expect(parseHostMessage({ channel: 'degamed', type: 'input', action: 'jump', down: true })).not.toBeNull();
+    expect(parseHostMessage({ channel: 'degamed', type: 'focus' })).not.toBeNull();
   });
 });

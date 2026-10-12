@@ -345,6 +345,22 @@ export interface BigCostume {
   hemCut?: number;
   /** Wrap the scarf around the neck. */
   knot?: boolean;
+  /** Where the chain hangs from (default: the % scarf root, or the head with `chainFromHead`). */
+  chainRoot?: 'scarf' | 'head' | 'hand' | 'hip';
+  chainAt?: [number, number];
+  /** trail: streams back as keyed; hang: dangles and swings (a lantern); up: a springy antenna. */
+  chainMode?: 'trail' | 'hang' | 'up';
+  /** Per-segment widths (overrides scarfWidth taper), e.g. a bushy tail. */
+  chainWidths?: number[];
+  /** Colour for the last segments (a white tail tip) and the fraction where it starts. */
+  chainTipColor?: number;
+  chainTipFrom?: number;
+  /** A little sprite at the end of the chain (a lantern, a bulb), centred on the last point. */
+  chainTip?: { rows: string[]; map: Record<string, number> };
+  /** Draw the chain in front of the body (a lantern held out front). */
+  chainFront?: boolean;
+  /** A mark painted on the cloak relative to the + hip marker (wing eyespot, badge, stripes). */
+  emblem?: { rows: string[]; map: Record<string, number>; dx: number; dy: number };
 }
 
 /** One hand-keyed animation frame. */
@@ -433,16 +449,26 @@ export const BIG_ANIMS: SpriteSheet['animations'] = {
   turn: { frames: [29, 30], fps: 12, loop: false },
 };
 
-function chain(x: number, y: number, n: number, seg: number, s: [number, number, number]): [number, number][] {
+function chain(x: number, y: number, n: number, seg: number, s: [number, number, number], gravity = 0.25): [number, number][] {
   const [ang, wave, ph] = s;
   const pts: [number, number][] = [[x, y]];
   for (let i = 1; i <= n; i++) {
     const k = i / n;
-    const a = ang + Math.sin(ph + i * 0.9) * wave * k + 0.15 * k * Math.sign(Math.cos(ang));
+    const a = ang + Math.sin(ph + i * 0.9) * wave * k + 0.15 * k * Math.sign(Math.cos(ang)) * (gravity > 0 ? 1 : 0);
     const [px, py] = pts[i - 1]!;
-    pts.push([px + Math.cos(a) * seg, py + Math.sin(a) * seg + k * 0.25]);
+    pts.push([px + Math.cos(a) * seg, py + Math.sin(a) * seg + k * gravity]);
   }
   return pts;
+}
+
+/** Turns the keyed scarf angle into a hanging swing or a springy antenna lean. */
+function chainAngle(mode: 'trail' | 'hang' | 'up', s: [number, number, number]): [number, number, number] {
+  const [ang, wave, ph] = s;
+  const back = -Math.cos(ang); // 1 when the scarf streams straight back
+  const rising = Math.sin(ang) < -0.3; // falling: things float upward
+  if (mode === 'hang') return [Math.PI / 2 + 0.45 * back + (rising ? 0.9 : 0), wave * 0.5, ph];
+  if (mode === 'up') return [-Math.PI / 2 - 0.35 * back + (rising ? 0.1 : 0), wave * 0.35, ph];
+  return s;
 }
 
 export function drawBigHero(cos: BigCostume, key: BigKey): Ix {
@@ -484,22 +510,57 @@ export function drawBigHero(cos: BigCostume, key: BigKey): Ix {
     });
   }
 
-  // scarf / hair / plume chain, behind the body
-  const root: [number, number] = cos.chainFromHead ? [hx + cos.chainFromHead[0], hy + cos.chainFromHead[1]] : [cx + pct[0] + (cos.scarfAt?.[0] ?? 0), cy + pct[1] + (cos.scarfAt?.[1] ?? 0)];
-  const sp = chain(root[0], root[1], cos.scarfLen, 1.5, key.scarf);
-  sp.forEach(([x, y], i) => {
-    const t = i / sp.length;
-    const w = t < 0.55 ? cos.scarfWidth : t < 0.85 ? Math.max(1, cos.scarfWidth - 1) : 1;
-    const [px, py] = sp[Math.max(0, i - 1)]!;
-    for (let q = 0; q < w; q++) {
-      const col = q === 0 ? cos.scarf[2]! : q === w - 1 && w > 1 ? cos.scarf[0]! : cos.scarf[1]!;
-      c.line(Math.round(px), Math.round(py) + q, Math.round(x), Math.round(y) + q, col);
+  // scarf / hair / plume / tail / lantern chain
+  const rootKind = cos.chainRoot ?? (cos.chainFromHead ? 'head' : 'scarf');
+  const off = cos.chainAt ?? cos.chainFromHead ?? cos.scarfAt ?? [0, 0];
+  const root: [number, number] =
+    rootKind === 'head'
+      ? [hx + off[0], hy + off[1]]
+      : rootKind === 'hand' && hand
+        ? [cx + hand[0] + off[0], cy + hand[1] + off[1]]
+        : rootKind === 'hip'
+          ? [cx + plus[0] + off[0], cy + plus[1] + off[1]]
+          : [cx + pct[0] + off[0], cy + pct[1] + off[1]];
+  const mode = cos.chainMode ?? 'trail';
+  const sp = chain(root[0], root[1], cos.scarfLen, mode === 'up' ? 1.2 : 1.5, chainAngle(mode, key.scarf), mode === 'up' ? 0 : 0.25);
+  const drawChain = () => {
+    sp.forEach(([x, y], i) => {
+      const t = i / sp.length;
+      const w = cos.chainWidths ? (cos.chainWidths[Math.min(cos.chainWidths.length - 1, i)] ?? 1) : t < 0.55 ? cos.scarfWidth : t < 0.85 ? Math.max(1, cos.scarfWidth - 1) : 1;
+      const [px, py] = sp[Math.max(0, i - 1)]!;
+      const tip = cos.chainTipColor !== undefined && t >= (cos.chainTipFrom ?? 0.75);
+      const top = -Math.floor((w - 1) / 2);
+      for (let q = 0; q < w; q++) {
+        let col = q === 0 ? cos.scarf[2]! : q === w - 1 && w > 1 ? cos.scarf[0]! : cos.scarf[1]!;
+        if (tip) col = q === w - 1 && w > 2 ? cos.scarf[1]! : cos.chainTipColor!;
+        c.line(Math.round(px), Math.round(py) + top + q, Math.round(x), Math.round(y) + top + q, col);
+      }
+    });
+    if (cos.chainTip) {
+      const [ex, ey] = sp[sp.length - 1]!;
+      const tr = cos.chainTip.rows;
+      c.grid(tr, cos.chainTip.map, Math.round(ex - tr[0]!.length / 2), Math.round(ey - (mode === 'up' ? tr.length - 1 : 0)));
     }
-  });
+  };
+  if (!cos.chainFront) drawChain();
 
   // legs, cloak, head
   c.grid(legs, legMap, hipX - 6, hipY);
   c.grid(cloak.map((r) => r.replace('@', '.')), cloakMap, cx, cy);
+  if (cos.emblem) {
+    const e = cos.emblem;
+    // only paint over cloak pixels, so the mark follows every pose's silhouette
+    e.rows.forEach((row, j) => {
+      for (let i = 0; i < row.length; i++) {
+        const ch = row[i]!;
+        if (ch === '.') continue;
+        const x = cx + plus[0] + e.dx + i;
+        const y = cy + plus[1] + e.dy + j;
+        const v = c.get(x, y);
+        if (v === k || v === cc || v === C || v === K) c.set(x, y, e.map[ch]!);
+      }
+    });
+  }
   c.grid(head, cos.head.map, hx, hy);
   // the head casts a soft shadow on the cloak
   for (let x = hx; x < hx + head[0]!.length; x++) {
@@ -519,6 +580,8 @@ export function drawBigHero(cos: BigCostume, key: BigKey): Ix {
     c.set(nx - 5, ny + 2, cos.scarf[0]!);
   }
 
+  if (cos.chainFront) drawChain();
+
   // weapon from the hand
   if (key.weapon && hand) {
     const ax = cx + hand[0];
@@ -534,7 +597,7 @@ export function drawBigHero(cos: BigCostume, key: BigKey): Ix {
   }
 
   // shading: rim light from the upper right, soft shadow lower left
-  const soft = new Set([k, cc, C, ...cos.scarf, ...(cos.headRim ?? [])]);
+  const soft = new Set([k, cc, C, ...cos.scarf.slice(0, 3), ...(cos.headRim ?? [])]);
   c.rim(1, -1, soft);
   c.shade(-1, 1, new Set([cc, C]));
 

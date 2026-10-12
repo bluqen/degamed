@@ -26,6 +26,8 @@ export interface GameSpec {
   kit: string;
   title: string;
   theme: string;
+  /** Hero variant id from the theme's `heroes` (additive; omitted = the theme's default hero). */
+  hero?: string;
   seed?: number;
   params?: Record<string, number | boolean | string>;
   story?: string;
@@ -76,7 +78,10 @@ export const CatalogSchema = z.object({
     .array(z.object({ id: z.string().min(1).max(40), name: Short(60), description: Short(240), params: z.array(KitParamSchema).max(24) }))
     .min(1)
     .max(16),
-  themes: z.array(z.object({ id: z.string().min(1).max(40), name: Short(60), description: Short(240) })).min(1).max(32),
+  themes: z
+    .array(z.object({ id: z.string().min(1).max(40), name: Short(60), description: Short(240), heroes: z.array(Short(30)).max(8).optional() }))
+    .min(1)
+    .max(32),
 });
 /** The slice of the kit and theme catalogues the model sees. */
 export type Catalog = z.infer<typeof CatalogSchema>;
@@ -87,6 +92,7 @@ export const GameSpecSchema = z.object({
   kit: z.string().min(1).max(40),
   theme: z.string().min(1).max(40),
   title: z.string().min(1).max(80),
+  hero: z.string().max(40).optional(),
   story: z.string().max(400).optional(),
   seed: z.number().int().optional(),
   params: z.record(z.string().max(40), ParamValue).optional(),
@@ -133,6 +139,7 @@ export type FileEdit = z.infer<typeof FileEditSchema>;
 const SpecPatchSchema = z.object({
   kit: z.string().max(40).optional(),
   theme: z.string().max(40).optional(),
+  hero: z.string().max(40).optional(),
   title: z.string().max(80).optional(),
   story: z.string().max(400).optional(),
   params: z.record(z.string().max(40), ParamValue).optional(),
@@ -177,7 +184,7 @@ export function outputJsonSchema(task: TaskKind): Record<string, unknown> {
   if (task === 'create') {
     return {
       type: 'object',
-      properties: { kit: { type: 'string' }, theme: { type: 'string' }, title: { type: 'string' }, story: { type: 'string' }, params },
+      properties: { kit: { type: 'string' }, theme: { type: 'string' }, hero: { type: 'string' }, title: { type: 'string' }, story: { type: 'string' }, params },
       required: ['kit', 'theme', 'title', 'story'],
     };
   }
@@ -201,16 +208,18 @@ export function outputJsonSchema(task: TaskKind): Record<string, unknown> {
 // that providers with prompt caching can reuse.
 
 const CREATE_RULES = `You design small 2D games for Degamed. Turn the player's idea into a game spec.
-Reply with JSON only: {"kit":"<kit id>","theme":"<theme id>","title":"...","story":"...","params":{"<key>":<value>}}
+Reply with JSON only: {"kit":"<kit id>","theme":"<theme id>","hero":"<hero id, optional>","title":"...","story":"...","params":{"<key>":<value>}}
 Rules:
 - kit and theme must be ids from the lists below. Pick the closest genre, then the closest mood and setting.
 - title: 1-5 catchy words, no quotes. story: one sentence under 140 characters about the hero and their goal.
+- The hero must be one the theme can draw: if the theme lists heroes, set "hero" to the closest id. If the idea's creature isn't in the theme's description or hero list, don't name it in the title or story; call the hero "a little wanderer".
 - params: only keys of the chosen kit, inside their ranges. Leave out keys that should keep the default. Match the idea ("very hard" -> hard difficulty and more enemies, "floaty" -> lower gravity, "short" -> shorter level).`;
 
 const EDIT_RULES = `You change an existing Degamed game when the player asks.
 Reply with JSON only: {"summary":"<one friendly sentence saying what changed>","spec":{<only changed fields: kit, theme, title, story, params>},"edits":[{"path":"...","find":"...","replace":"..."}]}
 Rules:
-- Prefer a spec change. Use only kit ids, theme ids and param keys from the lists below, inside their ranges.
+- Prefer a spec change. Use only kit ids, theme ids, hero ids and param keys from the lists below, inside their ranges.
+- Only change the theme when the player names a place or a mood ("move it to a cave", "make it spooky"). "Add a boss" is not a theme change.
 - Only if the spec can't express the request (new abilities, new behaviour), add small code edits to the files shown. "find" must be an exact, unique snippet of the current file; "replace" is its new text. Never rewrite whole files.
 - If you need a file that isn't shown, reply {"summary":"","needFiles":["<path>"]} instead.
 - If the request is impossible, leave spec and edits out and explain kindly in summary.`;
@@ -229,7 +238,7 @@ function describeParam(p: KitParam): string {
 /** Compact catalogue text: about 30 tokens per kit and 15 per theme. */
 export function catalogText(catalog: Catalog): string {
   const kits = catalog.kits.map((k) => `${k.id}: ${k.description}${k.params.length ? ` | params: ${k.params.map(describeParam).join('; ')}` : ''}`);
-  const themes = catalog.themes.map((t) => `${t.id}: ${t.description}`);
+  const themes = catalog.themes.map((t) => `${t.id}: ${t.description}${t.heroes?.length ? ` | heroes: ${t.heroes.join(', ')}` : ''}`);
   return `KITS\n${kits.join('\n')}\nTHEMES\n${themes.join('\n')}`;
 }
 
@@ -376,6 +385,9 @@ export function checkSpec(raw: unknown, catalog: Catalog): { spec?: GameSpec; er
   const story = s.story?.trim();
   if (story) spec.story = clip(story, 200);
   if (s.seed !== undefined) spec.seed = s.seed;
+  // A hero only counts if the theme can draw it; otherwise the theme's default hero is used.
+  const hero = s.hero && theme.heroes?.find((h) => norm(h) === norm(s.hero!));
+  if (hero) spec.hero = hero;
   const { params } = sanitizeParams(s.params, kit.params);
   if (Object.keys(params).length) spec.params = params;
   return { spec, errors: [] };
@@ -388,6 +400,7 @@ export function applySpecPatch(spec: GameSpec, patch: SpecPatch, catalog: Catalo
     ...spec,
     ...(patch.kit !== undefined ? { kit: patch.kit } : {}),
     ...(patch.theme !== undefined ? { theme: patch.theme } : {}),
+    ...(patch.hero !== undefined ? { hero: patch.hero } : {}),
     ...(patch.title !== undefined && patch.title.trim() ? { title: patch.title } : {}),
     ...(patch.story !== undefined ? { story: patch.story } : {}),
     params: { ...(kitChanged ? {} : spec.params), ...patch.params },

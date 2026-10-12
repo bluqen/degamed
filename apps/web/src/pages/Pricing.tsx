@@ -1,122 +1,72 @@
-import { useState } from 'react';
-import { Check } from 'lucide-react';
+import { Check, KeyRound, Sparkles, Zap } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { SiteFooter, SiteHeader } from '../components/SiteHeader';
-import { ButtonLink } from '../ui';
+import { ButtonLink, Card, cx } from '../ui';
 
-// Final prices are not decided yet. Edit these when they are.
-const PRICES = {
-  ngn: { symbol: '₦', creator: '[₦ PRICE]', pro: '[₦ PRICE]' },
-  usd: { symbol: '$', creator: '$6', pro: '$18' },
-};
-
-const plans = [
+const PLANS: { icon: ReactNode; name: string; price: string; blurb: string; points: string[]; featured?: boolean }[] = [
   {
-    name: 'Free',
-    blurb: 'For learning and playing around',
-    price: (c: keyof typeof PRICES) => `${PRICES[c].symbol}0`,
-    cta: 'Start free',
-    featured: false,
-    perks: [
-      'Unlimited AI with your own key',
-      '30 trial messages on Degamed AI',
-      'Web export and Windows (with splash)',
-      '3 private projects',
-      'Publish to the gallery',
-      '500 MB uploads',
-    ],
+    icon: <Zap size={18} />,
+    name: 'Instant mode',
+    price: 'Free',
+    blurb: 'No AI needed. Picks a game and a look from your words in a second.',
+    points: ['Unlimited games', 'Works offline', 'Tune, change the look and share'],
   },
   {
-    name: 'Creator',
-    blurb: 'For making and shipping games',
-    price: (c: keyof typeof PRICES) => PRICES[c].creator,
-    cta: 'Upgrade with Paystack',
+    icon: <Sparkles size={18} />,
+    name: 'Degamed AI',
+    price: 'Free daily allowance',
+    blurb: 'Smarter changes by chat, with a small number of AI requests each day.',
+    points: ['A few AI edits per day', 'Falls back to instant mode at the limit', 'No card needed'],
     featured: true,
-    perks: [
-      'Everything in Free',
-      'Monthly Degamed AI credits',
-      'Windows, macOS, Linux and Android exports',
-      'No splash screen or badge',
-      'Unlimited private projects',
-      'Sell on the marketplace and receive tips',
-      '5 GB uploads',
-    ],
   },
   {
-    name: 'Pro',
-    blurb: 'For studios and serious creators',
-    price: (c: keyof typeof PRICES) => PRICES[c].pro,
-    cta: 'Go Pro',
-    featured: false,
-    perks: [
-      'Everything in Creator',
-      'More credits, including the best models',
-      'Custom domains for your games',
-      'Player analytics',
-      '3 team seats',
-      'Play Store and iOS builds (coming soon)',
-    ],
+    icon: <KeyRound size={18} />,
+    name: 'Your own AI key',
+    price: 'Free',
+    blurb: 'Bring a Gemini, OpenAI or Anthropic key. You pay your provider directly.',
+    points: ['No daily limit from us', 'Your key stays in your browser', 'Pick the model you like'],
   },
 ];
 
+/** While in beta, everything is free. Paid plans will be announced here before they start. */
 export function Pricing() {
-  const [currency, setCurrency] = useState<keyof typeof PRICES>('ngn');
   return (
-    <div className="min-h-screen">
+    <div className="flex min-h-dvh flex-col">
       <SiteHeader />
-      <section className="mx-auto flex max-w-[1240px] flex-col items-center gap-4 px-6 pt-14 pb-6 text-center">
-        <h1 className="font-display text-4xl font-bold tracking-tight sm:text-6xl">Pricing that grows with your games</h1>
-        <p className="max-w-[640px] text-lg leading-relaxed text-muted">
-          Bring your own AI key and Degamed is free forever. Upgrade for AI credits, native builds and selling your
-          work.
+      <main className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col items-center px-4 py-16 sm:px-6 sm:py-24">
+        <span className="text-body-sm font-semibold text-brand-ink">Pricing</span>
+        <h1 className="mt-3 text-center font-display text-[40px] leading-[1.05] font-bold tracking-[-0.03em] text-balance sm:text-[56px]">
+          Free while we’re in beta
+        </h1>
+        <p className="mt-4 max-w-[560px] text-center text-body-lg text-balance text-muted">
+          Make, play and share as many games as you like. If we ever add paid extras, we’ll tell you well before anything changes.
         </p>
-        <div role="group" aria-label="Currency" className="inline-flex rounded-xl border border-line bg-panel p-1">
-          {(['ngn', 'usd'] as const).map((c) => (
-            <button
-              key={c}
-              type="button"
-              aria-pressed={currency === c}
-              onClick={() => setCurrency(c)}
-              className={`min-h-10 rounded-lg px-4 ${currency === c ? 'bg-brand font-semibold text-on-brand' : 'text-muted'}`}
-            >
-              {c === 'ngn' ? '₦ Naira' : '$ USD'}
-            </button>
+        <div className="mt-14 grid w-full gap-5 md:grid-cols-3">
+          {PLANS.map((p) => (
+            <Card key={p.name} className={cx('relative flex flex-col gap-5 p-6', p.featured && 'border-brand shadow-[0_0_0_1px_var(--c-brand)]')}>
+              <div className="flex items-center gap-3">
+                <span className="flex size-10 items-center justify-center rounded-md bg-brand-tint text-brand-ink">{p.icon}</span>
+                <div className="flex flex-col">
+                  <h2 className="text-subtitle font-semibold">{p.name}</h2>
+                  <span className="text-body-sm font-semibold text-muted">{p.price}</span>
+                </div>
+              </div>
+              <p className="text-body text-muted">{p.blurb}</p>
+              <ul className="flex flex-col gap-2.5 text-body">
+                {p.points.map((x) => (
+                  <li key={x} className="flex items-start gap-2.5">
+                    <Check size={16} className="mt-1 shrink-0 text-ok" aria-hidden="true" />
+                    {x}
+                  </li>
+                ))}
+              </ul>
+            </Card>
           ))}
         </div>
-      </section>
-
-      <section className="mx-auto grid max-w-[1240px] grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4 px-6 pt-6 pb-20">
-        {plans.map((p) => (
-          <div
-            key={p.name}
-            className={`relative flex flex-col gap-4 rounded-[18px] p-7 ${p.featured ? 'border-2 border-brand bg-brand-tint' : 'border border-line bg-surface'}`}
-          >
-            {p.featured && (
-              <span className="absolute -top-3 left-7 rounded-full bg-brand px-2.5 py-1 text-xs font-semibold text-on-brand">
-                Most popular
-              </span>
-            )}
-            <div className="flex flex-col gap-1.5">
-              <strong className="text-xl">{p.name}</strong>
-              <span className="text-muted">{p.blurb}</span>
-            </div>
-            <div className="font-display text-4xl">
-              {p.price(currency)}
-              {p.name !== 'Free' && <span className="text-lg text-muted">/month</span>}
-            </div>
-            <ButtonLink to="/login" variant={p.featured ? 'primary' : 'secondary'}>
-              {p.cta}
-            </ButtonLink>
-            <ul className="flex flex-col gap-2.5 text-[15px] text-ink-2">
-              {p.perks.map((perk) => (
-                <li key={perk} className="flex gap-2">
-                  <Check size={18} className="mt-0.5 shrink-0 text-ok" aria-hidden="true" />
-                  {perk}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </section>
+        <ButtonLink to="/create" size="lg" className="mt-12">
+          Start creating
+        </ButtonLink>
+      </main>
       <SiteFooter />
     </div>
   );

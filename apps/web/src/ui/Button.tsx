@@ -22,7 +22,7 @@ const variants: Record<ButtonVariant, string> = {
 
 const sizes: Record<ButtonSize, string> = {
   sm: 'h-8 rounded-sm px-3 text-body-sm',
-  md: 'h-10 rounded-md px-4 text-body',
+  md: 'h-10 rounded-md px-4 text-body max-sm:h-11',
   lg: 'h-12 rounded-lg px-5 text-body-lg',
 };
 
@@ -105,7 +105,7 @@ export function ButtonLink({
 
 const iconSizes: Record<ButtonSize, string> = {
   sm: 'size-8 rounded-sm',
-  md: 'size-10 rounded-md',
+  md: 'size-10 rounded-md max-sm:size-11',
   lg: 'size-12 rounded-lg',
 };
 

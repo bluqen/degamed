@@ -102,7 +102,7 @@ export default class Player extends Behaviour {
     if (!Input.down('jump') && v.y < -this.jump * 0.42) v.y = -this.jump * 0.42;
     // Snappier falls with a little hang time at the top of the arc.
     if (v.y > -30 && v.y < 30) v.y += this.gravity * -0.35 * dt;
-    else if (v.y > 0) v.y = Math.min(v.y + this.gravity * 0.45 * dt, 560);
+    else if (v.y > 0) v.y = Math.min(v.y + this.gravity * 0.7 * dt, 580); // falls at ~1.7× gravity
 
     if (this.attack) {
       this.attackT = Math.max(0, this.attackT - dt);
@@ -552,7 +552,7 @@ export default class Runner extends Behaviour {
       Game.sound('jump');
     }
     if (!Input.down('jump') && !Input.down('up') && v.y < -this.jump * 0.45) v.y = -this.jump * 0.45;
-    if (v.y > 0) v.y = Math.min(v.y + this.gravity * 0.4 * dt, 600);
+    if (v.y > 0) v.y = Math.min(v.y + this.gravity * 0.6 * dt, 620);
 
     // Slide: duck under barriers (or drop faster in the air).
     if (Input.pressed('down')) {

@@ -1,19 +1,17 @@
 /**
  * Ember Forge: the deep halls of a burning castle-forge. Plum-black stone, molten light rising
- * from below, colossal gears and arcades, chains and torn banners, embers drifting upward and a
- * helmed wanderer trailing a flame plume. Mood reference: Dead Cells, Blasphemous.
+ * from below, colossal forge chimneys, gears and arcades, chains and torn banners, embers drifting
+ * upward. The hero is Ash, a forge warden in a light verdigris cloak with a flame plume; magma slugs
+ * inch along the halls.
  */
 import { Canvas, fbm, gradient, Ix, MatLayer, Palette, rng, bayer, type Material } from '../core';
-import { heroSheet } from '../hero';
-import { bigHeroSheet } from '../hero2';
-import { emberBig } from './big-heroes';
+import { castFor, castSheet } from './big-heroes';
 import { arcade, gear, hangingChain, lightShafts, mistBand, overgrow, pipe, tower } from '../scenery';
 import { derive, px01, tileNoise, TILE } from '../tiles';
 import { backEdges, backWall } from '../tiles';
 import { bonesDecal, crackDecal, grateDecal, veinDecal } from '../decals';
 import { sheetOf, type Raster } from '../../pixel';
 import type { ArtTheme, ParallaxLayer, PropInfo, SpriteSheet } from '../types';
-import { emberHeroCostume } from './ember-hero';
 import { checkpointSheet, flyerSheet, spikeStrip } from '../extras';
 
 const W = 480;
@@ -548,8 +546,8 @@ function decals(): Record<string, Raster> {
 export const EMBER_FORGE_META = {
   id: 'ember-forge',
   name: 'Ember Forge',
-  description: 'The burning halls of a castle-forge: dark plum stone, molten light, giant gears, chains, banners, drifting embers and a helmed hero with a flame plume.',
-  keywords: ['fire', 'lava', 'forge', 'castle', 'dungeon', 'hell', 'volcano', 'medieval', 'knight', 'sword', 'roguelike', 'action', 'combat', 'epic', 'dark fantasy', 'ember', 'embers', 'molten', 'boss', 'gothic', 'warrior'],
+  description: 'The burning halls of a castle-forge: dark plum stone, molten light, giant chimneys and gears, chains, banners and drifting embers.',
+  keywords: ['fire', 'lava', 'forge', 'furnace', 'smithy', 'castle', 'fortress', 'dungeon', 'volcano', 'hell', 'molten', 'ember', 'embers', 'burning', 'hot', 'medieval', 'gothic', 'dark fantasy', 'infernal'],
   palette: [C.top, C.mid, C.low, C.glow, ...C.stone, ...C.iron, ...C.lava, ...C.banner, ...C.gold],
   background: C.top,
 };
@@ -561,8 +559,7 @@ export function emberForge(): ArtTheme {
     layers: layers(),
     tiles: forgeTiles(),
     sprites: {
-      hero: bigHeroSheet(emberBig()),
-      heroSmall: heroSheet(emberHeroCostume()),
+      hero: castSheet('warden'),
       enemy: slugSheet(),
       pickup: wispSheet(),
       goal: forgeGateSheet(),
@@ -571,6 +568,7 @@ export function emberForge(): ArtTheme {
     },
     props: p,
     propInfo: info,
+    heroes: castFor('warden'),
     decals: decals(),
     tileSize: TILE,
     lights: {

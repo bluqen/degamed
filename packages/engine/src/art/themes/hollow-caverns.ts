@@ -1,19 +1,17 @@
 /**
- * Hollow Caverns: blue-black caverns beneath a fallen kingdom. Distant spires with a few warm
- * windows, layered stalactites rimmed in cold blue light, glowing fungus and drifting spores, and
- * a small horned vessel with a bone-white mask. Mood reference: Hollow Knight.
+ * Hollow Caverns: blue-black caverns under a forgotten city. Distant spires with a few warm
+ * windows, the carved statue of a winged moth keeper, layered stalactites rimmed in cold blue
+ * light, glowing fungus and drifting spores. The hero is Lumen, a moth carrying a lantern; puffcap
+ * mushrooms waddle through the dark.
  */
 import { Canvas, fbm, gradient, Ix, MatLayer, Palette, rng, bayer, type Material, type Rng } from '../core';
-import { heroSheet } from '../hero';
-import { bigHeroSheet } from '../hero2';
-import { hollowBig } from './big-heroes';
+import { castFor, castSheet } from './big-heroes';
 import { hangingChain, lightShafts, mistBand, speckle } from '../scenery';
 import { derive, px01, tileCells, tileNoise, TILE } from '../tiles';
 import { backEdges, backWall } from '../tiles';
 import { bonesDecal, crackDecal, fossilDecal, rootsDecal, veinDecal } from '../decals';
 import { sheetOf, type Raster } from '../../pixel';
 import type { ArtTheme, ParallaxLayer, PropInfo, SpriteSheet } from '../types';
-import { hollowHeroCostume } from './hollow-hero';
 import { checkpointSheet, flyerSheet, spikeStrip } from '../extras';
 
 const W = 480;
@@ -142,39 +140,58 @@ function farCity(): Canvas {
 }
 
 /** Where the great statue stands in the far cave layer (centre x, ground y). */
-const STATUE: [number, number] = [178, 240];
+const STATUE: [number, number] = [178, 246];
 
-/** A colossal statue of a masked, horned knight leaning on a nail, carved from the cave rock. */
+/**
+ * A colossal statue of a winged moth keeper, carved from the cave rock: folded wings spread
+ * behind it, feathery antennae, great hollow eyes, and a lantern staff whose lamp still glows.
+ */
 function statue(L: MatLayer, cx: number, base: number): void {
   // stepped pedestal
-  L.rect(cx - 40, base - 8, 80, 8, 2);
-  L.rect(cx - 34, base - 16, 68, 8, 2);
-  // cloak: a broad bell with a ragged hem
-  L.poly([[cx - 18, base - 104], [cx + 18, base - 104], [cx + 32, base - 16], [cx - 32, base - 16]], 2);
-  for (let x = cx - 32; x < cx + 32; x += 6) L.poly([[x, base - 17], [x + 6, base - 17], [x + 3, base - 12]], 2);
-  // the mask
-  L.ellipse(cx, base - 124, 23, 20, 2);
-  // horns sweeping up and out
-  const horn = (dir: number) => {
-    const pts: [number, number][] = [];
-    for (let i = 0; i <= 10; i++) {
-      const t = i / 10;
-      pts.push([cx + dir * (12 + t * 14 + Math.sin(t * Math.PI) * 4), base - 138 - t * 62]);
+  L.rect(cx - 44, base - 8, 88, 8, 2);
+  L.rect(cx - 36, base - 16, 72, 8, 2);
+  // wings: two broad scalloped fans behind the body
+  for (const dir of [-1, 1]) {
+    const pts: [number, number][] = [[cx, base - 110]];
+    for (let i = 0; i <= 12; i++) {
+      const t = i / 12;
+      const a = -0.9 + t * 1.9;
+      const r = 62 + Math.sin(t * Math.PI * 3) * 5;
+      pts.push([cx + dir * Math.cos(a) * r * 0.85, base - 92 + Math.sin(a) * r * 0.75]);
     }
-    for (let i = 10; i >= 0; i--) {
-      const t = i / 10;
-      pts.push([cx + dir * (4 + t * 20 + Math.sin(t * Math.PI) * 4) + dir * (1 - t) * 2, base - 136 - t * 60]);
-    }
+    pts.push([cx, base - 40]);
     L.poly(pts, 2);
-  };
-  horn(-1);
-  horn(1);
-  // hollow eyes
-  L.ellipse(cx - 9, base - 120, 5, 7.5, 3);
-  L.ellipse(cx + 9, base - 120, 5, 7.5, 3);
-  // the nail it leans on
-  L.line(cx + 26, base - 16, cx + 40, base - 150, 2, 3);
-  L.rect(cx + 34, base - 98, 12, 3, 2);
+    // the wing's eyespot, carved deep
+    L.ellipse(cx + dir * 34, base - 96, 7, 6, 3);
+    L.ellipse(cx + dir * 34, base - 96, 3, 2.5, 2);
+  }
+  // robed body
+  L.poly([[cx - 14, base - 104], [cx + 14, base - 104], [cx + 26, base - 16], [cx - 26, base - 16]], 2);
+  // round furred head
+  L.ellipse(cx, base - 118, 17, 15, 2);
+  // feathery antennae sweeping up and out
+  for (const dir of [-1, 1]) {
+    let px = cx + dir * 6;
+    let py = base - 130;
+    for (let i = 0; i < 14; i++) {
+      const nx = px + dir * 1.6;
+      const ny = py - 3;
+      L.line(px, py, nx, ny, 2, 2);
+      // barbs
+      L.line(nx, ny, nx + dir * 4, ny + 2, 2);
+      L.line(nx, ny, nx - dir * 1, ny - 3, 2);
+      px = nx;
+      py = ny;
+    }
+  }
+  // great hollow eyes
+  L.ellipse(cx - 7, base - 118, 5.5, 6.5, 3);
+  L.ellipse(cx + 7, base - 118, 5.5, 6.5, 3);
+  // the lantern staff
+  L.line(cx + 22, base - 16, cx + 30, base - 150, 2, 3);
+  L.rect(cx + 24, base - 154, 12, 3, 2);
+  L.rect(cx + 31, base - 151, 1, 6, 2);
+  L.rect(cx + 28, base - 145, 7, 9, 2);
 }
 
 function farCave(): Canvas {
@@ -284,7 +301,7 @@ function layers(): ParallaxLayer[] {
   return [
     { name: 'backdrop', raster: backdrop().toRaster(), factor: 0, tiled: true },
     { name: 'far city', raster: farCity().toRaster(), factor: 0.07, tiled: true },
-    { name: 'far cave', raster: farCave().toRaster(), factor: 0.18, tiled: true, glows: [{ x: STATUE[0] - 38, y: STATUE[1] - 24, color: '#8fdcff', radius: 6, intensity: 0.8, flicker: 0.2 }, { x: STATUE[0] + 38, y: STATUE[1] - 24, color: '#8fdcff', radius: 6, intensity: 0.8, flicker: 0.2 }] },
+    { name: 'far cave', raster: farCave().toRaster(), factor: 0.18, tiled: true, glows: [{ x: STATUE[0] + 31, y: STATUE[1] - 140, color: '#ffc04a', radius: 6, intensity: 0.9, flicker: 0.3 }, { x: STATUE[0] - 40, y: STATUE[1] - 22, color: '#8fdcff', radius: 5, intensity: 0.7, flicker: 0.2 }] },
     { name: 'glow mist', raster: glowMist().toRaster(), factor: 0.3, tiled: true },
     { name: 'mid cave', raster: midCave().toRaster(), factor: 0.45, tiled: true },
     { name: 'near cave', raster: nearCave().toRaster(), factor: 0.7, tiled: true },
@@ -408,63 +425,62 @@ function caveTiles(): ArtTheme['tiles'] {
 // ── Creatures ───────────────────────────────────────────────────────────────
 
 /**
- * A shell crawler: an amber banded dome on six scuttling legs, a pale face plate with two dark
- * eyes and twitching antennae. The shell bounces on every other step; idle peeks out and back.
+ * A puffcap: a waddling mushroom with a glowing-spotted cap, two sleepy eyes on its stem and
+ * root-nub feet. The cap bounces as it waddles; idle, it puffs out a little cloud of spores.
  */
-function crawlerSheet(): SpriteSheet {
-  const FW = 34;
-  const FH = 24;
+function puffcapSheet(): SpriteSheet {
+  const FW = 30;
+  const FH = 28;
   const pal = new Palette();
-  const [ol, olLit] = pal.ramp(['#05030a', '#3a2214']);
-  const shell = pal.ramp(['#5a2610', '#9c4a1a', '#d8802e', '#ffbf62', '#ffe2a0']);
-  const [band, bandLit] = pal.ramp(['#4a1e0a', '#7a3412']);
-  const [leg, legLit] = pal.ramp(['#140c12', '#2e1e22']);
-  const face = pal.ramp(['#7d7f9a', '#c9cbdc', '#f1f2fa']);
-  const [eye, glint] = pal.ramp(['#05030a', '#8fe3ff']);
+  const [ol, olLit] = pal.ramp(['#06040c', '#2a1e3a']);
+  const cap = pal.ramp(['#2a1a4a', '#4a2e7a', '#7a4aa8', '#a878d0']);
+  const [spot, spotHot] = pal.ramp(['#4fd8c8', '#d8fff6']);
+  const [gill] = pal.ramp(['#1a1230']);
+  const stem = pal.ramp(['#7a7090', '#b8b0c8', '#e4e0ec']);
+  const [eye] = pal.ramp(['#120c1c']);
+  const [foot] = pal.ramp(['#4a4060']);
+  const [spore] = pal.ramp(['#8ff0e0']);
   const [flash] = pal.ramp(['#ffffff']);
   const frames: Raster[] = [];
   const draw = (f: number, mode: 'walk' | 'idle' | 'hurt') => {
     const c = new Ix(FW, FH, pal);
     const walk = mode === 'walk';
-    const bob = walk ? [0, 1, 1, 0, 0, 1, 1, 0][f % 8]! : 0;
-    const tilt = walk ? [0, 0, 1, 1, 0, 0, -1, -1][f % 8]! : 0;
-    const base = 18 + bob;
+    const sway = walk ? [0, 1, 1, 0, 0, -1, -1, 0][f % 8]! : 0;
+    const bounce = walk ? [0, 1, 0, -1, 0, 1, 0, -1][f % 8]! : mode === 'idle' && f % 2 ? 1 : 0;
     const cx = 15;
-    // shell dome with bands
-    const squash = mode === 'idle' && f % 2 ? 1 : 0;
-    c.ellipse(cx, base, 13, 12 - squash, (x, y, nx, ny) => {
-      const light = -ny * 0.85 + nx * 0.35;
-      return shell[Math.max(0, Math.min(4, Math.round(1.6 + light * 2)))]!;
-    });
-    for (let y = base + 1; y < FH; y++) for (let x = 0; x < FW; x++) if (c.get(x, y) && c.get(x, y) !== leg && c.get(x, y) !== legLit) c.set(x, y, 0);
-    // legs: three pairs, alternating tripod gait (far legs darker, behind the shell)
-    for (let k = 0; k < 3; k++) {
-      for (const far of [true, false]) {
-        const lx = 8 + k * 7 + (far ? -1 : 1);
-        const ph = (f + k * 3 + (far ? 4 : 0)) % 8;
-        const step = walk ? Math.round(Math.sin((ph / 8) * Math.PI * 2) * 2) : 0;
-        const lift = walk && ph < 4 ? 1 : 0;
-        const col = far ? leg! : legLit!;
-        c.line(lx, base - 1, lx + step - 1, base + 2 - lift, col);
-        c.line(lx + step - 1, base + 2 - lift, lx + step, FH - 2 - lift, col);
-        c.set(lx + step + 1, FH - 2 - lift, col);
-      }
+    const ground = FH - 2;
+    // feet: little root nubs that step alternately
+    for (const [dx, ph] of [[-4, 0], [3, 4]] as const) {
+      const lift = walk && (f + ph) % 8 < 3 ? 1 : 0;
+      c.rect(cx + dx + (walk ? Math.round(Math.sin(((f + ph) / 8) * Math.PI * 2)) : 0), ground - lift, 3, 2, foot!);
     }
-    for (const bx of [8 + tilt, 15 + tilt, 22 + tilt])
-      for (let y = 0; y <= base; y++) if (c.get(bx, y) && shell.includes(c.get(bx, y))) c.set(bx, y, y < base - 7 ? bandLit! : band!);
-    for (let x = 0; x < FW; x++) if (c.get(x, base) && shell.includes(c.get(x, base))) c.set(x, base, shell[0]!);
-    // face plate, peeking out further when idle
-    const peek = mode === 'idle' ? (f % 2 ? 2 : 0) : 0;
-    const fx = 25 + peek;
-    const fy = base - 7;
-    c.grid(['.fFF.', 'fFFFF', 'FeFFe', 'FeFFe', 'FFFFF', '.fff.'], { f: face[0]!, F: face[1]!, e: eye! }, fx, fy);
-    c.set(fx + 1, fy + 2, glint!);
-    c.set(fx + 4, fy + 2, glint!);
-    // antennae twitch
-    const tw = walk ? [0, 1, 0, -1, 0, 1, 0, -1][f % 8]! : f % 2;
-    c.line(fx + 2, fy, fx + 4, fy - 4 + tw, face[0]!);
-    c.line(fx + 4, fy, fx + 7, fy - 3 - tw, face[0]!);
-    c.rim(0, -1, new Set(shell));
+    // stem: a soft barrel, leaning with the sway
+    for (let y = ground - 11 + bounce; y < ground; y++) {
+      const t = (y - (ground - 11)) / 11;
+      const half = 4.5 + Math.sin(t * Math.PI) * 1.2;
+      const ox = Math.round(sway * (1 - t));
+      for (let x = Math.round(cx - half) + ox; x <= Math.round(cx + half) + ox; x++) c.set(x, y, x < cx - 2 + ox ? stem[0]! : x > cx + 2 + ox ? stem[2]! : stem[1]!);
+    }
+    // sleepy eyes on the stem
+    const ey = ground - 7 + bounce;
+    c.set(cx + 1 + sway, ey, eye!);
+    c.set(cx + 4 + sway, ey, eye!);
+    if (mode !== 'idle' || f % 2 === 0) c.set(cx + 1 + sway, ey + 1, eye!), c.set(cx + 4 + sway, ey + 1, eye!);
+    // the cap: a wide dome with gills underneath and glowing spots
+    const capY = ground - 12 + bounce;
+    const squash = walk && bounce > 0 ? 1 : 0;
+    c.ellipse(cx + sway, capY, 12 + squash, 8 - squash, (x, y, nx, ny) => (y > capY ? 0 : cap[Math.max(0, Math.min(3, Math.round(1.7 - ny * 1.5 + nx * 0.4)))]!));
+    for (let x = cx - 11 + sway; x <= cx + 11 + sway; x++) {
+      c.set(x, capY, gill!);
+      if (x % 2) c.set(x, capY + 1, gill!);
+    }
+    for (const [sx, sy] of [[-6, -3], [-1, -6], [5, -4], [8, -1], [-9, -1]] as const) {
+      c.set(cx + sx + sway, capY + sy, spot!);
+      if (sy < -3) c.set(cx + sx + sway + 1, capY + sy, spotHot!);
+    }
+    // idle: a puff of spores rising
+    if (mode === 'idle' && f % 2) for (const [px, py] of [[-3, -11], [1, -13], [4, -10], [-1, -15]] as const) c.set(cx + px, capY + py, spore!);
+    c.rim(0, -1, new Set(cap));
     c.outline(ol!, olLit!);
     if (mode === 'hurt') for (let i = 0; i < c.px.length; i++) if (c.px[i] && c.px[i] !== ol) c.px[i] = flash!;
     frames.push(c.toRaster());
@@ -478,12 +494,12 @@ function crawlerSheet(): SpriteSheet {
     frameWidth: FW,
     frameHeight: FH,
     animations: {
-      walk: { frames: [0, 1, 2, 3, 4, 5, 6, 7], fps: 12, loop: true },
-      idle: { frames: [8, 8, 9, 9, 9, 8], fps: 3, loop: true },
+      walk: { frames: [0, 1, 2, 3, 4, 5, 6, 7], fps: 10, loop: true },
+      idle: { frames: [8, 8, 8, 9, 9, 8], fps: 3, loop: true },
       hurt: { frames: [10, 0, 10, 0], fps: 14, loop: false },
     },
-    hitbox: { x: 3, y: 8, w: 28, h: 15 },
-    anchor: { x: 16, y: 23 },
+    hitbox: { x: 5, y: 8, w: 20, h: 19 },
+    anchor: { x: 15, y: 27 },
   };
 }
 
@@ -617,7 +633,7 @@ function props(): { props: Record<string, Raster>; info: Record<string, PropInfo
     out.roots = c.toRaster();
     info.roots = { anchor: 'ceiling', weight: 3 };
   }
-  // lumafly lantern on a chain
+  // a firefly lantern on a chain
   {
     const c = new Canvas(14, 34);
     for (let y = 0; y < 18; y++) c.set(7, y, y % 3 === 0 ? S[5]! : S[3]!);
@@ -658,36 +674,42 @@ function props(): { props: Record<string, Raster>; info: Record<string, PropInfo
     out.grass = c.toRaster();
     info.grass = { anchor: 'ground', weight: 6 };
   }
-  // a resting bench
-  {
-    const c = new Canvas(30, 14);
-    for (let x = 1; x < 29; x++) {
-      c.set(x, 6, S[6]!);
-      c.set(x, 7, S[4]!);
-      c.set(x, 8, S[2]!);
-      if (x % 3 === 0) c.set(x, 2, S[5]!), c.set(x, 3, S[4]!), c.set(x, 4, S[4]!), c.set(x, 5, S[3]!);
-    }
-    for (let x = 2; x < 28; x++) c.set(x, 1, S[5]!);
-    for (const lx of [3, 25]) for (let y = 9; y < 14; y++) c.set(lx, y, S[3]!), c.set(lx + 1, y, S[2]!);
-    out.bench = c.toRaster();
-    info.bench = { anchor: 'ground', weight: 1 };
-  }
-  // old shell
+  // a little stone shrine with a candle niche
   {
     const pal = new Palette();
     const [ol] = pal.ramp(['#020308']);
-    const b = pal.ramp(['#6e7894', '#b6bfd6', '#eef1f9']);
-    const [e] = pal.ramp(['#06070d']);
-    const c = new Ix(14, 10, pal);
-    c.ellipse(7, 6, 6, 4.5, (x, y, nx, ny) => (ny < -0.3 ? b[2]! : nx < -0.4 ? b[0]! : b[1]!));
-    c.set(5, 6, e!);
-    c.set(5, 7, e!);
-    c.set(9, 6, e!);
-    c.set(9, 7, e!);
-    for (let x = 0; x < 14; x++) for (let y = 9; y < 10; y++) c.set(x, y, 0);
+    const st = pal.ramp([S[2]!, S[4]!, S[5]!, S[6]!]);
+    const [niche] = pal.ramp(['#05070e']);
+    const [flame, core] = pal.ramp(['#f0a040', '#fff0b0']);
+    const c = new Ix(18, 22, pal);
+    c.rect(1, 18, 16, 4, st[1]!);
+    c.rect(3, 6, 12, 12, st[1]!);
+    c.poly([[2, 7], [9, 0], [16, 7]], st[2]!);
+    c.rect(6, 9, 6, 7, niche!);
+    c.set(9, 13, flame!);
+    c.set(9, 12, core!);
+    c.set(8, 14, st[3]!);
+    c.set(9, 14, st[3]!);
+    c.rim(0, -1, new Set(st));
+    c.shade(-1, 0, new Set(st));
     c.outline(ol!);
-    out.shell = c.toRaster();
-    info.shell = { anchor: 'ground', weight: 1 };
+    out.shrine = c.toRaster();
+    info.shrine = { anchor: 'ground', light: { color: C.amber[2]!, radius: 40, intensity: 0.55, flicker: 0.25, x: 9, y: 12 }, weight: 1 };
+  }
+  // a glowing spore pod on a stalk
+  {
+    const pal = new Palette();
+    const [ol] = pal.ramp(['#020308']);
+    const pod = pal.ramp(['#2a5a6a', '#4fa6b8', '#9fe8ff']);
+    const [stalk] = pal.ramp([C.teal[1]!]);
+    const c = new Ix(12, 18, pal);
+    c.line(6, 10, 6, 17, stalk!);
+    c.line(5, 17, 7, 17, stalk!);
+    c.ellipse(6, 6, 4.5, 5.5, (x, y, nx, ny) => pod[Math.max(0, Math.min(2, Math.round(1 - ny * 1.2)))]!);
+    for (const [x, y] of [[4, 4], [7, 6], [5, 8]] as const) c.set(x, y, pod[2]!);
+    c.outline(ol!);
+    out.sporepod = c.toRaster();
+    info.sporepod = { anchor: 'ground', light: { color: C.blue[2]!, radius: 30, intensity: 0.45, x: 6, y: 6 }, weight: 2 };
   }
   // hanging chain
   {
@@ -712,8 +734,8 @@ function decals(): Record<string, Raster> {
 export const HOLLOW_CAVERNS_META = {
   id: 'hollow-caverns',
   name: 'Hollow Caverns',
-  description: 'Dark blue caverns under a fallen kingdom: glowing fungus, drifting spores, distant lit spires and a small horned hero with a white mask.',
-  keywords: ['cave', 'cavern', 'underground', 'dark', 'knight', 'bug', 'insect', 'mask', 'kingdom', 'fungus', 'mushroom', 'glow', 'spores', 'crystal', 'metroidvania', 'souls', 'gothic', 'mysterious', 'deep', 'night', 'ancient'],
+  description: 'Dark blue caverns under a forgotten city: glowing fungus, drifting spores, a giant moth statue and a little moth carrying a lantern.',
+  keywords: ['cave', 'cavern', 'caves', 'underground', 'tunnels', 'grotto', 'mines', 'dark', 'deep', 'mushroom', 'fungus', 'glow', 'glowing', 'spores', 'crystal', 'mysterious', 'eerie', 'gothic', 'ancient', 'quiet', 'night'],
   palette: [C.top, C.mid, C.glowSky, C.fog, ...C.stone, ...C.blue, ...C.amber, ...C.teal, '#f4f6fb'],
   background: C.top,
 };
@@ -725,9 +747,8 @@ export function hollowCaverns(): ArtTheme {
     layers: layers(),
     tiles: caveTiles(),
     sprites: {
-      hero: bigHeroSheet(hollowBig()),
-      heroSmall: heroSheet(hollowHeroCostume()),
-      enemy: crawlerSheet(),
+      hero: castSheet('moth'),
+      enemy: puffcapSheet(),
       pickup: shardSheet(),
       goal: archSheet(),
       flyer: flyerSheet({ body: ['#1a1830', '#2c2a4a', '#4a4670'], wing: ['#6f80b0', '#c8d4f2', '#ffffff'], eye: '#ff9a4a', outline: '#03040a', glowEye: true }),
@@ -735,13 +756,14 @@ export function hollowCaverns(): ArtTheme {
     },
     props: p,
     propInfo: info,
+    heroes: castFor('moth'),
     decals: decals(),
     tileSize: TILE,
     lights: {
       hero: { color: '#cfe0ff', radius: 64, intensity: 0.55 },
       pickup: { color: C.blue[2]!, radius: 40, intensity: 0.8, flicker: 0.06 },
       goal: { color: C.blue[2]!, radius: 90, intensity: 0.9, flicker: 0.05 },
-      enemy: { color: C.amber[2]!, radius: 22, intensity: 0.25 },
+      enemy: { color: '#4fd8c8', radius: 26, intensity: 0.35, flicker: 0.1 },
     },
     environment: {
       ambient: { color: '#d4dfff', intensity: 0.88 },

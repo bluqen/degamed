@@ -8,7 +8,7 @@ import { FONT_CELL, FONT_CHARS, FONT_KEY, FONT_LETTER_SPACING, drawFontSheet, fo
 import { InputState, Key } from './input';
 import { compileScripts, DEGAMED_MODULE_SOURCE, ScriptError } from './scripts';
 import { Sfx } from './sfx';
-import { DEFAULT_TOUCH, mountTouchControls } from './touch';
+import { belowStripHeight, choosePlacement, DEFAULT_TOUCH, mountTouchControls, type TouchPlacement } from './touch';
 
 export interface RuntimeHooks {
   log(level: 'info' | 'warn' | 'error', message: string, source?: string): void;
@@ -358,6 +358,10 @@ class World {
 }
 
 export interface GameHandle {
+  /** Average CPU time per frame in ms (update + draw calls) and the current effects quality (0–2). */
+  stats(): { ms: number; quality: number };
+  /** Presses or releases a named action (on-screen controls drawn by the host page, tests). */
+  setAction(action: string, down: boolean): void;
   restart(): void;
   pause(): void;
   resume(): void;
@@ -470,8 +474,14 @@ export interface SpawnOverrides {
 
 /** Starts a project inside `parent`. Rejects with a ScriptError if the project can't load. */
 export interface StartOptions {
+  /**
+   * On-screen controls: 'auto' (default) shows them on touch devices, under the game in portrait;
+   * 'overlay' always draws them over the game; 'external' leaves them to the host page, which
+   * sends 'input' messages.
+   */
+  touch?: 'auto' | 'overlay' | 'external';
   /** Visual quality: 'auto' (default) steps effects down on slow devices. */
-  quality?: 'auto' | 'high' | 'low';
+  quality?: 'auto' | 'high' | 'medium' | 'low';
 }
 
 export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks: RuntimeHooks, options: StartOptions = {}): Promise<GameHandle> {
@@ -482,6 +492,8 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
   let ctl: SceneControls;
   let elapsed = 0;
   let timeScale = 1;
+  /** HUD scale: 2 on small screens. */
+  let uiScale = 1;
   const state: Record<string, unknown> = {};
   const { width: W, height: H } = manifest.resolution;
   const pixelArt = manifest.artStyle.startsWith('pixel');
@@ -807,6 +819,7 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
       this.bgCamera.setRoundPixels(pixelArt);
       if (scene.background) this.bgCamera.setBackgroundColor(scene.background);
       const parallaxObjects: Phaser.GameObjects.GameObject[] = [];
+      const parallaxFactors: number[] = [];
       this.parallaxSprites = [];
       scene.parallax.forEach((layer, i) => {
         if (!this.textures.exists(layer.asset)) return hooks.error(`Missing parallax image ${layer.asset}`, { file: layer.asset });
@@ -819,6 +832,7 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
         sprite.setOrigin(0, 0).setScrollFactor(0).setDepth(front ? DEPTH.foreground + i : -100 + i);
         if (!front) {
           parallaxObjects.push(sprite);
+          parallaxFactors.push(layer.factor);
           this.bgObjects.add(sprite);
         }
         if (layer.tiled && sprite instanceof Phaser.GameObjects.TileSprite) this.parallaxSprites.push({ sprite, factor: layer.factor });
@@ -880,6 +894,11 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
             width: W,
             height: H,
             parallax: parallaxObjects,
+            parallaxFactors,
+            background: (go) => {
+              this.bgObjects.add(go);
+              this.route(go);
+            },
             surfaces: () => world.surfaces(),
             lights: () => world.lightSources(),
             quality: options.quality,
@@ -892,6 +911,11 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
           width: W,
           height: H,
           parallax: parallaxObjects,
+          parallaxFactors,
+          background: (go) => {
+            this.bgObjects.add(go);
+            this.route(go);
+          },
           surfaces: () => world.surfaces(),
           lights: () => world.lightSources(),
           quality: options.quality,
@@ -1049,6 +1073,11 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
         if (flashes[i]!.age >= flashes[i]!.life) flashes.splice(i, 1);
       }
       this.atmosphere?.update(dtReal);
+      for (const e of this.world.entities) {
+        if (!(e.go instanceof Phaser.GameObjects.BitmapText) || !e.hasTag('ui')) continue;
+        const want = e.baseScaleX * uiScale;
+        if (e.go.scaleX !== want) e.go.setScale(want);
+      }
     }
 
     private attachScript(e: Entity, handle: EntityHandle, extraProps?: Record<string, unknown>) {
@@ -1250,29 +1279,71 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
     pixelArt,
     roundPixels: pixelArt,
     physics: { default: 'arcade', arcade: { gravity: { x: manifest.physics.gravity.x, y: manifest.physics.gravity.y }, debug: false } },
-    scale: { mode: Phaser.Scale.NONE, autoCenter: Phaser.Scale.CENTER_BOTH, zoom: 1 },
+    scale: { mode: Phaser.Scale.NONE, autoCenter: Phaser.Scale.NO_CENTER, zoom: 1 },
     audio: { noAudio: true },
     banner: false,
     scene: DegamedScene,
   });
 
+  // On-screen controls (unless the host page draws its own and sends 'input' messages).
+  const touch = options.touch === 'external' ? null : mountTouchControls(parent, input, manifest.touch ?? DEFAULT_TOUCH);
+
   // Crisp pixels: scale by whole numbers when that wastes little space, otherwise fit exactly.
+  // With touch controls in portrait, the game sits at the top and the controls get the space below.
   const fit = () => {
     const rect = parent.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
-    const zoom = pixelArt ? pixelZoom(rect.width, rect.height, W, H) : Math.min(rect.width / W, rect.height / H);
+    const placement: TouchPlacement =
+      touch?.visible && options.touch !== 'overlay' ? choosePlacement(rect.width, rect.height, W, H) : 'overlay';
+    const availH = placement === 'below' ? rect.height - belowStripHeight(rect.width, rect.height) : rect.height;
+    const zoom = pixelArt ? pixelZoom(rect.width, availH, W, H) : Math.min(rect.width / W, availH / H);
     if (Math.abs(game.scale.zoom - zoom) > 1e-3) game.scale.setZoom(zoom);
     else game.scale.refresh();
+    const gw = W * zoom;
+    const gh = H * zoom;
+    const gx = Math.floor((rect.width - gw) / 2);
+    const gy = placement === 'below' ? Math.floor((availH - gh) * 0.35) : Math.floor((rect.height - gh) / 2);
+    const canvas = game.canvas;
+    if (canvas) {
+      canvas.style.display = 'block';
+      canvas.style.marginLeft = `${gx}px`;
+      canvas.style.marginTop = `${gy}px`;
+    }
+    // Small screens: draw the HUD twice as big so it stays readable.
+    uiScale = zoom < 1.5 ? 2 : 1;
+    touch?.layout({ width: rect.width, height: rect.height, game: { x: gx, y: gy, width: gw, height: gh }, placement });
   };
+  if (touch) touch.onVisibilityChange = fit;
   const observer = typeof ResizeObserver === 'function' ? new ResizeObserver(fit) : null;
   observer?.observe(parent);
   game.events.once(Phaser.Core.Events.READY, fit);
   fit();
 
-  const unmountTouch = mountTouchControls(parent, input, manifest.touch ?? DEFAULT_TOUCH);
+  // CPU cost per frame: from the start of the step to the end of rendering (an average).
+  let stepStart = 0;
+  let cpuMs = 0;
+  game.events.on(Phaser.Core.Events.PRE_STEP, () => (stepStart = performance.now()));
+  game.events.on(Phaser.Core.Events.POST_RENDER, () => {
+    if (stepStart) cpuMs = cpuMs * 0.9 + (performance.now() - stepStart) * 0.1;
+  });
+
+  const hostCodes = new Set<string>();
 
   const handle: GameHandle = {
     input,
+    stats: () => {
+      const s = game.scene.getScene('main') as unknown as { atmosphere?: { quality: number } | null } | null;
+      return { ms: Math.round(cpuMs * 10) / 10, quality: s?.atmosphere?.quality ?? 2 };
+    },
+    setAction: (action, down) => {
+      const code = `Host:${action}`;
+      if (!hostCodes.has(code)) {
+        input.addBinding(action, code);
+        hostCodes.add(code);
+      }
+      if (down) input.press(code);
+      else input.release(code);
+    },
     restart: () => game.scene.getScene('main')?.scene.restart(),
     pause: () => game.scene.pause('main'),
     resume: () => game.scene.resume('main'),
@@ -1288,7 +1359,7 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
       }),
     destroy: () => {
       observer?.disconnect();
-      unmountTouch();
+      touch?.dispose();
       input.dispose();
       game.destroy(true);
     },

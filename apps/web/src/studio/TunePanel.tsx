@@ -13,6 +13,16 @@ export function humanize(s: string): string {
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
 
+/** Plain words for a slider position, relative to the kit's default ("Normal"). */
+export function level(v: number, min: number, max: number, def: number): string {
+  if (v === def) return 'Normal';
+  if (v < def) return (v - min) / Math.max(1e-9, def - min) < 0.5 ? 'Very low' : 'Low';
+  return (v - def) / Math.max(1e-9, max - def) > 0.5 ? 'Very high' : 'High';
+}
+
+/** "Jump height (tiles)" → "Jump height": units are for engineers, not players. */
+export const plainLabel = (label: string) => label.replace(/\s*\([^)]*\)\s*/g, ' ').trim();
+
 /** Simple controls generated from the kit's params, grouped the way the kit suggests. */
 export function TunePanel({
   studio,
@@ -59,7 +69,7 @@ export function TunePanel({
                 key={p.key}
                 param={p}
                 value={values[p.key] ?? p.default}
-                onChange={(v) => studio.setParam(p.key, v, `Change ${p.label.toLowerCase()}`)}
+                onChange={(v) => studio.setParam(p.key, v, `Change ${plainLabel(p.label).toLowerCase()}`)}
               />
             ))}
           </div>
@@ -97,15 +107,15 @@ function Control({
   onChange: (v: number | boolean | string) => void;
 }) {
   if (p.type === 'boolean')
-    return <Switch label={p.label} checked={Boolean(value)} onChange={onChange} />;
+    return <Switch label={plainLabel(p.label)} checked={Boolean(value)} onChange={onChange} />;
   if (p.type === 'choice') {
     const choices = p.choices ?? [];
     if (choices.length <= 4 && choices.every((c) => humanize(c).length <= 10))
       return (
         <div className="flex flex-col gap-2">
-          <span className="text-body text-ink">{p.label}</span>
+          <span className="text-body text-ink">{plainLabel(p.label)}</span>
           <Segmented
-            label={p.label}
+            label={plainLabel(p.label)}
             value={String(value)}
             options={choices.map((c) => ({ value: c, label: humanize(c) }))}
             onChange={onChange}
@@ -114,7 +124,7 @@ function Control({
       );
     return (
       <label className="flex flex-col gap-2">
-        <span className="text-body text-ink">{p.label}</span>
+        <span className="text-body text-ink">{plainLabel(p.label)}</span>
         <Select value={String(value)} onChange={(e) => onChange(e.target.value)}>
           {choices.map((c) => (
             <option key={c} value={c}>
@@ -132,13 +142,13 @@ function Control({
   const def = Number(p.default) || 1;
   return (
     <Slider
-      label={p.label}
+      label={plainLabel(p.label)}
       value={num}
       min={min}
       max={max}
       step={p.step ?? (max - min > 20 ? 1 : 0.1)}
       onChange={onChange}
-      format={(v) => (v === def ? 'Normal' : `${Math.round((v / def) * 100)}%`)}
+      format={(v) => level(v, min, max, def)}
     />
   );
 }

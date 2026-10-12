@@ -12,7 +12,9 @@ import type { Encoder } from '@degamed/engine/templates';
 import type { ProjectFiles } from '@degamed/shared';
 import { catalogFor, getBackend, SPEC_FILE, type GameBackend } from './catalog';
 import { checkProject, jsSyntaxError } from './check';
-import { hash, instantEdit, instantSpec, words } from './instant';
+import { drawableText } from './heroes';
+import { hash, instantEdit, instantSpec, mentionsPlace, words, type InstantEdit } from './instant';
+import { suggestions } from './suggest';
 import { applyEdits, changedPaths, EditError, isScript, isTextFile, MODS_FILE, mergeRebuild, readMods, writeMods, type Mod } from './patch';
 import {
   addUsage,
@@ -140,6 +142,12 @@ export async function createGame(i: {
     spec = instantSpec(prompt, backend).spec;
   }
   spec.seed ??= hash(prompt) % 100000;
+  // Never promise a hero the art can't draw (models sometimes ignore that rule).
+  const chosenTheme = backend.themes.find((t) => t.id === spec!.theme);
+  if (chosenTheme) {
+    spec.title = drawableText(spec.title, chosenTheme);
+    if (spec.story) spec.story = drawableText(spec.story, chosenTheme);
+  }
   i.signal?.throwIfAborted();
 
   say('building', `Building “${spec.title}”…`);
@@ -173,6 +181,17 @@ export interface EditResult {
 }
 
 const SHORT_REQUEST_WORDS = 5;
+
+/**
+ * The honest answer when free mode can't do something. The examples come from `suggestions()` for
+ * this game, so every one of them works on the current kit.
+ */
+function freeModeAnswer(files: ProjectFiles, free: InstantEdit | undefined): string {
+  const chips = suggestions(files).slice(0, 2).map((c) => `“${c.charAt(0).toLowerCase()}${c.slice(1)}”`);
+  const tryThese = chips.length ? ` or try ${chips.join(' or ')}` : '';
+  if (free?.unsupported) return `${free.unsupported}. Add an AI key in Settings to try it${tryThese}.`;
+  return `I couldn’t work that one out in free mode. Add an AI key in Settings for any change${tryThese}.`;
+}
 
 /** Picks the scripts most relevant to a request, within the context budget. */
 function pickContext(request: string, files: ProjectFiles, extra: string[] = []): Record<string, string> {
@@ -286,12 +305,11 @@ export async function editGame(i: {
   const simple = free?.understood && words(request).length <= SHORT_REQUEST_WORDS;
 
   const applyFree = (why?: string): EditResult => {
-    if (!spec || !free?.understood) {
-      const msg = spec
-        ? 'I couldn’t work that one out in free mode. Try something like “make it harder”, “floatier jumps” or “make it night”, or add an AI key in Settings for any change.'
-        : 'This game wasn’t made from a description, so free mode can’t change it. Add an AI key in Settings to edit it by chatting.';
-      return finish(i.files, msg, 'instant', NO_USAGE, why);
+    if (!spec) {
+      return finish(i.files, 'This game wasn’t made from a description, so free mode can’t change it. Add an AI key in Settings to edit it by chatting.', 'instant', NO_USAGE, why);
     }
+    if (!free?.understood) return finish(i.files, freeModeAnswer(i.files, free), 'instant', NO_USAGE, why);
+    if (JSON.stringify(free.spec) === JSON.stringify(spec)) return finish(i.files, free.summary, 'instant', NO_USAGE, why);
     say('building', 'Rebuilding your game…');
     const { files } = rebuild(i.files, spec, free.spec, i.encode, backend);
     return finish(files, free.summary, 'instant', NO_USAGE, why);
@@ -338,6 +356,11 @@ export async function editGame(i: {
       out.edits = [];
       summary += ' (I couldn’t apply the code part of that change.)';
     }
+  }
+  // A model may not move the game to another world unless the player named a place or mood.
+  if (out.spec?.theme && spec && out.spec.theme !== spec.theme && !mentionsPlace(request, backend.themes)) {
+    const { theme: _dropped, ...rest } = out.spec;
+    out.spec = rest;
   }
   if (out.spec && spec) {
     const next = applySpecPatch(spec, out.spec, catalog).spec;

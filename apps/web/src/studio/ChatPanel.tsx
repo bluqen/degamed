@@ -18,11 +18,40 @@ interface Message {
 
 let nextId = 0;
 
+/** The conversation is kept per game on this device, so it survives rebuilds and reloads. */
+const chatKey = (gameId: string) => `degamed.chat.v1.${gameId}`;
+
+function loadChat(gameId: string): Message[] | null {
+  try {
+    const raw = localStorage.getItem(chatKey(gameId));
+    const list = raw ? (JSON.parse(raw) as Message[]) : null;
+    if (!Array.isArray(list) || !list.length) return null;
+    return list
+      .filter((m) => (m.role === 'user' || m.role === 'assistant') && typeof m.text === 'string')
+      .map((m) => ({ ...m, id: ++nextId, undoable: false }));
+  } catch {
+    return null;
+  }
+}
+
+function saveChat(gameId: string, messages: Message[]) {
+  try {
+    const keep = messages.filter((m) => m.status !== 'pending').slice(-60);
+    localStorage.setItem(chatKey(gameId), JSON.stringify(keep));
+  } catch {
+    // Storage full or blocked: the chat just isn't remembered.
+  }
+}
+
 /** Change the game by talking to it. */
-export function ChatPanel({ studio, intro }: { studio: Studio; intro: string }) {
-  const [messages, setMessages] = useState<Message[]>(() => [
-    { id: ++nextId, role: 'assistant', text: intro, status: 'done' },
-  ]);
+export function ChatPanel({ studio, intro, fresh = false }: { studio: Studio; intro: string; fresh?: boolean }) {
+  const [messages, setMessages] = useState<Message[]>(() => {
+    const saved = loadChat(studio.id);
+    const greeting: Message = { id: ++nextId, role: 'assistant', text: intro, status: 'done' };
+    // A brand-new game always opens with its "ready" message; returning shows the old chat.
+    return saved ? (fresh ? [...saved, greeting] : saved) : [greeting];
+  });
+  useEffect(() => saveChat(studio.id, messages), [studio.id, messages]);
   const [draft, setDraft] = useState('');
   const [busy, setBusy] = useState(false);
   const list = useRef<HTMLDivElement>(null);
@@ -185,7 +214,7 @@ export function ChatPanel({ studio, intro }: { studio: Studio; intro: string }) 
                 <button
                   type="button"
                   onClick={() => void send(c)}
-                  className="h-8 rounded-full border border-line bg-surface px-3 text-body-sm font-medium whitespace-nowrap text-ink-2 transition-colors hover:border-brand hover:bg-brand-tint hover:text-brand-ink"
+                  className="h-10 rounded-full border border-line bg-surface px-3.5 sm:h-8 sm:px-3 text-body-sm font-medium whitespace-nowrap text-ink-2 transition-colors hover:border-brand hover:bg-brand-tint hover:text-brand-ink"
                 >
                   {c}
                 </button>

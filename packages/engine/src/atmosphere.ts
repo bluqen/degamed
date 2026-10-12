@@ -243,8 +243,12 @@ export interface AtmosphereOptions {
   surfaces: () => readonly Rect[];
   /** Lights in the world this frame. */
   lights: () => Iterable<LightSource>;
+  /** Scroll factor of each `parallax` layer. */
+  parallaxFactors?: number[];
+  /** Registers an object drawn by the background camera. */
+  background?: (go: Phaser.GameObjects.GameObject) => void;
   /** 'auto' lowers quality on slow devices; 'high' and 'low' pin it. */
-  quality?: 'auto' | 'high' | 'low';
+  quality?: 'auto' | 'high' | 'medium' | 'low';
 }
 
 export class Atmosphere {
@@ -263,6 +267,9 @@ export class Atmosphere {
   quality = 2;
   private frameTimes: number[] = [];
   private fogAmounts: { color: string; amount: number; height: number }[] = [];
+  /** Filters switched off at quality 0 (grade, and the buffer that keeps the lightmap off the background). */
+  private readonly cheapFilters: { active: boolean }[] = [];
+  private merged: Phaser.GameObjects.TileSprite | null = null;
   private settle = 2;
 
   constructor(
@@ -294,6 +301,7 @@ export class Atmosphere {
     for (const p of env.particles ?? []) this.buildParticles(p.type, p.density, p.color);
     this.buildPost(env);
     if (opts.quality === 'low') this.setQuality(0);
+    if (opts.quality === 'medium') this.setQuality(1);
   }
 
   private buildFog(env: Environment) {
@@ -492,14 +500,15 @@ export class Atmosphere {
         blendAmount: env.bloom.strength,
       });
     }
-    if (env.grade && (env.grade.contrast !== undefined || env.grade.saturation !== undefined || env.grade.tint)) {
+    if (env.grade && hasGrade) {
       const cm = filters.addColorMatrix();
       cm.colorMatrix.set(gradeMatrix(env.grade));
+      this.cheapFilters.push(cm);
     }
     // The lightmap must only darken the world, not the (pre-lit) background, which a separate
     // camera draws underneath. A camera with a filter renders into its own transparent buffer,
     // where MULTIPLY leaves empty pixels empty, so make sure there is at least one.
-    if (this.lightmap && !hasGrade) filters.addColorMatrix();
+    if (this.lightmap && !hasGrade) this.cheapFilters.push(filters.addColorMatrix());
     if (env.vignette && env.vignette > 0) {
       // A soft dark frame as one overlay quad (cheaper than a filter pass, and a nicer curve).
       const v = env.vignette;
@@ -523,21 +532,33 @@ export class Atmosphere {
   }
 
   /** Steps quality down when the device can't keep up (never back up, to avoid flicker). */
-  private watchPerformance(dt: number) {
-    if (this.quality === 0 || (this.opts.quality ?? 'auto') !== 'auto') return;
-    this.settle -= dt;
+  private lastFrame = 0;
+  private watchPerformance() {
+    // Real wall-clock frame times (Phaser's own delta is smoothed and capped).
+    const now = performance.now();
+    const frame = this.lastFrame ? (now - this.lastFrame) / 1000 : 0;
+    this.lastFrame = now;
+    if (this.quality === 0 || (this.opts.quality ?? 'auto') !== 'auto' || !frame) return;
+    this.settle -= frame;
     if (this.settle > 0) return;
-    this.frameTimes.push(Math.max(dt, this.scene.game.loop.delta / 1000));
+    this.frameTimes.push(frame);
     const total = this.frameTimes.reduce((a, b) => a + b, 0);
-    if (total < 1.5) return;
+    if (total < 1) return;
     const avg = total / this.frameTimes.length;
     this.frameTimes = [];
     if (avg > 1 / 48) this.setQuality(this.quality - 1);
   }
 
+  /**
+   * 2 = everything. 1 = no bloom, half the particles. 0 = the cheap canary for weak phones: also
+   * no lightmap, no colour-grade pass, no mist or halos, and the far background layers merged
+   * into one.
+   */
   setQuality(q: number) {
     this.quality = Math.max(0, Math.min(2, q));
     for (const b of this.bloom ?? []) b.parallelFilters.active = this.quality >= 2;
+    for (const f of this.cheapFilters) f.active = this.quality >= 1;
+    this.lightmap?.setVisible(this.quality >= 1);
     for (const layer of this.layers) {
       const e = layer.emitter as unknown as { frequency: number; __base?: number };
       e.__base ??= e.frequency;
@@ -545,18 +566,52 @@ export class Atmosphere {
     }
     this.splashRate = this.quality >= 2 ? this.baseSplash : this.baseSplash / 2;
     for (const m of this.mists) m.sprite.setVisible(this.quality >= 1);
-    this.settle = 2;
+    this.mergeFarLayers(this.quality <= 1);
+    this.settle = 1;
+  }
+
+  /** Bakes the slow far layers into one texture (they barely move anyway): fewer full-screen draws. */
+  private mergeFarLayers(on: boolean) {
+    const far = this.opts.parallax.filter((l) => this.factorOf(l) <= 0.2) as Phaser.GameObjects.TileSprite[];
+    if (far.length < 2) return;
+    if (on && !this.merged) {
+      const { width: W, height: H } = this.opts;
+      const key = `__dg_merged_${far.map((l) => l.texture.key).join('|')}`;
+      if (!this.scene.textures.exists(key)) {
+        const w = Math.max(...far.map((l) => (l.texture.getSourceImage() as HTMLCanvasElement).width));
+        const tex = this.scene.textures.createCanvas(key, w, H);
+        if (tex) {
+          for (const l of far) {
+            const img = l.texture.getSourceImage() as HTMLCanvasElement;
+            for (let x = 0; x < w; x += img.width) tex.context.drawImage(img, x, l.y);
+          }
+          tex.refresh();
+        }
+      }
+      const factor = this.factorOf(far[far.length - 1]!);
+      this.merged = this.scene.add.tileSprite(0, 0, W, H, key).setOrigin(0, 0).setScrollFactor(0).setDepth(far[0]!.depth);
+      this.opts.background?.(this.merged);
+      this.parallaxFactor.set(this.merged, factor);
+    }
+    if (this.merged) this.merged.setVisible(on);
+    for (const l of far) l.setVisible(!on);
+  }
+
+  private readonly parallaxFactor = new Map<Phaser.GameObjects.GameObject, number>();
+  private factorOf(l: Phaser.GameObjects.GameObject) {
+    return this.parallaxFactor.get(l) ?? this.opts.parallaxFactors?.[this.opts.parallax.indexOf(l)] ?? 1;
   }
 
   private baseSplash = 0;
 
   update(dt: number) {
     this.time += dt;
-    this.watchPerformance(dt);
+    this.watchPerformance();
     const cam = this.cam;
     const view = cam.worldView;
 
     for (const m of this.mists) m.sprite.tilePositionX = cam.scrollX * m.factor + this.time * m.speed;
+    if (this.merged?.visible) this.merged.tilePositionX = cam.scrollX * (this.parallaxFactor.get(this.merged) ?? 0);
 
     for (const layer of this.layers) {
       if (!layer.zone) continue;
@@ -583,7 +638,7 @@ export class Atmosphere {
     const view = cam.worldView;
     const sx = this.opts.width / view.width;
     const sy = this.opts.height / view.height;
-    const rt = this.lightmap;
+    const rt = this.quality >= 1 ? this.lightmap : null;
     if (rt) {
       rt.clear();
       rt.fill(this.ambient, 1);

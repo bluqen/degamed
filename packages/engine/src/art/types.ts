@@ -88,6 +88,11 @@ export interface ArtTheme {
   /** Optional (additive): tile size in pixels (all tiles are square). */
   tileSize?: number;
   /**
+   * Optional (additive): alternative heroes. The first is the theme's own hero (the same sheet as
+   * `sprites.hero`); pick another by matching `keywords` against the player's prompt ("a robot").
+   */
+  heroes?: HeroVariant[];
+  /**
    * Optional (additive): large details (cracks, pipes, bones, roots, fossils) to scatter over
    * solid interiors and back walls so big areas of fill don't look stamped. Draw them over the
    * tiles, clipped to fully solid cells, roughly one per 4×3 tiles chosen by a position hash.
@@ -98,6 +103,14 @@ export interface ArtTheme {
    * swaying grass, lava shimmer, flickering flames. See `AmbientSprite`.
    */
   ambientSprites?: Record<string, AmbientSprite>;
+}
+
+/** An alternative hero a theme can use. */
+export interface HeroVariant {
+  id: string;
+  name: string;
+  keywords: string[];
+  sheet: SpriteSheet;
 }
 
 /** A small looping decoration animation. */

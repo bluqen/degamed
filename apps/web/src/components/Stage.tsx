@@ -24,6 +24,18 @@ export interface StageHandle {
  * Shows real art (poster) while the engine loads, a gentle "click to play" hint,
  * and a calm message if the game crashes.
  */
+/** Full screen, and on phones turn to landscape where the browser allows it. */
+export async function goFullscreen(el: HTMLElement | null) {
+  if (!el) return;
+  try {
+    await el.requestFullscreen?.({ navigationUI: 'hide' });
+    const o = screen.orientation as ScreenOrientation & { lock?: (o: string) => Promise<void> };
+    if (window.matchMedia('(pointer: coarse)').matches) await o.lock?.('landscape').catch(() => {});
+  } catch {
+    // Full screen isn't allowed here (e.g. iOS Safari on an element); the game still plays inline.
+  }
+}
+
 export const Stage = forwardRef<
   StageHandle,
   {
@@ -37,6 +49,8 @@ export const Stage = forwardRef<
     className?: string;
     /** Hide the hover controls (restart, full screen). */
     bare?: boolean;
+    /** Show the overlay controls only on phones (the page has its own buttons on bigger screens). */
+    overlayOnPhoneOnly?: boolean;
     startLabel?: string;
     startHint?: ReactNode;
     rounded?: boolean;
@@ -49,6 +63,7 @@ export const Stage = forwardRef<
     autoStart = true,
     className,
     bare = false,
+    overlayOnPhoneOnly = false,
     startLabel = 'Play',
     startHint,
     rounded = true,
@@ -91,7 +106,8 @@ export const Stage = forwardRef<
     if (!started || !files) return;
     if (first.current) {
       first.current = false;
-      return;
+      // The player sends the first game itself once it's ready, unless it was ready first.
+      if (!play.ready) return;
     }
     play.run(files);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -115,12 +131,14 @@ export const Stage = forwardRef<
 
   useImperativeHandle(ref, () => ({
     restart: () => (play.ready ? play.restart() : undefined),
-    fullscreen: () => void box.current?.requestFullscreen?.(),
+    fullscreen: () => void goFullscreen(box.current),
     focus: () => frame.current?.focus(),
   }));
 
-  const error = play.lines.find((l) => l.level === 'error');
-  const loading = started && !play.ready;
+  const error = loadFailed
+    ? { message: 'it couldn’t be loaded. Check your connection and try again.' }
+    : play.lines.find((l) => l.level === 'error');
+  const loading = started && (!play.ready || !files) && !loadFailed;
 
   return (
     <div
@@ -214,7 +232,12 @@ export const Stage = forwardRef<
       )}
 
       {!bare && started && play.ready && (
-        <div className="absolute top-3 right-3 flex gap-1 rounded-md bg-black/55 p-1 opacity-0 backdrop-blur transition-opacity duration-200 group-hover:opacity-100 focus-within:opacity-100">
+        <div
+          className={cx(
+            'absolute top-2 right-2 flex gap-1 rounded-md bg-black/55 p-1 backdrop-blur transition-opacity duration-200 focus-within:opacity-100 group-hover:opacity-100',
+            overlayOnPhoneOnly ? 'sm:hidden' : 'opacity-0 max-sm:opacity-100',
+          )}
+        >
           <IconButton
             label="Restart"
             size="sm"
@@ -227,7 +250,7 @@ export const Stage = forwardRef<
             label="Full screen"
             size="sm"
             className="text-white hover:bg-white/15 hover:text-white"
-            onClick={() => void box.current?.requestFullscreen?.()}
+            onClick={() => void goFullscreen(box.current)}
           >
             <Maximize2 size={16} />
           </IconButton>

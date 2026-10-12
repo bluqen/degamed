@@ -1,19 +1,17 @@
 /**
- * Sunlit Meadow: a bright, warm summer day. Puffy cel-shaded clouds, snow-capped mountains in a
- * blue haze, rolling hills with round trees, lush grass over warm soil, flowers and a red-haired
- * climber. Mood reference: Celeste's sunny chapters, Stardew Valley.
+ * Sunlit Meadow: a bright, warm summer day. Puffy cel-shaded clouds, snow-capped mountains and a
+ * distant castle in a blue haze, rolling hills with round trees and a windmill, lush grass over
+ * warm soil and flowers. The hero is Fen, a fox kid with a huge bushy tail; jelly slimes hop about;
+ * golden acorns to collect and a bell arch at the end.
  */
 import { Canvas, fbm, gradient, Ix, MatLayer, Palette, rng, bayer, mix, type Material, type Rng } from '../core';
-import { heroSheet } from '../hero';
-import { bigHeroSheet } from '../hero2';
-import { meadowBig } from './big-heroes';
+import { castFor, castSheet } from './big-heroes';
 import { mistBand, overgrow, shadedBlob } from '../scenery';
 import { derive, px01, tileNoise, TILE } from '../tiles';
 import { backEdges, backWall } from '../tiles';
 import { bonesDecal, fossilDecal, rootsDecal, stonesDecal } from '../decals';
 import { sheetOf, type Raster } from '../../pixel';
 import type { ArtTheme, ParallaxLayer, PropInfo, SpriteSheet } from '../types';
-import { meadowHeroCostume } from './meadow-hero';
 import { checkpointSheet, flyerSheet, spikeStrip } from '../extras';
 
 const W = 480;
@@ -527,15 +525,15 @@ function slimeSheet(): SpriteSheet {
   };
 }
 
-/** A bobbing strawberry with a sparkle. */
-function berrySheet(): SpriteSheet {
+/** A golden acorn that bobs and glints. */
+function acornSheet(): SpriteSheet {
   const FW = 14;
   const FH = 16;
   const pal = new Palette();
-  const [ol] = pal.ramp(['#4a1426']);
-  const red = pal.ramp(['#9e1f3a', '#e0384a', '#ff6a6a', '#ffb0a0']);
-  const leaf = pal.ramp(['#2f7d3f', '#71c653']);
-  const [seedC] = pal.ramp(['#ffe08a']);
+  const [ol] = pal.ramp(['#3a2016']);
+  const nut = pal.ramp(['#9a5a1e', '#d8902e', '#ffc85a', '#fff0b0']);
+  const cap = pal.ramp(['#4a2e1a', '#7a4e2a', '#a8763e']);
+  const [stem] = pal.ramp(['#5a3a20']);
   const [white] = pal.ramp(['#ffffff']);
   const frames: Raster[] = [];
   for (let f = 0; f < 8; f++) {
@@ -543,57 +541,80 @@ function berrySheet(): SpriteSheet {
     const bob = Math.round(Math.sin((f / 8) * Math.PI * 2) * 1.3);
     const cx = 7;
     const cy = 9 + bob;
-    c.poly([[cx - 4.5, cy - 3], [cx + 4.5, cy - 3], [cx + 4, cy + 1], [cx, cy + 5], [cx - 4, cy + 1]], (x, y) => (y < cy - 1 ? red[2]! : x < cx - 2 ? red[0]! : red[1]!));
-    c.set(cx - 2, cy - 2, red[3]!);
-    for (const [sx, sy] of [[-2, 0], [1, -1], [3, 0], [-1, 2], [2, 2], [0, 4]] as const) c.set(cx + sx, cy + sy, seedC!);
-    c.grid(['l.L.l', '.LlL.', '..l..'], { l: leaf[0]!, L: leaf[1]! }, cx - 2, cy - 5);
+    // nut: an egg shape, pointed at the bottom
+    c.ellipse(cx, cy + 1, 4, 4.5, (x, y, nx, ny) => nut[Math.max(0, Math.min(3, Math.round(1.6 - ny * 1.2 - nx * 0.6)))]!);
+    c.set(cx, cy + 6, nut[0]!);
+    // cap with a cross-hatched texture and a little stem
+    c.ellipse(cx, cy - 3, 5, 2.6, (x, y) => cap[(x + y) % 3 === 0 ? 0 : (x + y) % 3 === 1 ? 1 : 2]!);
+    c.set(cx + 1, cy - 6, stem!);
+    c.set(cx + 2, cy - 7, stem!);
     c.outline(ol!);
+    // a travelling glint
     if (f === 1 || f === 2) {
-      c.set(12, 2, white!);
-      c.set(11, 3, white!);
-      c.set(13, 3, white!);
-      c.set(12, 4, white!);
+      c.set(cx - 2, cy, white!);
+      c.set(12, 3, white!);
+      c.set(11, 4, white!);
+      c.set(13, 4, white!);
+      c.set(12, 5, white!);
     }
     frames.push(c.toRaster());
   }
   return { raster: sheetOf(frames), frameWidth: FW, frameHeight: FH, animations: { idle: { frames: [0, 1, 2, 3, 4, 5, 6, 7], fps: 9, loop: true } } };
 }
 
-/** A summit flag waving in the breeze. */
-function flagSheet(): SpriteSheet {
-  const FW = 28;
+/** The goal: a little wooden bell arch; the brass bell swings and rings. */
+function bellSheet(): SpriteSheet {
+  const FW = 30;
   const FH = 44;
   const pal = new Palette();
-  const [ol] = pal.ramp(['#2a1a2e']);
-  const pole = pal.ramp(C.wood);
-  const cloth = pal.ramp(['#8a1f3a', '#d83a4a', '#ff7a5a', '#ffc08a']);
-  const [emb] = pal.ramp(['#fff3c8']);
-  const [stone1, stone2, stone3] = pal.ramp(C.stone.slice(0, 3));
+  const [ol] = pal.ramp(['#2a1a1e']);
+  const wood = pal.ramp(C.wood);
+  const brass = pal.ramp(['#7a4a14', '#c8862a', '#f0c050', '#fff0a0']);
+  const roof = pal.ramp(['#7a1f2e', '#c4392f', '#ef6d3a']);
+  const [rope] = pal.ramp(['#e8d6b0']);
+  const [stone1, stone2] = pal.ramp([C.stone[1]!, C.stone[2]!]);
   const frames: Raster[] = [];
+  const swing = [0, 0.35, 0.5, 0.35, 0, -0.35];
   for (let f = 0; f < 6; f++) {
     const c = new Ix(FW, FH, pal);
-    for (let y = 2; y < FH - 3; y++) c.set(4, y, pole[2]!), c.set(5, y, pole[1]!);
-    c.set(4, 1, cloth[3]!);
-    c.set(5, 1, cloth[2]!);
-    // cloth: each column follows a travelling wave
-    for (let x = 6; x < 25; x++) {
-      const t = (x - 6) / 19;
-      const off = Math.round(Math.sin(f * 1.05 - x * 0.45) * 2 * t);
-      const top = 3 + off;
-      const bot = 14 + off - Math.round(t * 2);
-      for (let y = top; y <= bot; y++) {
-        const shade = Math.sin(f * 1.05 - x * 0.45 + 1.2);
-        c.set(x, y, y === top ? cloth[3]! : shade > 0.5 ? cloth[2]! : shade < -0.5 ? cloth[0]! : cloth[1]!);
-      }
-      if (x > 11 && x < 16) for (let y = top + 4; y < top + 8; y++) c.set(x, y, emb!);
+    // posts and crossbeam
+    for (const px of [5, 23]) {
+      c.rect(px, 10, 2, FH - 12, wood[1]!);
+      c.set(px, 10, wood[3]!);
     }
-    // cairn of stones at the base
-    c.ellipse(5, FH - 3, 5, 3, (x, y, nx, ny) => (ny < -0.2 ? stone3! : nx < 0 ? stone1! : stone2!));
-    c.ellipse(10, FH - 2, 3, 2, (x, y, nx, ny) => (ny < -0.2 ? stone3! : stone2!));
+    c.rect(3, 9, 24, 3, wood[2]!);
+    for (let x = 3; x < 27; x++) c.set(x, 9, wood[3]!);
+    // little gabled roof
+    c.poly([[1, 9], [15, 1], [29, 9]], roof[1]!);
+    for (let x = 1; x < 29; x++) c.set(x, 8, roof[0]!);
+    c.line(15, 1, 28, 8, roof[2]!);
+    // stone base
+    c.rect(2, FH - 3, 26, 3, stone1!);
+    for (let x = 2; x < 28; x += 4) c.set(x, FH - 3, stone2!);
+    // the bell swings from the beam
+    const a = swing[f]!;
+    const hx = 15;
+    const hy = 12;
+    const bx = hx + Math.sin(a) * 9;
+    const by = hy + Math.cos(a) * 9;
+    c.line(hx, hy, Math.round(bx), Math.round(by) - 4, wood[0]!);
+    c.poly(
+      [
+        [bx - 3 + Math.sin(a) * -1, by - 6],
+        [bx + 3 + Math.sin(a) * -1, by - 6],
+        [bx + 6, by + 3],
+        [bx - 6, by + 3],
+      ],
+      (x) => (x < bx - 2 ? brass[1]! : x > bx + 2 ? brass[0]! : brass[2]!),
+    );
+    c.set(Math.round(bx - 1), Math.round(by - 4), brass[3]!);
+    c.set(Math.round(bx), Math.round(by + 4), brass[0]!);
+    // rope pull
+    c.line(Math.round(bx), Math.round(by + 4), Math.round(bx - Math.sin(a) * 2), FH - 10, rope!);
     c.outline(ol!);
     frames.push(c.toRaster());
   }
-  return { raster: sheetOf(frames), frameWidth: FW, frameHeight: FH, animations: { idle: { frames: [0, 1, 2, 3, 4, 5], fps: 8, loop: true } }, anchor: { x: 5, y: 43 } };
+  return { raster: sheetOf(frames), frameWidth: FW, frameHeight: FH, animations: { idle: { frames: [0, 1, 2, 3, 4, 5], fps: 6, loop: true } }, anchor: { x: 15, y: 43 } };
 }
 
 // ── Props ───────────────────────────────────────────────────────────────────
@@ -758,8 +779,8 @@ function decals(): Record<string, Raster> {
 export const SUNLIT_MEADOW_META = {
   id: 'sunlit-meadow',
   name: 'Sunlit Meadow',
-  description: 'A bright, warm summer meadow: puffy clouds, snowy peaks, round trees, flowers and a red-haired climber. Cheerful and cosy.',
-  keywords: ['happy', 'cheerful', 'bright', 'cute', 'cozy', 'cosy', 'meadow', 'grass', 'forest', 'nature', 'summer', 'day', 'sunny', 'farm', 'kids', 'family', 'adventure', 'mountain', 'climb', 'flowers', 'spring', 'relaxing', 'colorful', 'colourful'],
+  description: 'A bright, warm summer meadow: puffy clouds, snowy peaks, a windmill, round trees and flowers. A fox kid with a bushy tail. Cheerful and cosy.',
+  keywords: ['meadow', 'grass', 'field', 'fields', 'forest', 'woods', 'nature', 'countryside', 'hills', 'mountain', 'farm', 'garden', 'flowers', 'summer', 'spring', 'day', 'sunny', 'bright', 'cheerful', 'happy', 'cute', 'cozy', 'cosy', 'peaceful', 'relaxing', 'colorful', 'colourful'],
   palette: [C.skyTop, C.skyMid, C.horizon, C.warm, ...C.grass, ...C.dirt, ...C.stone, ...C.wood, ...C.flower],
   background: C.skyMid,
 };
@@ -771,20 +792,20 @@ export function sunlitMeadow(): ArtTheme {
     layers: layers(),
     tiles: meadowTiles(),
     sprites: {
-      hero: bigHeroSheet(meadowBig()),
-      heroSmall: heroSheet(meadowHeroCostume()),
+      hero: castSheet('fox'),
       enemy: slimeSheet(),
-      pickup: berrySheet(),
-      goal: flagSheet(),
+      pickup: acornSheet(),
+      goal: bellSheet(),
       flyer: flyerSheet({ body: ['#c48a1e', '#ffc93a', '#fff0a0'], wing: ['#b8d8f0', '#eef8ff', '#ffffff'], eye: '#2a1a2e', outline: '#3a2228', stripes: '#3a2228' }),
       checkpoint: checkpointSheet({ post: C.wood.slice(0, 3), cage: C.wood[3]!, glow: '#ffd25e', core: '#fff6d8', outline: '#3a2228', banner: '#e0384a' }),
     },
     props: p,
     propInfo: info,
+    heroes: castFor('fox'),
     decals: decals(),
     tileSize: TILE,
     lights: {
-      pickup: { color: '#ffd0c0', radius: 24, intensity: 0.25 },
+      pickup: { color: '#ffe08a', radius: 24, intensity: 0.25 },
       goal: { color: '#fff0c0', radius: 50, intensity: 0.3 },
     },
     environment: {

@@ -3,6 +3,7 @@
  * a game spec, and a chat request into a spec change. Runs in well under a millisecond.
  */
 import type { GameBackend, KitInfo, ThemeInfo } from './catalog';
+import { creatureIn, drawableText, heroFor } from './heroes';
 import { sanitizeParams, type GameSpec, type KitParam } from './protocol';
 
 // ---------------------------------------------------------------------------------------------
@@ -226,6 +227,8 @@ const NOUN_KNOB: [RegExp, Knob][] = [
 interface Rule {
   re: RegExp;
   knobs: [Knob, Change][];
+  /** What to say when the setting is already there ("It’s already night"). */
+  already?: string;
   say?: string;
 }
 
@@ -291,7 +294,6 @@ export function hash(text: string): number {
   return h >>> 0;
 }
 
-const HEROES = ['robot', 'cat', 'kitten', 'knight', 'fox', 'frog', 'girl', 'boy', 'ninja', 'wizard', 'witch', 'ghost', 'slime', 'astronaut', 'dragon', 'bird', 'bunny', 'rabbit', 'dog', 'puppy', 'princess', 'prince', 'pirate', 'alien', 'bear', 'mouse', 'bee', 'samurai', 'kid', 'owl', 'penguin', 'snail', 'duck', 'hedgehog', 'raccoon', 'mushroom', 'droid', 'android', 'explorer', 'thief', 'monk', 'squirrel', 'goblin', 'skeleton', 'hero', 'blob', 'cube', 'lantern', 'spirit', 'firefly', 'moth', 'turtle', 'axolotl', 'octopus', 'cyborg', 'viking'];
 
 const ADJ: Record<string, string[]> = {
   dark: ['Hollow', 'Silent', 'Forgotten', 'Lantern', 'Deep'],
@@ -311,9 +313,10 @@ const HOME_GOALS = ['family', 'home', 'mom', 'mum', 'mother', 'dad', 'father', '
 
 const cap = (s: string) => s.replace(/\b[a-z]/g, (c) => c.toUpperCase());
 
-/** "the robot" in "...where a little robot looks for its family" */
-function heroOf(ws: string[]): string | undefined {
-  return ws.find((w) => HEROES.includes(w));
+/** The creature the prompt is about, if the theme can draw it. */
+function drawableHero(prompt: string, theme: ThemeInfo): string | undefined {
+  const c = creatureIn(prompt);
+  return c && heroFor(theme, c.kind) ? c.word : undefined;
 }
 
 function goalOf(text: string): string | undefined {
@@ -330,12 +333,12 @@ function explicitTitle(text: string): string | undefined {
 
 export function instantTitle(prompt: string, theme: ThemeInfo, seed: number): string {
   const given = explicitTitle(prompt);
-  if (given) return given;
+  if (given) return drawableText(given, theme);
   const ws = words(prompt);
   const mood = [...conceptsOf(ws)][0] ?? [...conceptsOf(themeWords(theme))][0] ?? 'none';
   const adjs = ADJ[mood] ?? ADJ.none!;
   const adj = adjs[seed % adjs.length]!;
-  const hero = heroOf(ws);
+  const hero = drawableHero(prompt, theme);
   const goal = goalOf(prompt);
   const place = theme.name.split(' ').at(-1) ?? theme.name;
   const options: string[] = [];
@@ -361,11 +364,11 @@ export function instantStory(prompt: string, theme: ThemeInfo): string {
       .trim()
       .replace(/\s+/g, ' ')
       .replace(/^((?:an?|the|one)\s+(?:[a-z-]+\s+)?[a-z-]+)\s+(?:who|that)\s+/i, '$1 ');
-    const sentence = s.charAt(0).toUpperCase() + s.slice(1);
+    const sentence = drawableText(s.charAt(0).toUpperCase() + s.slice(1), theme);
     return /[.!?]$/.test(sentence) ? sentence : `${sentence}.`;
   }
-  const hero = heroOf(words(prompt));
-  return hero ? `A brave little ${hero} sets out across the ${theme.name}.` : `An adventure across the ${theme.name}.`;
+  const hero = drawableHero(prompt, theme);
+  return hero ? `A brave little ${hero} sets out across the ${theme.name}.` : `A little wanderer sets out across the ${theme.name}.`;
 }
 
 export interface InstantResult {
@@ -385,7 +388,11 @@ export function instantSpec(prompt: string, backend: Pick<GameBackend, 'kits' | 
   const kit = kits[0]!.score > 0 ? kits[0]!.kit : (backend.kits.find((k) => k.id === 'platformer') ?? backend.kits[0]!);
   notes.push(`kit:${kit.id}`);
 
-  const themes = scoreThemes(backend.themes, ws).sort((a, b) => b.score - a.score);
+  // A theme that can draw the hero the player asked for ("a robot") gets a strong bonus.
+  const creature = creatureIn(prompt);
+  const themes = scoreThemes(backend.themes, ws)
+    .map((t) => ({ ...t, score: t.score + (creature && heroFor(t.theme, creature.kind) ? 4 : 0) }))
+    .sort((a, b) => b.score - a.score);
   const top = themes[0]!.score;
   // No signal: pick a theme from the prompt's hash, so vague prompts still get variety.
   const best = themes.filter((t) => t.score === top);
@@ -412,6 +419,8 @@ export function instantSpec(prompt: string, backend: Pick<GameBackend, 'kits' | 
 
   const spec: GameSpec = { kit: kit.id, theme: theme.id, title: instantTitle(prompt, theme, seed), story: instantStory(prompt, theme), seed: seed % 100000 };
   if (Object.keys(changed).length) spec.params = changed;
+  const variant = creature && heroFor(theme, creature.kind)?.id;
+  if (variant) spec.hero = variant;
   return { spec, notes };
 }
 
@@ -419,12 +428,12 @@ export function instantSpec(prompt: string, backend: Pick<GameBackend, 'kits' | 
 // Chat request → spec change
 
 const EDIT_RULES: Rule[] = [
-  { re: /\b(much|way|a lot)\s+(harder|tougher|more difficult)\b/, knobs: [['difficulty', { by: 0.5 }], ['enemies', { by: 0.4 }]], say: 'Made it a lot harder' },
-  { re: /\b(harder|tougher|more difficult|more challenging|more of a challenge)\b/, knobs: [['difficulty', { by: 0.25 }], ['enemies', { by: 0.2 }]], say: 'Made it harder' },
-  { re: /\b(much|way|a lot)\s+easier\b/, knobs: [['difficulty', { by: -0.5 }], ['enemies', { by: -0.4 }]], say: 'Made it a lot easier' },
-  { re: /\b(easier|less difficult|simpler|too hard|more forgiving)\b/, knobs: [['difficulty', { by: -0.25 }], ['enemies', { by: -0.2 }]], say: 'Made it easier' },
-  { re: /\b(no|remove( all)?( the)?|get rid of( the)?)\s+(enemies|monsters|foes|baddies)\b/, knobs: [['enemies', { to: 0 }]], say: 'Removed the enemies' },
-  { re: /\b(more|extra|add( more)?)\s+(enemies|monsters|foes|baddies|slimes)\b/, knobs: [['enemies', { by: 0.25 }]], say: 'Added more enemies' },
+  { re: /\b(much|way|a lot)\s+(harder|tougher|more difficult)\b/, knobs: [['difficulty', { by: 0.5 }], ['enemies', { by: 0.4 }]], say: 'Made it a lot harder', already: 'It’s already as hard as it goes' },
+  { re: /\b(harder|tougher|more difficult|more challenging|more of a challenge)\b/, knobs: [['difficulty', { by: 0.25 }], ['enemies', { by: 0.2 }]], say: 'Made it harder', already: 'It’s already as hard as it goes' },
+  { re: /\b(much|way|a lot)\s+easier\b/, knobs: [['difficulty', { by: -0.5 }], ['enemies', { by: -0.4 }]], say: 'Made it a lot easier', already: 'It’s already as easy as it goes' },
+  { re: /\b(easier|less difficult|simpler|too hard|more forgiving)\b/, knobs: [['difficulty', { by: -0.25 }], ['enemies', { by: -0.2 }]], say: 'Made it easier', already: 'It’s already as easy as it goes' },
+  { re: /\b(no|remove( all)?( the)?|get rid of( the)?)\s+(enemies|monsters|foes|baddies)\b/, knobs: [['enemies', { to: 0 }]], say: 'Removed the enemies', already: 'There are no enemies already' },
+  { re: /\b(more|extra|add( more)?)\s+(enemies|monsters|foes|baddies|slimes)\b/, knobs: [['enemies', { by: 0.25 }]], say: 'Added more enemies', already: 'It already has as many enemies as it can' },
   { re: /\b(fewer|less)\s+(enemies|monsters|foes|baddies|slimes)\b/, knobs: [['enemies', { by: -0.25 }]], say: 'Removed some enemies' },
   { re: /\b(more|extra|add( more)?)\s+(coins|gems|stars|pickups|treasure|loot|crystals|collectibles)\b/, knobs: [['pickups', { by: 0.3 }]], say: 'Added more to collect' },
   { re: /\b(fewer|less)\s+(coins|gems|stars|pickups|crystals)\b/, knobs: [['pickups', { by: -0.3 }]], say: 'Made fewer things to collect' },
@@ -436,9 +445,9 @@ const EDIT_RULES: Rule[] = [
   { re: /\b(slower|slow (it )?down)\b/, knobs: [['speed', { by: -0.2 }]], say: 'Slowed things down' },
   { re: /\b(longer|bigger level|more levels?|extend)\b/, knobs: [['length', { by: 0.25 }]], say: 'Made the level longer' },
   { re: /\b(shorter|smaller level|fewer levels?)\b/, knobs: [['length', { by: -0.25 }]], say: 'Made the level shorter' },
-  { re: /\b(night|midnight|nighttime|dark(er)?)\b/, knobs: [['night', { pick: 'night', to: 1 }]], say: 'Turned it to night' },
+  { re: /\b(night|midnight|nighttime|dark(er)?)\b/, knobs: [['night', { pick: 'night', to: 1 }]], say: 'Turned it to night', already: 'It’s already as dark as it gets' },
   { re: /\b(dusk|sunset|twilight|evening)\b/, knobs: [['night', { pick: 'dusk', to: 0.7 }]], say: 'Set it at dusk' },
-  { re: /\b(day|daytime|daylight|morning|brighter|lighter)\b/, knobs: [['night', { pick: 'day', to: 0 }]], say: 'Turned it to day' },
+  { re: /\b(day|daytime|daylight|morning|brighter|lighter)\b/, knobs: [['night', { pick: 'day', to: 0 }]], say: 'Turned it to day', already: 'It’s already as bright as it gets' },
   { re: /\b(stop|no|without|remove)( the)? (rain|snow|weather)\b|\bclear (skies|sky|weather)\b/, knobs: [['weather', { pick: 'clear' }]], say: 'Cleared the weather' },
   { re: /\b(rain|rainy|raining|storm|stormy)\b/, knobs: [['weather', { pick: 'rain' }]], say: 'Made it rain' },
   { re: /\b(snow|snowy|snowing|blizzard)\b/, knobs: [['weather', { pick: 'snow' }]], say: 'Made it snow' },
@@ -449,18 +458,58 @@ const EDIT_RULES: Rule[] = [
   { re: /\b(less|fewer)\s+(decoration|details?|plants|greenery|clutter)\b|\b(cleaner|simpler look|more minimal)\b/, knobs: [['decoration', { by: -0.3 }]], say: 'Cleaned up the decoration' },
   { re: /\b(no|remove( the)?)\s+checkpoints\b/, knobs: [['checkpoints', { to: 0 }]], say: 'Removed the checkpoints' },
   { re: /\b(add|more)\s+checkpoints\b/, knobs: [['checkpoints', { to: 1 }]], say: 'Added checkpoints' },
-  { re: /\bdouble[- ]?jumps?\b/, knobs: [['doubleJump', { to: 1 }]], say: 'Added a double jump' },
+  { re: /\bdouble[- ]?jumps?\b/, knobs: [['doubleJump', { to: 1 }]], say: 'Added a double jump', already: 'The hero can already double jump' },
   { re: /\b(more|extra)\s+(lives|hearts|health)\b/, knobs: [['lives', { by: 0.25 }]], say: 'Added more lives' },
 ];
 
 export interface InstantEdit {
   spec: GameSpec;
   summary: string;
+  /** True when free mode handled the request (even if the answer is "it's already like that"). */
   understood: boolean;
+  /** Why free mode can't do it, as a plain sentence ("Bosses aren’t in free mode yet"). */
+  unsupported?: string;
 }
 
-function themeSwitch(request: string, current: GameSpec, themes: ThemeInfo[]): ThemeInfo | undefined {
-  const ws = words(request);
+/** Words that name a place: an explicit request to move the game to another world. */
+const PLACE_NOUNS = new Set(
+  (
+    'cave caves cavern caverns underground forest forests woods jungle meadow meadows field fields grassland ruins ruin city town ' +
+    'factory castle forge volcano mountain mountains peaks desert ocean sea beach island space swamp garden village dungeon ' +
+    'crypt tower temple hills halls mines depths'
+  ).split(' '),
+);
+/** Mood words: may move the game too ("make it spooky"), unless a setting already handled them. */
+const MOOD_WORDS = new Set(
+  'spooky creepy haunted scary eerie gloomy moody melancholy rainy stormy wet grey gray cheerful happy sunny sunlit cozy cosy warm fiery molten burning hellish snowy icy frozen wintry night dark darker lava grass'.split(' '),
+);
+
+/** Requests free mode can't fulfil, with a plain-English name for the honest answer. */
+const UNSUPPORTED: [RegExp, string][] = [
+  [/\bboss(es)?\b/, 'Bosses aren’t in free mode yet'],
+  [/\b(shoot|shoots|shooting|gun|guns|bullets?|lasers?|fireballs?|projectiles?)\b/, 'Shooting isn’t in free mode yet'],
+  [/\b(talk|talks|talking|dialog|dialogue|npcs?|conversation|speech)\b/, 'Talking characters aren’t in free mode yet'],
+  [/\b(shop|store|inventory|items|upgrades?)\b/, 'Shops and items aren’t in free mode yet'],
+  [/\b(multiplayer|co-?op|two players?|2 players?|online)\b/, 'Multiplayer isn’t possible yet'],
+  [/\b(music|song|soundtrack|sound effects?)\b/, 'Changing the music isn’t in free mode yet'],
+  [/\b(dash|grapple|grappling|wall ?jump|glide|swim|swimming|fly|flying)\b/, 'New moves like that aren’t in free mode yet'],
+  [/\b(timer|time limit|countdown)\b/, 'Timers aren’t in free mode yet'],
+  [/\b(puzzles?|keys?|doors?|switch(es)?|levers?)\b/, 'Puzzles aren’t in free mode yet'],
+];
+
+/** Does a request name a place, a mood or a theme? Only then may anything change the world. */
+export function mentionsPlace(request: string, themes: ThemeInfo[]): boolean {
+  const names = new Set(themes.flatMap((t) => [...words(t.name), ...words(t.id)]));
+  return words(request).some((w) => PLACE_NOUNS.has(w) || MOOD_WORDS.has(w) || names.has(w));
+}
+
+function themeSwitch(request: string, current: GameSpec, themes: ThemeInfo[], placesOnly = false): ThemeInfo | undefined {
+  // Only place and mood words (and theme names) count: "add a boss" must never change the world.
+  const names = new Set(themes.flatMap((t) => [...words(t.name), ...words(t.id)]));
+  const all = words(request);
+  if (placesOnly && !all.some((w) => PLACE_NOUNS.has(w) || names.has(w))) return undefined;
+  const ws = all.filter((w) => PLACE_NOUNS.has(w) || MOOD_WORDS.has(w) || names.has(w));
+  if (!ws.length) return undefined;
   const scored = scoreThemes(themes, ws)
     .filter((t) => t.theme.id !== current.theme)
     .sort((a, b) => b.score - a.score);
@@ -482,9 +531,9 @@ export function instantEdit(request: string, spec: GameSpec, backend: Pick<GameB
     said.push(`Renamed it to “${next.title}”`);
   }
 
-  // Genre switch: "make it a shooter"
+  // Genre switch: only when a genre is named outright ("make it a runner"), never "make it a cave".
   const kitScores = scoreKits(backend.kits, words(request)).filter((k) => k.kit.id !== spec.kit).sort((a, b) => b.score - a.score);
-  if (kitScores[0] && kitScores[0].score >= 3 && /\b(make it|turn it into|change it to|switch to|into)\b/.test(text)) {
+  if (kitScores[0] && kitScores[0].score >= 8 && /\b(make it|turn it into|change it to|switch to|into)\b/.test(text)) {
     next = { ...next, kit: kitScores[0].kit.id, params: {} };
     said.push(`Turned it into a ${kitScores[0].kit.name.toLowerCase()}`);
   }
@@ -492,6 +541,14 @@ export function instantEdit(request: string, spec: GameSpec, backend: Pick<GameB
   const kit = backend.kits.find((k) => k.id === next.kit) ?? backend.kits[0]!;
   const params: Params = { ...next.params };
   const touched = new Set<Knob>();
+  const already: string[] = [];
+  // A named place ("take it to the rainy ruins") wins over weather and time words in the same request.
+  const place = rename ? undefined : themeSwitch(request, next, backend.themes, true);
+  if (place) {
+    next.theme = place.id;
+    said.push(`Moved it to the ${place.name}`);
+    touched.add('weather');
+  }
   if (!rename) {
     for (const rule of EDIT_RULES) {
       if (!rule.re.test(text)) continue;
@@ -504,12 +561,13 @@ export function instantEdit(request: string, spec: GameSpec, backend: Pick<GameB
         touched.add(knob);
       }
       if (any && rule.say) said.push(rule.say);
+      else if (!any) already.push(rule.already ?? 'It’s already set that way');
     }
   }
 
   // World switch: "make it snowy", "set it in a spooky cave" (night handled by a param above).
   // If the kit has no night setting, "make it night" falls through to a darker theme.
-  if (!rename && !touched.has('night') && !touched.has('weather')) {
+  if (!rename && !place && !touched.has('night') && !touched.has('weather')) {
     const theme = themeSwitch(request, next, backend.themes);
     if (theme) {
       next.theme = theme.id;
@@ -517,12 +575,25 @@ export function instantEdit(request: string, spec: GameSpec, backend: Pick<GameB
     }
   }
 
+  // Hero swap: "make the hero a robot", "play as a bat" (only to a hero the world can draw).
+  const heroAsk = /\b(?:play as|hero (?:is|to be|into)|make (?:the|my) (?:hero|player|character) (?:an? )?|turn (?:the|my) (?:hero|player) into (?:an? )?|be an?)\s*(.+)$/i.exec(request);
+  const asked = heroAsk ? creatureIn(heroAsk[1]!) : undefined;
+  let heroNote: string | undefined;
+  if (!rename && asked) {
+    const theme = backend.themes.find((t) => t.id === next.theme);
+    const match = theme && heroFor(theme, asked.kind);
+    if (match?.id && match.id !== next.hero) {
+      next.hero = match.id;
+      said.push(`Your hero is now a ${asked.word}`);
+    } else if (!match) heroNote = `This world can’t draw a ${asked.word} yet`;
+  }
+
   const clean = Object.fromEntries(Object.entries(params).filter(([k, v]) => kit.params.find((p) => p.key === k)?.default !== v));
   next.params = clean;
   if (!Object.keys(clean).length) delete next.params;
-  return {
-    spec: next,
-    summary: said.length ? `${said.join('. ')}.` : '',
-    understood: said.length > 0,
-  };
+  if (said.length) return { spec: next, summary: `${said.join('. ')}.`, understood: true };
+  if (heroNote) return { spec, summary: '', understood: false, unsupported: heroNote };
+  if (already.length) return { spec, summary: `${[...new Set(already)].join('. ')}.`, understood: true };
+  const missing = UNSUPPORTED.find(([re]) => re.test(text))?.[1];
+  return { spec, summary: '', understood: false, ...(missing ? { unsupported: missing } : {}) };
 }

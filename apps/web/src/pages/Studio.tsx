@@ -109,6 +109,13 @@ function Studio({ id, initial, title }: { id: string; initial: ProjectFiles; tit
       ? 'This is a demo game. Ask me to change anything: the jumps, the speed, the enemies or the look.'
       : 'Welcome back! What should we change?';
 
+  // "Fresh" only applies to the first visit; a reload shouldn't greet again.
+  const freshOnce = useRef(!!location.state?.fresh);
+  useEffect(() => {
+    if (location.state?.fresh) navigate('.', { replace: true, state: null });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const openAdvanced = () => navigate(`/editor/${id}/advanced`);
   const play = () => navigate(`/play/${id}`);
 
@@ -229,7 +236,7 @@ function Studio({ id, initial, title }: { id: string; initial: ProjectFiles; tit
         {/* Game */}
         <section
           aria-label="Game"
-          className="flex min-h-0 min-w-0 flex-col items-center justify-center gap-4 p-3 sm:p-6 lg:p-8"
+          className="flex min-h-0 min-w-0 flex-col items-center justify-center gap-4 p-0 pb-3 sm:p-6 lg:p-8"
         >
           <div className="flex w-full max-w-[min(100%,calc((100dvh-56px-140px)*16/9))] flex-col gap-3 max-lg:max-w-none">
             <Stage
@@ -237,15 +244,24 @@ function Studio({ id, initial, title }: { id: string; initial: ProjectFiles; tit
               files={studio.files}
               title={studio.title}
               poster={poster}
-              className="shadow-3 ring-1 ring-line"
+              overlayOnPhoneOnly
+              className="shadow-3 ring-line max-sm:rounded-none sm:ring-1"
             />
-            <div className="flex items-center gap-3 px-1">
+            <div className="flex items-center gap-3 sm:px-1">
               <span className="hidden items-center gap-1.5 text-body-sm text-muted sm:inline-flex">
                 <Kbd>←</Kbd>
                 <Kbd>→</Kbd> move <span className="mx-1.5 text-faint">·</span> <Kbd>Space</Kbd> jump
               </span>
-              <span className="text-body-sm text-muted sm:hidden">Tap the game to play</span>
-              <div className="ml-auto flex items-center gap-1">
+              <Button
+                variant="secondary"
+                block
+                icon={<Maximize2 size={16} />}
+                onClick={() => stage.current?.fullscreen()}
+                className="mx-2 sm:hidden"
+              >
+                Play full screen
+              </Button>
+              <div className="ml-auto flex items-center gap-1 max-sm:hidden">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -285,7 +301,7 @@ function Studio({ id, initial, title }: { id: string; initial: ProjectFiles; tit
             {...tabPanelProps(tabsId, 'chat', panel === 'chat')}
             className={cx('min-h-0 flex-1', panel === 'chat' ? 'flex flex-col' : 'hidden')}
           >
-            <ChatPanel studio={studio} intro={intro} />
+            <ChatPanel studio={studio} intro={intro} fresh={freshOnce.current} />
           </div>
           <div
             {...tabPanelProps(tabsId, 'tune', panel === 'tune')}

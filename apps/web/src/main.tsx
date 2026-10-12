@@ -8,7 +8,6 @@ import { ToastProvider } from './ui';
 import { RequireAuth } from './components/AppShell';
 import { Landing } from './pages/Landing';
 import { Pricing } from './pages/Pricing';
-import { Login } from './pages/Login';
 import { ComingSoon, NotFound } from './pages/Placeholder';
 import { RouteError } from './pages/RouteError';
 
@@ -43,6 +42,7 @@ const Play = page(() => import('./pages/Play'), 'PlayPage');
 const Advanced = page(() => import('./pages/Editor'), 'Editor', <PageLoading label="Opening the advanced editor…" />);
 const Dashboard = page(() => import('./pages/Dashboard'), 'Dashboard');
 const Settings = page(() => import('./pages/Settings'), 'Settings');
+const Login = page(() => import('./pages/Login'), 'Login');
 const ArtLab = page(() => import('./pages/ArtLab'), 'ArtLab');
 
 const router = createBrowserRouter([

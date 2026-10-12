@@ -9,6 +9,7 @@ import { checkPlayable, checkProject } from './check';
 import { createGame, editGame } from './game';
 import { suggestions } from './suggest';
 import { instantSpec } from './instant';
+import { creatureIn, heroFor } from './heroes';
 import { encode } from './test-helpers';
 
 /** [prompt, kit, theme]. `null` = any. */
@@ -54,6 +55,20 @@ for (const mode of ['engine', 'stub'] as const) {
       expect(b.readSpec(r.files)).toMatchObject({ kit: r.spec.kit, theme: r.spec.theme });
       expect(checkPlayable(r.files)).toEqual([]);
       expect(checkProject(r.files)).toEqual([]);
+      // Never promise a hero the theme can't draw (critic, round 1).
+      const chosen = b.themes.find((t) => t.id === r.spec.theme)!;
+      for (const w of `${r.title} ${r.summary}`.split(/[^A-Za-z]+/)) {
+        const c = creatureIn(w);
+        if (c) expect(heroFor(chosen, c.kind), `${r.summary} names a ${c.word}`).not.toBeNull();
+      }
+    });
+
+    it('instant time-to-spec is far under the 300 ms bar', () => {
+      const t0 = performance.now();
+      for (const [prompt] of CASES) instantSpec(prompt, backend);
+      const avg = (performance.now() - t0) / CASES.length;
+      console.info(`[degamed/ai] instant time-to-spec (${mode}): ${avg.toFixed(2)} ms average`);
+      expect(avg).toBeLessThan(30);
     });
   });
 }

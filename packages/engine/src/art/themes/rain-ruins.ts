@@ -1,19 +1,17 @@
 /**
  * Rain Ruins: rusted industrial ruins under endless rain. Teal and grey-green fog, colossal
- * towers fading into the haze, pipes and girders overgrown with moss, a pale little creature with
- * a rust-red scarf. Mood reference: Rain World.
+ * towers and a radio mast fading into the haze, pipes and girders overgrown with moss. The hero is
+ * Pip, a little lantern robot in a tarp cape; rust crawler drones skitter about; batteries glow;
+ * a warm-windowed hatch waits at the end.
  */
 import { Canvas, gradient, Ix, MatLayer, Palette, rng, fbm, bayer, type Material } from '../core';
-import { heroSheet } from '../hero';
-import { bigHeroSheet } from '../hero2';
-import { rainBig } from './big-heroes';
+import { castFor, castSheet } from './big-heroes';
 import { cable, crane, mast, elbow, hangingChain, lightShafts, mistBand, overgrow, pipe, pylon, tank, tower, truss } from '../scenery';
 import { crack, derive, pickRamp, px01, tileNoise, TILE } from '../tiles';
 import { backEdges, backWall } from '../tiles';
 import { crackDecal, grateDecal, pipeDecal, rootsDecal } from '../decals';
 import { sheetOf, type Raster } from '../../pixel';
 import type { ArtTheme, ParallaxLayer, PropInfo, SpriteSheet } from '../types';
-import { rainHeroCostume } from './rain-hero';
 import { checkpointSheet, flyerSheet, spikeStrip } from '../extras';
 
 const W = 480;
@@ -418,175 +416,168 @@ function rainTiles(): ArtTheme['tiles'] {
 
 // ── Creatures ───────────────────────────────────────────────────────────────
 
-/** A lizard: dark slate body, hot-pink head, splayed legs, swaying tail. */
-function lizardSheet(): SpriteSheet {
-  const FW = 40;
-  const FH = 20;
+/**
+ * A rust crawler drone: a dented dome on four jointed legs, one red lens that scans, a stubby
+ * antenna. It skitters (8 frames), the lens sweeps while idle and flares before it lunges.
+ */
+function droneSheet(): SpriteSheet {
+  const FW = 36;
+  const FH = 24;
   const pal = new Palette();
-  const [ol, olLit] = pal.ramp(['#06090a', '#1d2a2b']);
-  const body = pal.ramp(['#223032', '#3a4a49', '#576866', '#7d8d85']);
-  const head = pal.ramp(['#5a1438', '#a52d63', '#e2639c', '#ffb0d2']);
-  const [tooth] = pal.ramp(['#f3ece2']);
-  const [tongue] = pal.ramp(['#ff5a7a']);
+  const [ol, olLit] = pal.ramp(['#0a0f10', '#2a3434']);
+  const shell = pal.ramp(['#3a3430', '#6a5a48', '#9a7e5a', '#c8a878']);
+  const rust = pal.ramp(['#5a2a18', '#8a4424']);
+  const [plate, plateLit] = pal.ramp(['#2a3232', '#4a5454']);
+  const [leg, legLit] = pal.ramp(['#1e2626', '#3e4a4a']);
+  const [lensRim, lens, lensHot] = pal.ramp(['#3a0a0a', '#e0302a', '#ffd0a0']);
   const [flash] = pal.ramp(['#ffffff']);
   const frames: Raster[] = [];
-  const HEAD = ['...HHHHH...', '.HHHhhhhHH.', 'HHhhhhhhhhH', 'hhhhhhhhhhh', 'dhhhhhhhhh.'];
-  const JAW = ['.ddhhhhhh..', '..dddddd...'];
-  const draw = (ph: number, mode: 'walk' | 'idle' | 'hurt' | 'bite') => {
+  const draw = (f: number, mode: 'walk' | 'idle' | 'attack' | 'hurt') => {
     const c = new Ix(FW, FH, pal);
-    const spine = 13;
     const walk = mode === 'walk';
-    const sway = (x: number) => Math.sin(ph + x * 0.3) * (walk ? 1 : 0.5);
-    const breathe = mode === 'idle' ? Math.round(Math.sin(ph)) : 0;
-    const bodyY = (x: number) => spine + sway(x) * 0.35 + breathe * 0.5;
-    const leg = (sx: number, phase: number, far: boolean) => {
-      const step = walk ? Math.sin(phase) * 3.5 : 0;
-      const lift = walk ? Math.max(0, Math.cos(phase)) * 2.5 : 0;
-      const col = far ? body[0]! : body[2]!;
-      const col2 = far ? body[0]! : body[1]!;
-      const sy = Math.round(bodyY(sx)) + 1;
-      const ex = Math.round(sx - 1 + step * 0.4);
-      const ey = sy + 2 - Math.round(lift * 0.5);
-      const fx = Math.round(sx + step);
-      const fy = Math.round(FH - 1 - lift);
-      c.line(sx, sy, ex, ey, col, 2);
-      c.line(ex, ey, fx, fy, col2);
-      c.line(ex + 1, ey, fx + 1, fy, col2);
-      c.set(fx + 2, fy, col2);
-      c.set(fx - 1, fy, col2);
+    const bob = walk ? [0, 1, 1, 0, 0, 1, 1, 0][f % 8]! : mode === 'attack' ? -1 : 0;
+    const cx = 17 + (mode === 'attack' ? 2 : 0);
+    const by = 12 + bob;
+    // legs: two pairs (far darker), jointed: knee up above the body line, foot down
+    const legAt = (hipX: number, ph: number, far: boolean) => {
+      const step = walk ? Math.round(Math.sin(ph) * 3) : 0;
+      const lift = walk && Math.cos(ph) > 0.3 ? 2 : 0;
+      const kx = hipX + Math.sign(hipX - cx) * 4 + step;
+      const ky = by - 3 - lift;
+      const fx = hipX + Math.sign(hipX - cx) * 6 + step;
+      const fy = FH - 2 - lift;
+      const col = far ? leg! : legLit!;
+      c.line(hipX, by + 1, kx, ky, col);
+      c.line(kx, ky, fx, fy, col);
+      c.set(fx, fy + 1, col);
     };
-    leg(16, ph + Math.PI, true);
-    leg(27, ph, true);
-    // tail: long, tapering, waving
-    for (let x = 0; x <= 13; x++) {
-      const t = x / 13;
-      const th = Math.max(1, Math.round(0.6 + t * 2.4));
-      const y = Math.round(spine - 1 + sway(x) * (2.2 - t * 1.6) + (1 - t) * 1.5);
-      for (let k = 0; k < th; k++) c.set(x, y + k, k === 0 ? body[2]! : body[1]!);
-    }
-    // body: thick chest, narrower hips and neck
-    for (let x = 12; x <= 31; x++) {
-      const t = (x - 12) / 19;
-      const half = 1.6 + Math.sin(t * Math.PI * 0.9) * 1.6;
-      const cy = bodyY(x);
-      for (let y = Math.round(cy - half); y <= Math.round(cy + half); y++) c.set(x, y, y <= cy - half + 0.6 ? body[3]! : y < cy ? body[2]! : body[1]!);
-    }
-    leg(18, ph, false);
-    leg(29, ph + Math.PI, false);
-    // head: a wedge with a hinged jaw
-    const hx = 29;
-    const hy = Math.round(bodyY(31)) - 5;
-    const open = mode === 'bite' ? (ph > 0.2 ? 3 : 2) : mode === 'idle' && ph > 3 ? 1 : 0;
-    c.grid(JAW, { d: head[0]!, h: head[1]! }, hx, hy + 5 + open);
-    c.grid(HEAD, { H: head[3]!, h: head[2]!, d: head[1]! }, hx, hy);
-    if (open) {
-      for (let k = 0; k < open; k++) for (let x = hx + 1; x <= hx + 9; x++) c.set(x, hy + 5 + k, ol!);
-      for (let x = hx + 2; x <= hx + 9; x += 2) c.set(x, hy + 5, tooth!), c.set(x + 1, hy + 4 + open, tooth!);
-    }
-    // a tongue flick (idle) tastes the air
-    if (mode === 'idle' && ph > 4) {
-      c.line(hx + 8, hy + 4, hx + 9, hy + 4, tongue!);
-      c.set(hx + 10, hy + 3, tongue!);
-      c.set(hx + 10, hy + 5, tongue!);
-    }
-    // the pink colour bleeds down the neck and spots the back
-    for (let x = 22; x < 29; x++) if ((x * 7) % 3 === 0) c.set(x, Math.round(bodyY(x) - 2), head[1]!);
-    for (let x = 14; x < 22; x += 3) c.set(x, Math.round(bodyY(x) - 2), head[0]!);
-    c.rim(0, -1, new Set(body.slice(1)));
+    const ph = (f / 8) * Math.PI * 2;
+    legAt(cx - 5, ph + Math.PI, true);
+    legAt(cx + 5, ph, true);
+    // chassis plate and dome
+    c.rect(cx - 9, by, 18, 3, plate!);
+    for (let x = cx - 9; x < cx + 9; x++) c.set(x, by, plateLit!);
+    c.ellipse(cx, by, 9, 7, (x, y, nx, ny) => (y >= by ? 0 : shell[Math.max(0, Math.min(3, Math.round(1.6 - ny * 1.5 + nx * 0.4)))]!));
+    // dents and rust
+    c.set(cx - 4, by - 4, rust[1]!);
+    c.set(cx - 3, by - 4, rust[0]!);
+    c.set(cx - 5, by - 2, rust[0]!);
+    c.set(cx + 2, by - 6, shell[3]!);
+    for (let x = cx - 8; x < cx + 8; x += 3) c.set(x, by + 2, rust[0]!);
+    // lens: sweeps while idle, flares on attack
+    const look = mode === 'idle' ? [0, 1, 2, 1][f % 4]! : 2;
+    const lx = cx + 5 + look - 2;
+    c.ellipse(lx, by - 3, 2.6, 2.6, lensRim!);
+    c.ellipse(lx, by - 3, 1.6, 1.6, lens!);
+    c.set(lx, by - 4, lensHot!);
+    if (mode === 'attack') c.set(lx + 1, by - 3, lensHot!), c.set(lx - 1, by - 3, lensHot!);
+    // antenna
+    c.line(cx - 3, by - 7, cx - 5, by - 11 + (walk ? f % 2 : 0), plateLit!);
+    c.set(cx - 5, by - 12 + (walk ? f % 2 : 0), lens!);
+    // near legs over the body
+    legAt(cx - 4, ph, false);
+    legAt(cx + 6, ph + Math.PI, false);
+    c.rim(0, -1, new Set(shell));
     c.outline(ol!, olLit!);
     if (mode === 'hurt') for (let i = 0; i < c.px.length; i++) if (c.px[i] && c.px[i] !== ol) c.px[i] = flash!;
     frames.push(c.toRaster());
   };
-  for (let f = 0; f < 8; f++) draw((f / 8) * Math.PI * 2, 'walk');
-  for (let f = 0; f < 4; f++) draw((f / 4) * Math.PI * 2, 'idle');
-  draw(0, 'bite');
-  draw(0.5, 'bite');
+  for (let f = 0; f < 8; f++) draw(f, 'walk');
+  for (let f = 0; f < 4; f++) draw(f, 'idle');
+  draw(0, 'attack');
   draw(0, 'hurt');
   return {
     raster: sheetOf(frames),
     frameWidth: FW,
     frameHeight: FH,
     animations: {
-      walk: { frames: [0, 1, 2, 3, 4, 5, 6, 7], fps: 12, loop: true },
-      idle: { frames: [8, 9, 10, 11, 11, 10], fps: 4, loop: true },
-      attack: { frames: [12, 13, 12], fps: 10, loop: false },
-      hurt: { frames: [14, 0, 14, 0], fps: 14, loop: false },
+      walk: { frames: [0, 1, 2, 3, 4, 5, 6, 7], fps: 14, loop: true },
+      idle: { frames: [8, 9, 10, 11, 10, 9], fps: 4, loop: true },
+      attack: { frames: [12, 12, 0], fps: 10, loop: false },
+      hurt: { frames: [13, 0, 13, 0], fps: 14, loop: false },
     },
-    hitbox: { x: 12, y: 8, w: 27, h: 12 },
-    anchor: { x: 24, y: 19 },
+    hitbox: { x: 6, y: 5, w: 24, h: 18 },
+    anchor: { x: 18, y: 23 },
   };
 }
 
-/** A glowing pearl that bobs and pulses. */
-function pearlSheet(): SpriteSheet {
-  const S = 14;
+/** A charged battery cell: glowing bars, a little bolt, bobbing and pulsing. */
+function batterySheet(): SpriteSheet {
+  const FW = 14;
+  const FH = 18;
   const frames: Raster[] = [];
   for (let f = 0; f < 8; f++) {
-    const c = new Canvas(S, S);
+    const c = new Canvas(FW, FH);
     const bob = Math.round(Math.sin((f / 8) * Math.PI * 2) * 1.2);
-    const pulse = 0.75 + 0.25 * Math.sin((f / 8) * Math.PI * 2);
-    const cx = 7;
-    const cy = 7 + bob;
-    c.glow(cx, cy, 6.5, C.glow, 0.55 * pulse);
-    c.disc(cx, cy, 3, '#1f7d70');
-    c.disc(cx, cy - 0.3, 2.6, '#4fd8bf');
-    c.disc(cx + 0.3, cy - 0.5, 1.7, '#a8fbe9');
-    c.set(cx, cy - 2, '#ffffff');
-    c.set(cx - 1, cy - 1, '#e8fff9');
+    const pulse = 0.6 + 0.4 * Math.sin((f / 8) * Math.PI * 2);
+    const x0 = 3;
+    const y0 = 3 + bob;
+    c.glow(7, y0 + 7, 8, C.glow, 0.45 * pulse);
+    // cap
+    c.fillRect(x0 + 2, y0, 4, 2, C.steel[3]!);
+    c.set(x0 + 2, y0, C.steel[4]!);
+    // casing: shaded cylinder
+    const shade = [C.steel[1]!, C.steel[3]!, C.steel[4]!, C.steel[3]!, C.steel[2]!, C.steel[2]!, C.steel[1]!, C.steel[0]!];
+    for (let y = 2; y < 13; y++) for (let i = 0; i < 8; i++) c.set(x0 + i, y0 + y, shade[i]!);
+    // charge window with bars filling up
+    const lit = 1 + (f % 4);
+    for (let k = 0; k < 4; k++) for (let i = 2; i < 6; i++) c.set(x0 + i, y0 + 11 - k * 2, k < lit ? (k === lit - 1 ? '#c8fff0' : C.glow) : '#1a3a38');
+    // bolt
+    c.set(x0 + 5, y0 + 3, '#fff6c0');
+    c.set(x0 + 4, y0 + 4, '#fff6c0');
+    c.set(x0 + 5, y0 + 4, '#fff6c0');
+    c.set(x0 + 4, y0 + 5, '#fff6c0');
     if (f === 2 || f === 3) {
-      const sx = f === 2 ? 11 : 10;
-      c.set(sx, 2, '#ffffff');
-      c.set(sx - 1, 2, '#bdf7ea', 0.7);
-      c.set(sx + 1, 2, '#bdf7ea', 0.7);
-      c.set(sx, 1, '#bdf7ea', 0.7);
-      c.set(sx, 3, '#bdf7ea', 0.7);
+      c.set(12, 2, '#ffffff');
+      c.set(11, 2, '#bdf7ea', 0.7);
+      c.set(12, 1, '#bdf7ea', 0.7);
+      c.set(12, 3, '#bdf7ea', 0.7);
+      c.set(13, 2, '#bdf7ea', 0.7);
     }
     frames.push(c.toRaster());
   }
-  return { raster: sheetOf(frames), frameWidth: S, frameHeight: S, animations: { idle: { frames: [0, 1, 2, 3, 4, 5, 6, 7], fps: 9, loop: true } } };
+  return { raster: sheetOf(frames), frameWidth: FW, frameHeight: FH, animations: { idle: { frames: [0, 1, 2, 3, 4, 5, 6, 7], fps: 9, loop: true } } };
 }
 
-/** The shelter gate: a heavy rusted doorway under a glowing glyph. */
-function gateSheet(): SpriteSheet {
+/** Home: a rusted round-topped hatch in a concrete frame, its porthole glowing warm. */
+function hatchSheet(): SpriteSheet {
   const FW = 32;
   const FH = 48;
+  const K = C.concrete;
+  const S = C.steel;
   const frames: Raster[] = [];
   for (let f = 0; f < 6; f++) {
     const c = new Canvas(FW, FH);
     const pulse = 0.6 + 0.4 * Math.sin((f / 6) * Math.PI * 2);
-    // dark interior with a faint warm floor glow
-    for (let y = 18; y < FH; y++) for (let x = 7; x < 25; x++) c.set(x, y, y > 40 ? '#18221f' : '#0a0f10');
-    for (let x = 8; x < 24; x++) c.set(x, 46, '#2c3a30', 0.6 + pulse * 0.3);
-    // posts
-    for (const px of [3, 25]) {
-      for (let y = 16; y < FH; y++) {
-        c.set(px, y, C.steel[1]!);
-        c.set(px + 1, y, C.steel[3]!);
-        c.set(px + 2, y, C.steel[2]!);
-        c.set(px + 3, y, C.steel[1]!);
-        if (y % 8 === 3) c.set(px + 1, y, C.steel[4]!), c.set(px + 2, y, C.steel[4]!);
+    // concrete frame
+    for (let y = 8; y < FH; y++) for (let x = 2; x < 30; x++) c.set(x, y, x < 5 ? K[3]! : x > 26 ? K[2]! : K[4]!);
+    for (let x = 2; x < 30; x++) c.set(x, 8, K[5]!), c.set(x, 9, K[4]!);
+    // the hatch: rounded top, riveted steel with rust
+    for (let y = 12; y < FH; y++)
+      for (let x = 7; x < 25; x++) {
+        if (y < 20 && Math.hypot(x + 0.5 - 16, y - 20) > 9) continue;
+        c.set(x, y, x < 10 ? S[1]! : x > 21 ? S[1]! : S[2]!);
       }
-      for (let y = 30; y < 36; y++) c.set(px + 2, y, C.rust[2]!), c.set(px + 1, y + 2, C.rust[1]!);
-    }
-    // lintel
-    for (let x = 1; x < 31; x++) {
-      c.set(x, 13, C.steel[4]!);
-      c.set(x, 14, C.steel[3]!);
-      c.set(x, 15, C.steel[2]!);
-      c.set(x, 16, C.steel[1]!);
-      c.set(x, 17, C.steel[0]!);
-    }
-    for (let x = 2; x < 30; x += 3) if (px01(x, 1, 3) > 0.5) c.set(x, 12, C.moss[3]!), c.set(x, 11, C.moss[2]!, 0.8);
-    // glyph: ring with a karma-like mark
-    const gx = 16;
-    const gy = 6;
-    c.glow(gx, gy, 10, '#bff5dc', 0.35 * pulse);
-    for (let a = 0; a < Math.PI * 2; a += 0.05) c.set(Math.round(gx - 0.5 + Math.cos(a) * 4.6), Math.round(gy - 0.5 + Math.sin(a) * 4.6), '#e9fff3', 0.6 + 0.4 * pulse);
-    for (let y = gy - 3; y <= gy + 2; y++) c.set(gx, y, '#e9fff3', 0.7 + 0.3 * pulse);
-    c.set(gx - 2, gy - 1, '#e9fff3', 0.8);
-    c.set(gx + 2, gy - 1, '#e9fff3', 0.8);
-    c.set(gx - 1, gy + 1, '#e9fff3', 0.8);
-    c.set(gx + 1, gy + 1, '#e9fff3', 0.8);
+    for (const x of [8, 23]) for (let y = 20; y < FH; y += 5) c.set(x, y, S[4]!);
+    for (let y = 30; y < 44; y++) if ((y * 7) % 5 < 2) c.set(11 + (y % 3), y, C.rust[1]!);
+    // handle wheel
+    c.set(20, 34, S[4]!);
+    c.set(19, 34, S[3]!);
+    c.set(21, 34, S[3]!);
+    c.set(20, 33, S[3]!);
+    c.set(20, 35, S[3]!);
+    // warm porthole: someone is home
+    c.glow(16, 22, 9, C.lamp, 0.45 * pulse);
+    c.disc(16, 22, 4.5, S[0]!);
+    c.disc(16, 22, 3.5, '#ffb84a');
+    c.disc(15.5, 21.5, 2, '#ffe6a0');
+    c.set(15, 20, '#ffffff');
+    // a little green lamp above the hatch blinks
+    c.set(16, 5, f % 3 === 0 ? '#7aff9a' : '#2a6a3a');
+    if (f % 3 === 0) c.glow(16, 5, 4, '#7aff9a', 0.6);
+    c.fillRect(14, 6, 5, 2, S[2]!);
+    // moss on the frame
+    for (let x = 2; x < 30; x += 1) if (((x * 13) % 7) < 2) c.set(x, 7, C.moss[3]!);
     frames.push(c.toRaster());
   }
   return { raster: sheetOf(frames), frameWidth: FW, frameHeight: FH, animations: { idle: { frames: [0, 1, 2, 3, 4, 5], fps: 6, loop: true } }, anchor: { x: 16, y: 47 } };
@@ -656,7 +647,7 @@ function props(): { props: Record<string, Raster>; info: Record<string, PropInfo
     out.grass = c.toRaster();
     info.grass = { anchor: 'ground', weight: 6 };
   }
-  // reeds with seed heads (pole plant)
+  // reeds with seed heads
   {
     const c = new Canvas(16, 30);
     const r = rng(12);
@@ -763,8 +754,8 @@ function decals(): Record<string, Raster> {
 export const RAIN_RUINS_META = {
   id: 'rain-ruins',
   name: 'Rain Ruins',
-  description: 'Moody rain-soaked industrial ruins in teal fog: rusted towers, pipes, moss and a small pale creature with a red scarf.',
-  keywords: ['rain', 'ruins', 'industrial', 'moody', 'dark', 'robot', 'city', 'rust', 'pipes', 'factory', 'fog', 'abandoned', 'post-apocalyptic', 'creature', 'survival', 'storm', 'wet', 'grey', 'melancholy', 'atmospheric'],
+  description: 'Moody rain-soaked industrial ruins in teal fog: rusted towers, a radio mast, pipes and moss. A little lantern robot looks for home.',
+  keywords: ['rain', 'ruins', 'industrial', 'city', 'factory', 'pipes', 'rust', 'fog', 'abandoned', 'post-apocalyptic', 'storm', 'wet', 'grey', 'moody', 'melancholy', 'lonely', 'overgrown', 'sewer', 'urban', 'atmospheric'],
   palette: [C.skyTop, C.skyMid, C.horizon, C.haze, ...C.concrete, ...C.moss, ...C.rust, ...C.steel, C.glow, C.lamp, '#eceadd', '#d4603a'],
   background: C.skyTop,
 };
@@ -776,22 +767,23 @@ export function rainRuins(): ArtTheme {
     layers: layers(),
     tiles: rainTiles(),
     sprites: {
-      hero: bigHeroSheet(rainBig()),
-      heroSmall: heroSheet(rainHeroCostume()),
-      enemy: lizardSheet(),
-      pickup: pearlSheet(),
-      goal: gateSheet(),
+      hero: castSheet('robot'),
+      enemy: droneSheet(),
+      pickup: batterySheet(),
+      goal: hatchSheet(),
       flyer: flyerSheet({ body: ['#1b2224', '#2e3a3a', '#4a5856'], wing: ['#3e4c4a', '#8fa59c', '#c4d4cb'], eye: '#e8f06a', outline: '#070b0c', glowEye: true }),
       checkpoint: checkpointSheet({ post: C.steel.slice(0, 3), cage: C.steel[3]!, glow: C.lamp, core: '#fff6d8', outline: '#0b1213' }),
     },
     props: p,
     propInfo: info,
+    heroes: castFor('robot'),
     decals: decals(),
     tileSize: TILE,
     lights: {
       hero: { color: '#cfe8df', radius: 46, intensity: 0.35 },
       pickup: { color: C.glow, radius: 40, intensity: 0.8, flicker: 0.05 },
-      goal: { color: '#bff5dc', radius: 72, intensity: 0.8, flicker: 0.04 },
+      goal: { color: C.lamp, radius: 72, intensity: 0.8, flicker: 0.04 },
+      enemy: { color: '#ff5a3a', radius: 22, intensity: 0.35, flicker: 0.1 },
     },
     environment: {
       ambient: { color: '#e0f0ec', intensity: 0.86 },

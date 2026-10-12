@@ -402,7 +402,10 @@ export class Ix {
       for (let x = Math.floor(cx - rx - 1); x <= cx + rx + 1; x++) {
         const nx = (x + 0.5 - cx) / rx;
         const ny = (y + 0.5 - cy) / ry;
-        if (nx * nx + ny * ny <= 1) this.set(x, y, typeof c === 'number' ? c : c(x, y, nx, ny));
+        if (nx * nx + ny * ny > 1) continue;
+        // a callback returning 0 means "leave this pixel alone"
+        const v = typeof c === 'number' ? c : c(x, y, nx, ny);
+        if (v || typeof c === 'number') this.set(x, y, v);
       }
   }
   poly(pts: [number, number][], c: number | ((x: number, y: number) => number)): void {

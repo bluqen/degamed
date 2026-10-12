@@ -1,23 +1,36 @@
 /**
- * Costumes for the big (round 2) heroes: a hand-drawn 14 px head per theme with blink and hurt
- * faces, plus hue-shifted ramps for cloak, legs, boots, hands, scarf and weapon.
+ * The original cast for the big (round 2) heroes. Each has a hand-drawn 14 px head with blink
+ * and hurt faces, hue-shifted ramps and its own piece of secondary motion:
+ *
+ * - Pip, a small lantern robot: yellow dome, one big glowing eye, a springy antenna with a bulb,
+ *   a patched tarp cape.
+ * - Lumen, a moth lantern bearer: feathery antennae, big glowing eyes, a mantle of folded dusty
+ *   wings with eyespots, a lantern swinging on a rope.
+ * - Fen, a fox kid: big ears, white muzzle, green hooded tunic, a huge bushy tail.
+ * - Ash, a forge warden: crested iron helm with a glowing visor, a flame plume, a verdigris cloak
+ *   bright enough to stand out against hot brick.
  */
 import { Palette } from '../core';
-import type { BigCostume } from '../hero2';
+import { bigHeroSheet, type BigCostume } from '../hero2';
+import type { HeroVariant, SpriteSheet } from '../types';
 
-/** Rain Ruins: a small pale creature with long ears, big dark eyes, a rust scarf and a tail. */
-export function rainBig(): BigCostume {
+/** Pip: a small lantern robot in a tarp cape. */
+export function robotBig(): BigCostume {
   const pal = new Palette();
-  const [outline, outlineLit] = pal.ramp(['#0b1315', '#253537']);
-  const cloak = pal.ramp(['#3e4b4e', '#7b8783', '#bfc2b4', '#eceadd']);
-  const [l0, l1] = pal.ramp(['#8f998f', '#c9cbbd']);
-  const [b0, b1] = pal.ramp(['#6f7a72', '#a9ada0']);
-  const [hand] = pal.ramp(['#dcdacb']);
-  const scarf = pal.ramp(['#561c19', '#99331f', '#d4603a']);
+  const [outline, outlineLit] = pal.ramp(['#0b1315', '#2b3a3a']);
+  const cloak = pal.ramp(['#2a3328', '#4a5a40', '#6f8254', '#a2b47a']);
+  const [l0, l1] = pal.ramp(['#4a5352', '#7d8784']);
+  const [b0, b1] = pal.ramp(['#2e3433', '#59615e']);
+  const [hand] = pal.ramp(['#8d9592']);
+  const cable = pal.ramp(['#2e3433', '#59615e', '#8d9592']);
   const weapon = pal.ramp(['#3a3128', '#b5a888', '#f2ead2']);
-  const slash = pal.ramp(['#5f9d93', '#bdefe3', '#ffffff']);
-  const [d, a, b, c] = pal.ramp(['#5d6a6a', '#9aa39c', '#d9d9cb', '#f6f4ea']);
-  const [e, w] = pal.ramp(['#0b1315', '#ffffff']);
+  const slash = pal.ramp(['#4fb8c8', '#c4f4ff', '#ffffff']);
+  const [o, y, Y] = pal.ramp(['#9a5a1a', '#e09a2a', '#ffd25a']);
+  const [r] = pal.ramp(['#7a3a1a']);
+  const [m, M] = pal.ramp(['#3e4544', '#7d8784']);
+  const [g, E, W] = pal.ramp(['#0e2a30', '#3fe0e8', '#e8ffff']);
+  const [bulb, bulbHi] = pal.ramp(['#ff5a3a', '#ffd0a0']);
+  const [patch, stitch] = pal.ramp(['#5a4a32', '#c9b07a']);
   const [flash] = pal.ramp(['#ffffff']);
   return {
     pal,
@@ -27,53 +40,59 @@ export function rainBig(): BigCostume {
     legs: [l0!, l1!],
     boots: [b0!, b1!],
     hand: hand!,
-    scarf,
+    scarf: cable,
     weapon,
     slash,
     flash: flash!,
     head: {
       anchorX: 6,
-      map: { d: d!, a: a!, b: b!, c: c!, e: e!, w: w! },
+      map: { o: o!, y: y!, Y: Y!, r: r!, m: m!, M: M!, g: g!, E: E!, W: W! },
       rows: [
-        '...b......b...',
-        '..bb.....bc...',
-        '..abb...bbc...',
-        '..abbbbbbbcc..',
-        '.aabbbbbbbbcc.',
-        '.abbbbbbbbbbc.',
-        'aabbbbwebbwebc',
-        'aabbbbeebbeebc',
-        'aabbbbeebbeebb',
-        '.aabbbbbbbbbb.',
-        '..aabbbbbbbb..',
-        '...daaaaaaa...',
+        '.....mMMm.....',
+        '...yyyyyyYY...',
+        '..yyyyyyyyYY..',
+        '.oyyyyyyyyyYY.',
+        '.oyyyyyggggyY.',
+        'ooyyyyggEEEgyY',
+        'ooyyyygEEWEEgy',
+        'ooyryygEEEEEgy',
+        'ooyyyyggEEEgyy',
+        '.ooyyyyggggyy.',
+        '.oMMMMMMMMMMM.',
+        '..mmmmmmmmmm..',
       ],
     },
-    blink: { 6: 'aabbbbbbbbbbbc', 7: 'aabbbbeebbeebc', 8: 'aabbbbbbbbbbbb' },
-    hurtFace: { 6: 'aabbbbewbbewbc', 7: 'aabbbbbebbbebc', 8: 'aabbbbebbbebbb' },
-    scarfLen: 9,
-    scarfWidth: 3,
-    scarfAt: [-1, -1],
-    tail: { ramp: [a!, b!], len: 7 },
-    weaponLen: 15,
+    blink: { 5: 'ooyyyyggggggyY', 6: 'ooyyyygEEEEEgy', 7: 'ooyryygggggggy', 8: 'ooyyyyggggggyy' },
+    hurtFace: { 5: 'ooyyyyggEgEgyY', 6: 'ooyyyyggWEggyy', 7: 'ooyryyggEgEgyy', 8: 'ooyyyyggggggyy' },
+    scarfLen: 6,
+    scarfWidth: 1,
+    chainRoot: 'head',
+    chainAt: [7, 0],
+    chainMode: 'up',
+    chainTip: { rows: ['.b.', 'bBb', '.b.'], map: { b: bulb!, B: bulbHi! } },
+    emblem: { rows: ['pppp', 'pspp', 'ppsp', 'pppp'], map: { p: patch!, s: stitch! }, dx: -4, dy: -3 },
+    weaponLen: 12,
     hemCut: 1,
-    knot: true,
   };
 }
 
-/** Hollow Caverns: a horned bone mask with deep black eyes, dark cloak, cape tail and a nail. */
-export function hollowBig(): BigCostume {
+/** Lumen: a moth lantern bearer. */
+export function mothBig(): BigCostume {
   const pal = new Palette();
-  const [outline, outlineLit] = pal.ramp(['#03040a', '#1a2440']);
-  const cloak = pal.ramp(['#0b0e1c', '#192037', '#29345a', '#43547f']);
-  const [l0, l1] = pal.ramp(['#151a30', '#28304f']);
-  const [b0, b1] = pal.ramp(['#07080f', '#11152a']);
-  const [hand] = pal.ramp(['#232b49']);
-  const scarf = pal.ramp(['#141a30', '#232d4d', '#36456e']);
-  const weapon = pal.ramp(['#3e4660', '#a9b4cc', '#f1f5ff']);
-  const slash = pal.ramp(['#6f8fd0', '#cfe2ff', '#ffffff']);
-  const [s, g, w] = pal.ramp(['#7d88a6', '#c3cbe0', '#f4f6fb']);
-  const [e, E] = pal.ramp(['#05060c', '#8fe3ff']);
+  const [outline, outlineLit] = pal.ramp(['#120a14', '#3a2a40']);
+  const cloak = pal.ramp(['#3a2a40', '#6a5072', '#a0849e', '#d6c2cc']);
+  const [l0, l1] = pal.ramp(['#2a1e30', '#4a3a52']);
+  const [b0, b1] = pal.ramp(['#1e1624', '#3a2e42']);
+  const [hand] = pal.ramp(['#d8c8b8']);
+  const rope = pal.ramp(['#5a4630', '#8a6e48', '#b89868']);
+  const weapon = pal.ramp(['#6a4a20', '#f0b040', '#fff0b0']);
+  const slash = pal.ramp(['#e0a040', '#ffe0a0', '#fffaf0']);
+  const [d, f, F] = pal.ramp(['#8a7c78', '#d8ccc0', '#f6f0e6']);
+  const [a, A] = pal.ramp(['#6a5a50', '#c8b49a']);
+  const [e, E, W] = pal.ramp(['#0e3a40', '#46d8d0', '#e0fffa']);
+  const [spotO, spotI] = pal.ramp(['#4a2a1a', '#e0a040']);
+  const [lg, lG, lW] = pal.ramp(['#a0601a', '#ffc04a', '#fff6c0']);
+  const [lf] = pal.ramp(['#3a2a20']);
   const [flash] = pal.ramp(['#ffffff']);
   return {
     pal,
@@ -83,54 +102,62 @@ export function hollowBig(): BigCostume {
     legs: [l0!, l1!],
     boots: [b0!, b1!],
     hand: hand!,
-    scarf,
+    scarf: rope,
     weapon,
     slash,
     flash: flash!,
     head: {
       anchorX: 6,
-      map: { s: s!, g: g!, w: w!, e: e!, E: E! },
+      map: { d: d!, f: f!, F: F!, a: a!, A: A!, e: e!, E: E!, W: W! },
       rows: [
-        '..w........w..',
-        '..ww......ww..',
-        '...w......w...',
-        '...ww....ww...',
-        '....wwwwwww...',
-        '..wwwwwwwwwww.',
-        '.gwwwwwwwwwwww',
-        '.gwwwEewwwEeww',
-        'gwwweeewweeeww',
-        'gwwweeewweeeww',
-        'gwwwweewwweeww',
-        'sgwwwwwwwwwwwg',
-        '.sggwwwwwwwgg.',
-        '..ssgggggggs..',
+        'A..........A..',
+        'aA.A.....AaA..',
+        '.aaA....AaaA..',
+        '..aaa..aaa....',
+        '....affffa....',
+        '...dfffFFFf...',
+        '..dffffffFFf..',
+        '.dffeEffffeEE.',
+        'dfffEEffeEEWE.',
+        'dfffEEffeEEEEf',
+        'dffffeffeEEEEf',
+        '.dfffffffeeef.',
+        '..dFFfFFFfFF..',
+        '...dFFFdFFd...',
       ],
     },
-    blink: { 7: '.gwwwwwwwwwwww', 8: 'gwwweeewweeeww', 9: 'gwwwwwwwwwwwww', 10: 'gwwwwwwwwwwwww' },
-    hurtFace: { 7: '.gwwwwwwwwwwww', 8: 'gwwwEeewwEeeww', 9: 'gwwwweewwweeww', 10: 'gwwwwwwwwwwwww' },
-    scarfLen: 7,
-    scarfWidth: 4,
-    scarfAt: [1, 1],
-    weaponLen: 14,
+    blink: { 7: '.dffffffffffff', 8: 'dfffeeffeeeeef', 9: 'dfffffffffffff', 10: 'dfffffffffffff' },
+    hurtFace: { 7: '.dffeEffffeEE.', 8: 'dfffEEffeEWEE.', 9: 'dfffeeffeeeeef', 10: 'dfffffffffffff' },
+    scarfLen: 5,
+    scarfWidth: 1,
+    chainRoot: 'hand',
+    chainAt: [0, 1],
+    chainMode: 'hang',
+    chainFront: true,
+    chainTip: { rows: ['.f.', 'fff', 'gGg', 'GWG', 'gGg', 'fff'], map: { f: lf!, g: lg!, G: lG!, W: lW! } },
+    emblem: { rows: ['.oo.', 'oiio', 'oiio', '.oo.'], map: { o: spotO!, i: spotI! }, dx: -6, dy: -4 },
+    weaponLen: 11,
   };
 }
 
-/** Sunlit Meadow: a red-haired climber with a bouncing braid, blue jacket and brown boots. */
-export function meadowBig(): BigCostume {
+/** Fen: a fox kid with a huge bushy tail. */
+export function foxBig(): BigCostume {
   const pal = new Palette();
-  const [outline, outlineLit] = pal.ramp(['#2a1a2e', '#5a3a4a']);
-  const cloak = pal.ramp(['#1b2558', '#2f4f9e', '#4a80d6', '#8cc0f5']);
-  const [l0, l1] = pal.ramp(['#33243a', '#4d3652']);
-  const [b0, b1] = pal.ramp(['#5a2f2a', '#8a4a35']);
-  const [hand] = pal.ramp(['#f2b48c']);
-  const hair = pal.ramp(['#7a1f2e', '#c4392f', '#ef6d3a']);
-  const weapon = pal.ramp(['#5a4a5a', '#c9c2d0', '#ffffff']);
+  const [outline, outlineLit] = pal.ramp(['#2a1a1e', '#5a3a2e']);
+  const cloak = pal.ramp(['#1e4a2e', '#2f6e3e', '#4a9a50', '#86c870']);
+  const [l0, l1] = pal.ramp(['#4a2e26', '#6e4434']);
+  const [b0, b1] = pal.ramp(['#2e1e1e', '#4a3030']);
+  const [hand] = pal.ramp(['#e07a32']);
+  const tail = pal.ramp(['#a8461a', '#e07a32', '#ffaa5a']);
+  const [tip] = pal.ramp(['#fff6ea']);
+  const weapon = pal.ramp(['#5a3a20', '#b98a52', '#f0d8a0']);
   const slash = pal.ramp(['#ffb36b', '#fff0c2', '#ffffff']);
-  const [S, s, sl] = pal.ramp(['#c97a62', '#f2b48c', '#ffd9b8']);
-  const [e, bl] = pal.ramp(['#2a1a2e', '#ef7f7f']);
+  const [r, o, O] = pal.ramp(['#a8461a', '#e07a32', '#ffaa5a']);
+  const [w, W] = pal.ramp(['#e8d8c8', '#fffaf2']);
+  const [i] = pal.ramp(['#f0a0a0']);
+  const [n, e] = pal.ramp(['#1e1418', '#2a1a1e']);
+  const [scarf] = pal.ramp(['#ffd25e']);
   const [flash] = pal.ramp(['#ffffff']);
-  const [d, h, H] = hair as [number, number, number];
   return {
     pal,
     outline: outline!,
@@ -139,51 +166,55 @@ export function meadowBig(): BigCostume {
     legs: [l0!, l1!],
     boots: [b0!, b1!],
     hand: hand!,
-    scarf: hair,
+    scarf: tail,
     weapon,
     slash,
     flash: flash!,
     head: {
       anchorX: 6,
-      map: { d, h, H, s: s!, S: S!, l: sl!, e: e!, b: bl! },
+      map: { r: r!, o: o!, O: O!, w: w!, W: W!, i: i!, n: n!, e: e!, s: scarf! },
       rows: [
-        '....hhhhh.....',
-        '..dhhHHHHh....',
-        '.dhhhhhHHHh...',
-        'dhhhhhhhhHHh..',
-        'dhhhhhhhhhhhh.',
-        'dhhhhhhhshhhh.',
-        'ddhhhhhssshhss',
-        'ddhhhSsssssssl',
-        'ddhhhSssessess',
-        'ddhhhSssessess',
-        '.dhhhSsssbsssb',
-        '..dhhSSsssssS.',
-        '....SSSSSSS...',
+        '..r.......r...',
+        '..rr.....roO..',
+        '..rir...rioO..',
+        '..riroooorioO.',
+        '..rooooooooOO.',
+        '.roooooooooooO',
+        'rrooooooeooo..',
+        'rroooooeeoowW.',
+        'rrooooowwWWWWW',
+        '.rooowwwWWWWWn',
+        '..rrwwwwWWW...',
+        '...sssssss....',
       ],
     },
-    blink: { 8: 'ddhhhSssssssss', 9: 'ddhhhSssessess' },
-    hurtFace: { 8: 'ddhhhSsseesees', 9: 'ddhhhSssssssss' },
-    scarfLen: 7,
+    blink: { 6: 'rrooooooooooo.', 7: 'rroooooeeoowW.' },
+    hurtFace: { 6: 'rrooooooeooo..', 7: 'rrooooeooeowW.' },
+    scarfLen: 8,
     scarfWidth: 4,
-    chainFromHead: [1, 2],
-    weaponLen: 13,
+    chainRoot: 'hip',
+    chainAt: [-4, 2],
+    chainWidths: [3, 4, 5, 5, 5, 5, 4, 3, 2],
+    chainTipColor: tip!,
+    chainTipFrom: 0.72,
+    weaponLen: 12,
     hemCut: 3,
   };
 }
 
-/** Ember Forge: a crested iron helm with a glowing visor and a flame plume. */
+/** Ash: a forge warden with a crested helm and a flame plume. */
 export function emberBig(): BigCostume {
   const pal = new Palette();
-  const [outline, outlineLit] = pal.ramp(['#0a0508', '#3a1a14']);
-  const cloak = pal.ramp(['#0b1c22', '#163a40', '#22585c', '#3f8580']);
-  const [l0, l1] = pal.ramp(['#1c1216', '#33262a']);
-  const [b0, b1] = pal.ramp(['#3a2e30', '#6e5a54']);
-  const [hand] = pal.ramp(['#6e5a54']);
-  const flame = pal.ramp(['#c2361a', '#ff8a2a', '#ffd76a']);
-  const weapon = pal.ramp(['#3a2e30', '#b9a59a', '#fff3e0']);
+  const [outline, outlineLit] = pal.ramp(['#0a0508', '#a0521e']);
+  // a light verdigris cloak so the hero stays well above the hot, dark brick in value
+  const cloak = pal.ramp(['#1f5a5a', '#3a8a82', '#62b8a4', '#a8ecd2']);
+  const [l0, l1] = pal.ramp(['#4a3a36', '#7a6458']);
+  const [b0, b1] = pal.ramp(['#6e5a54', '#a48c7c']);
+  const [hand] = pal.ramp(['#a48c7c']);
+  const flame = pal.ramp(['#e0461a', '#ffa03a', '#ffe68a']);
+  const weapon = pal.ramp(['#4a3a3a', '#d8c4b4', '#fff6e8']);
   const slash = pal.ramp(['#e0561e', '#ffc35a', '#fff6d6']);
-  const [m, M, h] = pal.ramp(['#4a3a3a', '#86705f', '#dcc3a6']);
+  const [m, M, h] = pal.ramp(['#7a6458', '#b89c84', '#f4dcc0']);
   const [g, G] = pal.ramp(['#ff8a2a', '#fff0a0']);
   const [flash] = pal.ramp(['#ffffff']);
   return {
@@ -224,4 +255,35 @@ export function emberBig(): BigCostume {
     chainFromHead: [6, 0],
     weaponLen: 15,
   };
+}
+
+/** The cast: every theme offers all of them (its own hero first), so prompts can pick one. */
+export const CAST: { id: string; name: string; keywords: string[]; costume: () => BigCostume }[] = [
+  { id: 'robot', name: 'Pip the lantern robot', keywords: ['robot', 'droid', 'android', 'machine', 'bot', 'mech', 'cyborg'], costume: robotBig },
+  { id: 'moth', name: 'Lumen the moth', keywords: ['moth', 'bug', 'insect', 'butterfly', 'lantern', 'wings', 'beetle'], costume: mothBig },
+  { id: 'fox', name: 'Fen the fox', keywords: ['fox', 'animal', 'critter', 'kid', 'child', 'cub', 'furry'], costume: foxBig },
+  { id: 'warden', name: 'Ash the forge warden', keywords: ['knight', 'warrior', 'soldier', 'armor', 'armour', 'helmet', 'guard', 'hero'], costume: emberBig },
+];
+
+const sheets = new Map<string, SpriteSheet>();
+
+/** The sprite sheet for a cast member, built once and shared by every theme. */
+export function castSheet(id: string): SpriteSheet {
+  let s = sheets.get(id);
+  if (!s) {
+    const c = CAST.find((x) => x.id === id) ?? CAST[0]!;
+    s = bigHeroSheet(c.costume());
+    sheets.set(id, s);
+  }
+  return s;
+}
+
+/** All cast members as hero variants, with `first` at the front. Sheets build on first access. */
+export function castFor(first: string): HeroVariant[] {
+  const order = [...CAST].sort((a, b) => (a.id === first ? -1 : b.id === first ? 1 : 0));
+  return order.map((c) => {
+    const v = { id: c.id, name: c.name, keywords: c.keywords } as HeroVariant;
+    Object.defineProperty(v, 'sheet', { enumerable: true, get: () => castSheet(c.id) });
+    return v;
+  });
 }

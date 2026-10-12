@@ -173,7 +173,6 @@ describe.each(THEME_IDS)('theme %s', (id) => {
     const S = t.sprites;
     const need: [string, string[]][] = [
       ['enemy', ['walk', 'hurt']],
-      ['heroSmall', ['idle', 'run']],
       ['pickup', ['idle']],
       ['goal', ['idle']],
       ['checkpoint', ['idle', 'lit']],
@@ -204,6 +203,63 @@ describe.each(THEME_IDS)('theme %s', (id) => {
         if (p[0] > 240 && p[1] > 240 && p[2] > 240) white++;
       }
     expect(white / solid).toBeGreaterThan(0.5);
+  });
+
+  it('describes places and moods only, in our own words', () => {
+    // genre, verb and character words make the AI switch worlds by accident ("add a boss")
+    const banned = ['boss', 'combat', 'sword', 'action', 'roguelike', 'epic', 'knight', 'warrior', 'robot', 'fox', 'moth', 'kids', 'family', 'adventure', 'climb', 'metroidvania', 'souls', 'survival', 'creature', 'bug', 'insect', 'mask', 'platformer', 'shooter'];
+    for (const k of t.keywords) expect(banned, k).not.toContain(k);
+    const franchises = /rain world|hollow knight|celeste|stardew|dead cells|blasphemous|slugcat|madeline|terraria|metroid|zelda|mario/i;
+    expect(t.description).not.toMatch(franchises);
+    for (const k of t.keywords) expect(k).not.toMatch(franchises);
+  });
+
+  it('offers a cast of heroes, its own first', () => {
+    const hs = t.heroes ?? [];
+    expect(hs.length).toBeGreaterThanOrEqual(3);
+    expect(new Set(hs.map((h) => h.id)).size).toBe(hs.length);
+    expect(hs[0]!.sheet).toBe(t.sprites.hero);
+    for (const h of hs) {
+      expect(h.keywords.length).toBeGreaterThan(2);
+      expect(h.sheet.animations.run).toBeDefined();
+    }
+  });
+
+  it('keeps the hero at least 30% brighter or darker than what is behind it', () => {
+    const luma = (c: number[]) => (0.2126 * c[0]! + 0.7152 * c[1]! + 0.0722 * c[2]!) / 255;
+    // the hero's own mean brightness (idle frame)
+    const h = t.sprites.hero;
+    let hs = 0;
+    let hn = 0;
+    for (let y = 0; y < h.frameHeight; y++)
+      for (let x = 0; x < h.frameWidth; x++) {
+        const p = px(h.raster, x, y);
+        if (p[3] < 255) continue;
+        hs += luma(p);
+        hn++;
+      }
+    const hero = hs / hn;
+    // what the player sees behind it: the parallax layers composited where the hero stands
+    // (the preview level puts the hero at x≈130..162, feet on y=208)
+    let bs = 0;
+    let bn = 0;
+    for (let y = 172; y < 208; y += 2)
+      for (let x = 130; x < 162; x += 2) {
+        let c = [0, 0, 0];
+        for (const l of t.layers) {
+          if (l.factor > 1) continue;
+          const lx = x % l.raster.width;
+          const ly = y - (l.y ?? 0);
+          if (ly < 0 || ly >= l.raster.height) continue;
+          const p = px(l.raster, lx, ly);
+          const a = p[3] / 255;
+          c = c.map((v, i) => v * (1 - a) + p[i]! * a);
+        }
+        bs += luma(c);
+        bn++;
+      }
+    const back = bs / bn;
+    expect(Math.abs(hero - back) / Math.max(hero, back)).toBeGreaterThanOrEqual(0.3);
   });
 
   it('has props with valid placement info', () => {

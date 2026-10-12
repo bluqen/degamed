@@ -35,6 +35,7 @@ Files in `packages/ai/src`:
 | `patch.ts` | Exact find/replace edits, `game.mods.json`, 3-way rebuild merge. |
 | `check.ts` | Static checks: JSON parses, manifest and scenes match the schema, referenced files exist, JS syntax (via `new Function`, never executed). `checkPlayable` mirrors the player's own pre-flight (`parseProject` + `compileScripts` in the engine runtime) without Phaser: manifest, start scene, frames files and their sheets, sprite and parallax images, every script and its imports (`'degamed'` or relative only). |
 | `suggest.ts` | 4–6 quick-action chips, each verified to work in instant mode (so chips are always free). |
+| `heroes.ts` | Round 3: never promise a hero the art can't draw. Creature words → kinds (robot/bot/droid…, bat, fox, cat…); `heroFor(theme, kind)` checks the theme's hero variants (`heroes`, when art ships them) or else the hero its `description` names; `drawableText` rewrites anything else to "a little wanderer". |
 
 Why it's cheap:
 - The model writes a **spec of about 40–100 tokens**, not code. Kits turn it into a full game.
@@ -161,3 +162,69 @@ Caveat: Workers AI model ids and neuron rates change; the 8B "fast" rate above i
 - The global ceiling counts requests, not cost, so it is conservative on days of mostly creates.
 - Workers AI model IDs and neuron rates are still unverified (no network here).
 - The stub backend (tests only) still wraps the starter template, so unit tests that use it don't see real kit params. The real kits are covered by the end-to-end tests.
+
+## Round 3 (critic must-fixes from docs/team/reviews/round-1.md)
+
+### Done
+1. **The story and title no longer promise a hero the art can't draw.**
+   - "A little robot looks for its family" on a theme without a robot becomes "A little wanderer looks for its family", and a "Robot of the Ruins" title becomes "Wanderer of the Ruins".
+   - The same rule applies to model replies, so a model that ignores the instruction gets cleaned up too.
+   - The rule covers the title, the story and the summary.
+   - **Ready for hero variants:**
+     - `ThemeInfo.heroes` and `GameSpec.hero` are new optional fields.
+     - The catalogue shows models each theme's hero ids, the create prompt tells models to pick one, and `checkSpec` keeps a hero only if the theme lists it.
+     - Instant mode picks the matching variant (`spec.hero`) and gives themes that can draw the asked-for creature a +4 bonus, so "a bat collects crystals" picks the cave theme that has a bat.
+     - "play as a robot" swaps the hero in chat. When the world can't draw it, free mode says so: "This world can’t draw a dragon yet…".
+   - **Requested on the BOARD:**
+     - art: `ArtTheme.heroes` (first entry = default), with each `description` plainly naming the default hero.
+     - engine: keep `spec.hero` through `normalizeSpec`, use the variant's sheet, and list `heroes` in `listThemes()`.
+2. **Worlds only change on explicit place or mood words.**
+   - Theme switches in chat only count place nouns (cave, forest, ruins, castle…), mood words (spooky, cheerful, rainy…) and theme names. Genre and verb keywords like `boss`, `sword` and `combat` can never move the world.
+   - A named place wins over weather words in the same request ("take it to the rainy ruins").
+   - Genre switches need the genre named outright ("make it an endless runner", "make it a metroidvania"), so "make it a cave" changes the world, not the kit.
+   - Model edits get the same guard: if a model changes the theme and the request names no place or mood, the theme change is dropped. The edit prompt now says so too.
+3. **Honest free mode, with suggestions that always work.**
+   - Things free mode can't do get a plain answer, and the examples come from `suggestions()` for the current game, so each one is a real, working chip on this kit: "Bosses aren’t in free mode yet. Add an AI key in Settings to try it or try “make it day” or “make it harder”."
+   - Covered requests: bosses, shooting, talking characters, shops, multiplayer, music, new moves, timers, puzzles.
+   - Settings already at their limit say so instead of failing: "It’s already as dark as it gets." On the cave kit, night and day map onto `darkness` (night → dark, day → light), and back again.
+4. **Regression tests** (`packages/ai/src/regressions.test.ts`, 26 tests), one group per finding:
+   - **Hero honesty:**
+     - unit tests for `drawableText`;
+     - 5 engine prompts (robot, bat, fox, knight, cat) whose title, story and summary may only name drawable creatures;
+     - hero variants picked and kept;
+     - a model's robot story cleaned up;
+     - hero ids validated;
+     - hero swaps in chat.
+   - **World switches:**
+     - "add a boss", "give me a sword", "make it epic" and others keep the world, even against a theme that wrongly lists `boss`;
+     - the honest "Bosses…" answer, where each suggested chip really changes the game;
+     - a model's unrequested theme change is dropped;
+     - explicit place and mood moves work;
+     - genre switches need the genre name.
+   - **Cave night and day:**
+     - night, day and night again;
+     - no chip that wouldn't change the game;
+     - fallback chips that work on the cave, runner and night-platformer games;
+     - the "already" wording.
+   - **Also in the end-to-end suite:**
+     - all 15 prompts now check that the summary never names an undrawable creature;
+     - instant time-to-spec is measured at **~1 ms average** (the bar is under 300 ms) and must stay under 30 ms.
+- Tests: `@degamed/ai` **154** (was 126); `@degamed/api` 23. Repo-wide typecheck and tests pass.
+
+### Next
+- Switch on hero variants as soon as art and engine ship them (only an end-to-end check needs adding; the logic is in place).
+- The critic's should-fixes for the hosted tier:
+  - weighted usage units (code edit ≈ 20× a spec task) against a daily neuron budget;
+  - a small separate per-user cap for code edits;
+  - a per-IP cap;
+  - `GET /ai/health` with today's totals and remaining budget.
+- Send only the relevant methods of big scripts for code edits.
+
+### Needs from others
+- **art:** `heroes` on `ArtTheme`, plain-English hero names in `description`, and keywords that are places and moods only.
+- **engine:** `GameSpec.hero` passed through to the hero sheet; `heroes` in `listThemes()`.
+- **design:** show `summary` as the reply even when nothing changed (the "already" and "isn't in free mode yet" answers).
+
+### Known issues
+- Until hero variants land, every creature that isn't named in a theme's `description` becomes "a little wanderer". Today that means robots, bats and foxes are never named. This is honest, but less personal.
+- The global ceiling still counts requests, not cost (see Next).

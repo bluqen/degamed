@@ -12,8 +12,9 @@ describe('instant mode: prompt → spec', () => {
     const s = spec('a moody rain-soaked platformer where a little robot looks for its family');
     expect(s.kit).toBe('platformer');
     expect(s.theme).toBe('rain-ruins');
-    expect(s.title).toMatch(/Robot/);
-    expect(s.story).toBe('A little robot looks for its family.');
+    // The test themes can't draw a robot, so the story never promises one.
+    expect(s.title).not.toMatch(/robot/i);
+    expect(s.story).toBe('A little wanderer looks for its family.');
   });
 
   it.each([
