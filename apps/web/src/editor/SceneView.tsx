@@ -460,10 +460,10 @@ export function SceneView() {
           : 'default';
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-[#0B0C10]">
+    <div className="flex min-h-0 flex-1 flex-col bg-sunken">
       {/* Toolbar */}
-      <div className="flex h-9 shrink-0 items-center gap-1 border-b border-[#1F222B] bg-[#13151B] px-2">
-        <div role="toolbar" aria-label="Tools" className="flex items-center gap-0.5 rounded-md bg-[#0F1015] p-0.5">
+      <div className="flex h-9 shrink-0 items-center gap-1 border-b border-line bg-surface px-2">
+        <div role="toolbar" aria-label="Tools" className="flex items-center gap-0.5 rounded-md bg-sunken p-0.5">
           {TOOLS.map((t) => (
             <button
               key={t.id}
@@ -472,24 +472,24 @@ export function SceneView() {
               aria-pressed={tool === t.id}
               title={`${t.label} (${t.key})`}
               onClick={() => ed.setTool(t.id)}
-              className={`flex size-7 items-center justify-center rounded ${tool === t.id ? 'bg-[#6B4EFF] text-white' : 'text-[#A3A9B8] hover:bg-[#232734] hover:text-white'}`}
+              className={`flex size-7 items-center justify-center rounded ${tool === t.id ? 'bg-brand text-on-brand' : 'text-muted hover:bg-surface-3 hover:text-on-brand'}`}
             >
               {t.icon}
             </button>
           ))}
         </div>
-        <span className="mx-1 h-5 w-px bg-[#262A35]" />
-        <div className="flex items-center rounded-md bg-[#0F1015] p-0.5">
+        <span className="mx-1 h-5 w-px bg-line" />
+        <div className="flex items-center rounded-md bg-sunken p-0.5">
           <button
             type="button"
             aria-pressed={opts.snap}
             title={`Snap to grid (${keyLabel('Shift+G')})`}
             onClick={() => ed.setView({ snap: !opts.snap })}
-            className={`flex h-7 items-center gap-1 rounded px-1.5 text-[12px] ${opts.snap ? 'bg-[#2B2550] text-white' : 'text-[#A3A9B8] hover:text-white'}`}
+            className={`flex h-7 items-center gap-1 rounded px-1.5 text-[12px] ${opts.snap ? 'bg-brand-tint text-ink' : 'text-muted hover:text-ink'}`}
           >
             <Magnet size={14} aria-hidden="true" /> Snap
           </button>
-          <MenuButton items={snapItems} label="Snapping options" className="flex h-7 w-5 items-center justify-center rounded text-muted hover:text-white">
+          <MenuButton items={snapItems} label="Snapping options" className="flex h-7 w-5 items-center justify-center rounded text-muted hover:text-ink">
             <ChevronDown size={12} />
           </MenuButton>
         </div>
@@ -498,7 +498,7 @@ export function SceneView() {
           aria-pressed={opts.grid}
           title="Show grid (G)"
           onClick={() => ed.setView({ grid: !opts.grid })}
-          className={`flex size-7 items-center justify-center rounded ${opts.grid ? 'text-cyan' : 'text-[#A3A9B8] hover:text-white'}`}
+          className={`flex size-7 items-center justify-center rounded ${opts.grid ? 'text-cyan' : 'text-muted hover:text-ink'}`}
         >
           <Grid3x3 size={15} aria-hidden="true" />
         </button>
@@ -507,25 +507,25 @@ export function SceneView() {
           aria-pressed={opts.rulers}
           title="Show rulers"
           onClick={() => ed.setView({ rulers: !opts.rulers })}
-          className={`flex size-7 items-center justify-center rounded ${opts.rulers ? 'text-cyan' : 'text-[#A3A9B8] hover:text-white'}`}
+          className={`flex size-7 items-center justify-center rounded ${opts.rulers ? 'text-cyan' : 'text-muted hover:text-ink'}`}
         >
           <Ruler size={15} aria-hidden="true" />
         </button>
-        <span className="mx-1 h-5 w-px bg-[#262A35]" />
-        <button type="button" onClick={() => ed.requestFrame('selection')} disabled={!selection.length} title="Focus selection (F)" className="flex size-7 items-center justify-center rounded text-[#A3A9B8] hover:text-white disabled:opacity-35">
+        <span className="mx-1 h-5 w-px bg-line" />
+        <button type="button" onClick={() => ed.requestFrame('selection')} disabled={!selection.length} title="Focus selection (F)" className="flex size-7 items-center justify-center rounded text-muted hover:text-ink disabled:opacity-35">
           <Scan size={15} aria-hidden="true" />
         </button>
-        <button type="button" onClick={() => ed.requestFrame('all')} title="Show whole level (Shift+F)" className="flex size-7 items-center justify-center rounded text-[#A3A9B8] hover:text-white">
+        <button type="button" onClick={() => ed.requestFrame('all')} title="Show whole level (Shift+F)" className="flex size-7 items-center justify-center rounded text-muted hover:text-ink">
           <Maximize size={15} aria-hidden="true" />
         </button>
-        <div className="ml-auto flex items-center gap-0.5 rounded-md bg-[#0F1015] p-0.5 text-[12px]">
-          <button type="button" aria-label="Zoom out" onClick={() => zoomBy(-1)} className="flex size-6 items-center justify-center rounded text-[#A3A9B8] hover:text-white">
+        <div className="ml-auto flex items-center gap-0.5 rounded-md bg-sunken p-0.5 text-[12px]">
+          <button type="button" aria-label="Zoom out" onClick={() => zoomBy(-1)} className="flex size-6 items-center justify-center rounded text-muted hover:text-ink">
             <Minus size={13} />
           </button>
-          <button type="button" title="Reset zoom to 100%" onClick={() => zoomAt(top + (size.w - top) / 2, top + (size.h - top) / 2, 1)} className="w-12 text-center text-ink-2 tabular-nums hover:text-white">
+          <button type="button" title="Reset zoom to 100%" onClick={() => zoomAt(top + (size.w - top) / 2, top + (size.h - top) / 2, 1)} className="w-12 text-center text-ink-2 tabular-nums hover:text-ink">
             {Math.round(view.zoom * 100)}%
           </button>
-          <button type="button" aria-label="Zoom in" onClick={() => zoomBy(1)} className="flex size-6 items-center justify-center rounded text-[#A3A9B8] hover:text-white">
+          <button type="button" aria-label="Zoom in" onClick={() => zoomBy(1)} className="flex size-6 items-center justify-center rounded text-muted hover:text-ink">
             <Plus size={13} />
           </button>
         </div>

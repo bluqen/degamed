@@ -1,0 +1,2506 @@
+{
+  "round": "0",
+  "startedAt": "2026-10-12T00:59:04.245Z",
+  "base": "http://localhost:5173",
+  "pages": [
+    {
+      "id": "landing",
+      "viewport": "desktop",
+      "scheme": "dark",
+      "path": "/",
+      "shots": [
+        "docs/team/shots/critic/baseline/landing--desktop-dark.png",
+        "docs/team/shots/critic/baseline/landing--desktop-dark-full.png"
+      ],
+      "status": 200,
+      "loadMs": 1471,
+      "finalUrl": "/",
+      "audit": {
+        "title": "Degamed: make stunning 2D games with AI",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 17,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 12,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Space Grotesk\"",
+          "\"IBM Plex Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "12px",
+          "13px",
+          "14px",
+          "15px",
+          "16px",
+          "17px",
+          "18px",
+          "22px",
+          "24px",
+          "48px",
+          "72px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(14, 15, 19)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 53,
+        "fonts.googleapis.com": 1,
+        "fonts.gstatic.com": 3
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "landing",
+      "viewport": "desktop",
+      "scheme": "light",
+      "path": "/",
+      "shots": [
+        "docs/team/shots/critic/baseline/landing--desktop-light.png"
+      ],
+      "status": 200,
+      "loadMs": 1243,
+      "finalUrl": "/",
+      "audit": {
+        "title": "Degamed: make stunning 2D games with AI",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 17,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 12,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Space Grotesk\"",
+          "\"IBM Plex Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "12px",
+          "13px",
+          "14px",
+          "15px",
+          "16px",
+          "17px",
+          "18px",
+          "22px",
+          "24px",
+          "48px",
+          "72px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(14, 15, 19)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 58,
+        "fonts.googleapis.com": 1,
+        "fonts.gstatic.com": 3
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "landing",
+      "viewport": "phone",
+      "scheme": "dark",
+      "path": "/",
+      "shots": [
+        "docs/team/shots/critic/baseline/landing--phone-dark.png"
+      ],
+      "status": 200,
+      "loadMs": 1182,
+      "finalUrl": "/",
+      "audit": {
+        "title": "Degamed: make stunning 2D games with AI",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 17,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 12,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Space Grotesk\"",
+          "\"IBM Plex Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "12px",
+          "13px",
+          "14px",
+          "15px",
+          "16px",
+          "17px",
+          "18px",
+          "22px",
+          "24px",
+          "36px",
+          "48px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(14, 15, 19)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 53,
+        "fonts.googleapis.com": 1,
+        "fonts.gstatic.com": 3
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "landing",
+      "viewport": "phone",
+      "scheme": "light",
+      "path": "/",
+      "shots": [
+        "docs/team/shots/critic/baseline/landing--phone-light.png"
+      ],
+      "status": 200,
+      "loadMs": 1094,
+      "finalUrl": "/",
+      "audit": {
+        "title": "Degamed: make stunning 2D games with AI",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 17,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 12,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Space Grotesk\"",
+          "\"IBM Plex Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "12px",
+          "13px",
+          "14px",
+          "15px",
+          "16px",
+          "17px",
+          "18px",
+          "22px",
+          "24px",
+          "36px",
+          "48px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(14, 15, 19)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 53,
+        "fonts.googleapis.com": 1,
+        "fonts.gstatic.com": 3
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "pricing",
+      "viewport": "desktop",
+      "scheme": "dark",
+      "path": "/pricing",
+      "shots": [
+        "docs/team/shots/critic/baseline/pricing--desktop-dark.png",
+        "docs/team/shots/critic/baseline/pricing--desktop-dark-full.png"
+      ],
+      "status": 200,
+      "loadMs": 1489,
+      "finalUrl": "/pricing",
+      "audit": {
+        "title": "Degamed: make stunning 2D games with AI",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 13,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 6,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Space Grotesk\"",
+          "\"IBM Plex Sans\""
+        ],
+        "fontSizes": [
+          "12px",
+          "14px",
+          "15px",
+          "16px",
+          "18px",
+          "20px",
+          "22px",
+          "36px",
+          "60px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(14, 15, 19)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 53,
+        "fonts.googleapis.com": 1,
+        "fonts.gstatic.com": 4
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "pricing",
+      "viewport": "desktop",
+      "scheme": "light",
+      "path": "/pricing",
+      "shots": [
+        "docs/team/shots/critic/baseline/pricing--desktop-light.png"
+      ],
+      "status": 200,
+      "loadMs": 1090,
+      "finalUrl": "/pricing",
+      "audit": {
+        "title": "Degamed: make stunning 2D games with AI",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 13,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 6,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Space Grotesk\"",
+          "\"IBM Plex Sans\""
+        ],
+        "fontSizes": [
+          "12px",
+          "14px",
+          "15px",
+          "16px",
+          "18px",
+          "20px",
+          "22px",
+          "36px",
+          "60px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(14, 15, 19)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 53,
+        "fonts.googleapis.com": 1,
+        "fonts.gstatic.com": 4
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "pricing",
+      "viewport": "phone",
+      "scheme": "dark",
+      "path": "/pricing",
+      "shots": [
+        "docs/team/shots/critic/baseline/pricing--phone-dark.png"
+      ],
+      "status": 200,
+      "loadMs": 1047,
+      "finalUrl": "/pricing",
+      "audit": {
+        "title": "Degamed: make stunning 2D games with AI",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 13,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 6,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Space Grotesk\"",
+          "\"IBM Plex Sans\""
+        ],
+        "fontSizes": [
+          "12px",
+          "14px",
+          "15px",
+          "16px",
+          "18px",
+          "20px",
+          "22px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(14, 15, 19)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 53,
+        "fonts.googleapis.com": 1,
+        "fonts.gstatic.com": 4
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "pricing",
+      "viewport": "phone",
+      "scheme": "light",
+      "path": "/pricing",
+      "shots": [
+        "docs/team/shots/critic/baseline/pricing--phone-light.png"
+      ],
+      "status": 200,
+      "loadMs": 1671,
+      "finalUrl": "/pricing",
+      "audit": {
+        "title": "Degamed: make stunning 2D games with AI",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 13,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 6,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "12px",
+          "14px",
+          "15px",
+          "18px",
+          "20px",
+          "22px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(246, 246, 249)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 57,
+        "fonts.googleapis.com": 1,
+        "fonts.gstatic.com": 4
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "login",
+      "viewport": "desktop",
+      "scheme": "dark",
+      "path": "/login",
+      "shots": [
+        "docs/team/shots/critic/baseline/login--desktop-dark.png",
+        "docs/team/shots/critic/baseline/login--desktop-dark-full.png"
+      ],
+      "status": 200,
+      "loadMs": 1156,
+      "finalUrl": "/login",
+      "audit": {
+        "title": "Degamed: make stunning 2D games with AI",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 1,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "12px",
+          "14px",
+          "15px",
+          "22px",
+          "30px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(12, 12, 17)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 55,
+        "fonts.googleapis.com": 1,
+        "fonts.gstatic.com": 1
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "login",
+      "viewport": "desktop",
+      "scheme": "light",
+      "path": "/login",
+      "shots": [
+        "docs/team/shots/critic/baseline/login--desktop-light.png"
+      ],
+      "status": 200,
+      "loadMs": 1050,
+      "finalUrl": "/login",
+      "audit": {
+        "title": "Degamed: make stunning 2D games with AI",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 1,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "12px",
+          "14px",
+          "15px",
+          "22px",
+          "30px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(246, 246, 249)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 55,
+        "fonts.googleapis.com": 1,
+        "fonts.gstatic.com": 1
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "login",
+      "viewport": "phone",
+      "scheme": "dark",
+      "path": "/login",
+      "shots": [
+        "docs/team/shots/critic/baseline/login--phone-dark.png"
+      ],
+      "status": 200,
+      "loadMs": 1139,
+      "finalUrl": "/login",
+      "audit": {
+        "title": "Degamed: make stunning 2D games with AI",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 1,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "12px",
+          "14px",
+          "15px",
+          "22px",
+          "30px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(246, 246, 249)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 58,
+        "fonts.googleapis.com": 1,
+        "fonts.gstatic.com": 1
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "login",
+      "viewport": "phone",
+      "scheme": "light",
+      "path": "/login",
+      "shots": [
+        "docs/team/shots/critic/baseline/login--phone-light.png"
+      ],
+      "status": 200,
+      "loadMs": 1025,
+      "finalUrl": "/login",
+      "audit": {
+        "title": "Degamed: make stunning 2D games with AI",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 1,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "12px",
+          "14px",
+          "15px",
+          "22px",
+          "30px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(246, 246, 249)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 55,
+        "fonts.googleapis.com": 1,
+        "fonts.gstatic.com": 1
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "new",
+      "viewport": "desktop",
+      "scheme": "dark",
+      "path": "/new",
+      "shots": [
+        "docs/team/shots/critic/baseline/new--desktop-dark.png",
+        "docs/team/shots/critic/baseline/new--desktop-dark-full.png"
+      ],
+      "status": 200,
+      "loadMs": 917,
+      "finalUrl": "/new",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 3,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 1,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\"",
+          "\"Bricolage Grotesque\""
+        ],
+        "fontSizes": [
+          "14px",
+          "15px",
+          "18px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(12, 12, 17)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 110,
+        "fonts.googleapis.com": 1
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "new",
+      "viewport": "desktop",
+      "scheme": "light",
+      "path": "/new",
+      "shots": [
+        "docs/team/shots/critic/baseline/new--desktop-light.png"
+      ],
+      "status": 200,
+      "loadMs": 768,
+      "finalUrl": "/new",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 3,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 1,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\"",
+          "\"Bricolage Grotesque\""
+        ],
+        "fontSizes": [
+          "14px",
+          "15px",
+          "18px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(246, 246, 249)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 55
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "new",
+      "viewport": "phone",
+      "scheme": "dark",
+      "path": "/new",
+      "shots": [
+        "docs/team/shots/critic/baseline/new--phone-dark.png"
+      ],
+      "status": 200,
+      "loadMs": 762,
+      "finalUrl": "/new",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 3,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 1,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\"",
+          "\"Bricolage Grotesque\""
+        ],
+        "fontSizes": [
+          "14px",
+          "15px",
+          "18px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(12, 12, 17)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 55
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "new",
+      "viewport": "phone",
+      "scheme": "light",
+      "path": "/new",
+      "shots": [
+        "docs/team/shots/critic/baseline/new--phone-light.png"
+      ],
+      "status": 200,
+      "loadMs": 774,
+      "finalUrl": "/new",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 3,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 1,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\"",
+          "\"Bricolage Grotesque\""
+        ],
+        "fontSizes": [
+          "14px",
+          "15px",
+          "18px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(246, 246, 249)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 55
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "explore",
+      "viewport": "desktop",
+      "scheme": "dark",
+      "path": "/explore",
+      "shots": [
+        "docs/team/shots/critic/baseline/explore--desktop-dark.png",
+        "docs/team/shots/critic/baseline/explore--desktop-dark-full.png"
+      ],
+      "status": 200,
+      "loadMs": 755,
+      "finalUrl": "/explore",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 8,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 6,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "14px",
+          "15px",
+          "22px",
+          "30px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(12, 12, 17)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 55
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "explore",
+      "viewport": "desktop",
+      "scheme": "light",
+      "path": "/explore",
+      "shots": [
+        "docs/team/shots/critic/baseline/explore--desktop-light.png"
+      ],
+      "status": 200,
+      "loadMs": 762,
+      "finalUrl": "/explore",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 8,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 6,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "14px",
+          "15px",
+          "22px",
+          "30px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(246, 246, 249)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 55
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "explore",
+      "viewport": "phone",
+      "scheme": "dark",
+      "path": "/explore",
+      "shots": [
+        "docs/team/shots/critic/baseline/explore--phone-dark.png"
+      ],
+      "status": 200,
+      "loadMs": 767,
+      "finalUrl": "/explore",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 8,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 6,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "14px",
+          "15px",
+          "22px",
+          "30px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(12, 12, 17)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 55
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "explore",
+      "viewport": "phone",
+      "scheme": "light",
+      "path": "/explore",
+      "shots": [
+        "docs/team/shots/critic/baseline/explore--phone-light.png"
+      ],
+      "status": 200,
+      "loadMs": 775,
+      "finalUrl": "/explore",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 8,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 6,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "14px",
+          "15px",
+          "22px",
+          "30px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(246, 246, 249)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 55
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "editor-simple",
+      "viewport": "desktop",
+      "scheme": "dark",
+      "path": "/editor/demo",
+      "shots": [
+        "docs/team/shots/critic/baseline/editor-simple--desktop-dark.png",
+        "docs/team/shots/critic/baseline/editor-simple--desktop-dark-game.png",
+        "docs/team/shots/critic/baseline/editor-simple--desktop-dark-after-input.png"
+      ],
+      "status": 200,
+      "loadMs": 1234,
+      "finalUrl": "/editor/demo",
+      "audit": {
+        "title": "Demo: Starter Platformer · Degamed",
+        "lang": "en",
+        "h1": 0,
+        "interactive": 15,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 15,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "12px",
+          "12.5px",
+          "13px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(12, 12, 17)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "fps": {
+        "samples": [
+          58,
+          60,
+          60,
+          60,
+          60
+        ],
+        "median": 60,
+        "min": 58,
+        "raf": [
+          60
+        ],
+        "longTasks": 7
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [
+        "net::ERR_ABORTED http://localhost:5174/node_modules/.vite/deps/zod.js?v=3859692c",
+        "net::ERR_ABORTED http://localhost:5174/node_modules/.vite/deps/phaser.js?v=57242188",
+        "net::ERR_ABORTED http://localhost:5174/@fs/home/user/degamed/packages/art/src/index.ts"
+      ],
+      "hosts": {
+        "localhost:5173": 192,
+        "localhost:5174": 43
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "editor-simple",
+      "viewport": "desktop",
+      "scheme": "light",
+      "path": "/editor/demo",
+      "shots": [
+        "docs/team/shots/critic/baseline/editor-simple--desktop-light.png",
+        "docs/team/shots/critic/baseline/editor-simple--desktop-light-game.png",
+        "docs/team/shots/critic/baseline/editor-simple--desktop-light-after-input.png"
+      ],
+      "status": 200,
+      "loadMs": 2454,
+      "finalUrl": "/editor/demo",
+      "audit": {
+        "title": "Demo: Starter Platformer · Degamed",
+        "lang": "en",
+        "h1": 0,
+        "interactive": 15,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 15,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "12px",
+          "12.5px",
+          "13px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(246, 246, 249)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "fps": {
+        "samples": [
+          60,
+          60,
+          60,
+          60,
+          60
+        ],
+        "median": 60,
+        "min": 60,
+        "raf": [
+          60
+        ],
+        "longTasks": 2
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 192,
+        "localhost:5174": 44
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "editor-simple",
+      "viewport": "phone",
+      "scheme": "dark",
+      "path": "/editor/demo",
+      "shots": [
+        "docs/team/shots/critic/baseline/editor-simple--phone-dark.png",
+        "docs/team/shots/critic/baseline/editor-simple--phone-dark-game.png",
+        "docs/team/shots/critic/baseline/editor-simple--phone-dark-after-input.png"
+      ],
+      "status": 200,
+      "loadMs": 2624,
+      "finalUrl": "/editor/demo",
+      "audit": {
+        "title": "Demo: Starter Platformer · Degamed",
+        "lang": "en",
+        "h1": 0,
+        "interactive": 13,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 13,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "12px",
+          "12.5px",
+          "13px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(12, 12, 17)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "fps": {
+        "samples": [
+          60,
+          60,
+          60,
+          60,
+          60
+        ],
+        "median": 60,
+        "min": 60,
+        "raf": [
+          60
+        ],
+        "longTasks": 0
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 195,
+        "localhost:5174": 44
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "editor-simple",
+      "viewport": "phone",
+      "scheme": "light",
+      "path": "/editor/demo",
+      "shots": [
+        "docs/team/shots/critic/baseline/editor-simple--phone-light.png",
+        "docs/team/shots/critic/baseline/editor-simple--phone-light-game.png",
+        "docs/team/shots/critic/baseline/editor-simple--phone-light-after-input.png"
+      ],
+      "status": 200,
+      "loadMs": 2103,
+      "finalUrl": "/editor/demo",
+      "audit": {
+        "title": "Demo: Starter Platformer · Degamed",
+        "lang": "en",
+        "h1": 0,
+        "interactive": 13,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 13,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "12px",
+          "12.5px",
+          "13px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(246, 246, 249)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "fps": {
+        "samples": [
+          60,
+          60,
+          60,
+          60,
+          60
+        ],
+        "median": 60,
+        "min": 60,
+        "raf": [
+          60
+        ],
+        "longTasks": 2
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 192,
+        "localhost:5174": 44
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "editor-pro",
+      "viewport": "desktop",
+      "scheme": "dark",
+      "path": "/editor/demo",
+      "shots": [
+        "docs/team/shots/critic/baseline/editor-pro--desktop-dark.png",
+        "docs/team/shots/critic/baseline/editor-pro--desktop-dark-game.png",
+        "docs/team/shots/critic/baseline/editor-pro--desktop-dark-after-input.png"
+      ],
+      "status": 200,
+      "loadMs": 2466,
+      "finalUrl": "/editor/demo",
+      "audit": {
+        "title": "Demo: Starter Platformer · Degamed",
+        "lang": "en",
+        "h1": 0,
+        "interactive": 124,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 124,
+        "tinyText": 22,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "10px",
+          "10.5px",
+          "11px",
+          "11.5px",
+          "12px",
+          "12.5px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(12, 12, 17)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "fps": {
+        "samples": [
+          58,
+          58,
+          60,
+          58,
+          57
+        ],
+        "median": 58,
+        "min": 57,
+        "raf": [
+          58
+        ],
+        "longTasks": 28
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 192,
+        "localhost:5174": 44
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "editor-pro",
+      "viewport": "desktop",
+      "scheme": "light",
+      "path": "/editor/demo",
+      "shots": [
+        "docs/team/shots/critic/baseline/editor-pro--desktop-light.png",
+        "docs/team/shots/critic/baseline/editor-pro--desktop-light-game.png",
+        "docs/team/shots/critic/baseline/editor-pro--desktop-light-after-input.png"
+      ],
+      "status": 200,
+      "loadMs": 2497,
+      "finalUrl": "/editor/demo",
+      "audit": {
+        "title": "Demo: Starter Platformer · Degamed",
+        "lang": "en",
+        "h1": 0,
+        "interactive": 124,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 124,
+        "tinyText": 22,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "10px",
+          "10.5px",
+          "11px",
+          "11.5px",
+          "12px",
+          "12.5px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(246, 246, 249)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "fps": {
+        "samples": [
+          58,
+          56,
+          58,
+          54,
+          58
+        ],
+        "median": 58,
+        "min": 54,
+        "raf": [
+          57
+        ],
+        "longTasks": 28
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 192,
+        "localhost:5174": 44
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "editor-pro",
+      "viewport": "phone",
+      "scheme": "dark",
+      "path": "/editor/demo",
+      "shots": [
+        "docs/team/shots/critic/baseline/editor-pro--phone-dark.png",
+        "docs/team/shots/critic/baseline/editor-pro--phone-dark-game.png",
+        "docs/team/shots/critic/baseline/editor-pro--phone-dark-after-input.png"
+      ],
+      "status": 200,
+      "loadMs": 2117,
+      "finalUrl": "/editor/demo",
+      "audit": {
+        "title": "Demo: Starter Platformer · Degamed",
+        "lang": "en",
+        "h1": 0,
+        "interactive": 13,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 13,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "12px",
+          "12.5px",
+          "13px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(12, 12, 17)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "fps": {
+        "samples": [
+          60,
+          60,
+          60,
+          60,
+          60
+        ],
+        "median": 60,
+        "min": 60,
+        "raf": [
+          60
+        ],
+        "longTasks": 0
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 192,
+        "localhost:5174": 44
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "editor-pro",
+      "viewport": "phone",
+      "scheme": "light",
+      "path": "/editor/demo",
+      "shots": [
+        "docs/team/shots/critic/baseline/editor-pro--phone-light.png",
+        "docs/team/shots/critic/baseline/editor-pro--phone-light-game.png",
+        "docs/team/shots/critic/baseline/editor-pro--phone-light-after-input.png"
+      ],
+      "status": 200,
+      "loadMs": 2118,
+      "finalUrl": "/editor/demo",
+      "audit": {
+        "title": "Demo: Starter Platformer · Degamed",
+        "lang": "en",
+        "h1": 0,
+        "interactive": 13,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 13,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"Plus Jakarta Sans\"",
+          "\"JetBrains Mono\""
+        ],
+        "fontSizes": [
+          "12px",
+          "12.5px",
+          "13px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(246, 246, 249)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": false,
+      "fps": {
+        "samples": [
+          60,
+          60,
+          60,
+          60,
+          60
+        ],
+        "median": 60,
+        "min": 60,
+        "raf": [
+          60
+        ],
+        "longTasks": 2
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 192,
+        "localhost:5174": 44
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "studio",
+      "viewport": "desktop",
+      "scheme": "dark",
+      "path": "/studio",
+      "shots": [
+        "docs/team/shots/critic/baseline/studio--desktop-dark.png",
+        "docs/team/shots/critic/baseline/studio--desktop-dark-full.png"
+      ],
+      "status": 200,
+      "loadMs": 910,
+      "finalUrl": "/studio",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(12, 12, 17)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 56
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "studio",
+      "viewport": "desktop",
+      "scheme": "light",
+      "path": "/studio",
+      "shots": [
+        "docs/team/shots/critic/baseline/studio--desktop-light.png"
+      ],
+      "status": 200,
+      "loadMs": 936,
+      "finalUrl": "/studio",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(246, 246, 249)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 56
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "studio",
+      "viewport": "phone",
+      "scheme": "dark",
+      "path": "/studio",
+      "shots": [
+        "docs/team/shots/critic/baseline/studio--phone-dark.png"
+      ],
+      "status": 200,
+      "loadMs": 936,
+      "finalUrl": "/studio",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(12, 12, 17)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 56
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "studio",
+      "viewport": "phone",
+      "scheme": "light",
+      "path": "/studio",
+      "shots": [
+        "docs/team/shots/critic/baseline/studio--phone-light.png"
+      ],
+      "status": 200,
+      "loadMs": 911,
+      "finalUrl": "/studio",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(246, 246, 249)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 56
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "play-demo",
+      "viewport": "desktop",
+      "scheme": "dark",
+      "path": "/play/demo",
+      "shots": [
+        "docs/team/shots/critic/baseline/play-demo--desktop-dark.png"
+      ],
+      "status": 200,
+      "loadMs": 920,
+      "finalUrl": "/play/demo",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(12, 12, 17)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "fps": {
+        "error": "no iframe or canvas found"
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 56
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "play-demo",
+      "viewport": "desktop",
+      "scheme": "light",
+      "path": "/play/demo",
+      "shots": [
+        "docs/team/shots/critic/baseline/play-demo--desktop-light.png"
+      ],
+      "status": 200,
+      "loadMs": 917,
+      "finalUrl": "/play/demo",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(246, 246, 249)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "fps": {
+        "error": "no iframe or canvas found"
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 56
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "play-demo",
+      "viewport": "phone",
+      "scheme": "dark",
+      "path": "/play/demo",
+      "shots": [
+        "docs/team/shots/critic/baseline/play-demo--phone-dark.png"
+      ],
+      "status": 200,
+      "loadMs": 891,
+      "finalUrl": "/play/demo",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(12, 12, 17)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "fps": {
+        "error": "no iframe or canvas found"
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 56
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "play-demo",
+      "viewport": "phone",
+      "scheme": "light",
+      "path": "/play/demo",
+      "shots": [
+        "docs/team/shots/critic/baseline/play-demo--phone-light.png"
+      ],
+      "status": 200,
+      "loadMs": 1037,
+      "finalUrl": "/play/demo",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(246, 246, 249)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "fps": {
+        "error": "no iframe or canvas found"
+      },
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 56
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "gallery",
+      "viewport": "desktop",
+      "scheme": "dark",
+      "path": "/gallery",
+      "shots": [
+        "docs/team/shots/critic/baseline/gallery--desktop-dark.png",
+        "docs/team/shots/critic/baseline/gallery--desktop-dark-full.png"
+      ],
+      "status": 200,
+      "loadMs": 912,
+      "finalUrl": "/gallery",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(12, 12, 17)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 56
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "gallery",
+      "viewport": "desktop",
+      "scheme": "light",
+      "path": "/gallery",
+      "shots": [
+        "docs/team/shots/critic/baseline/gallery--desktop-light.png"
+      ],
+      "status": 200,
+      "loadMs": 914,
+      "finalUrl": "/gallery",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(246, 246, 249)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 56
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "gallery",
+      "viewport": "phone",
+      "scheme": "dark",
+      "path": "/gallery",
+      "shots": [
+        "docs/team/shots/critic/baseline/gallery--phone-dark.png"
+      ],
+      "status": 200,
+      "loadMs": 895,
+      "finalUrl": "/gallery",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(12, 12, 17)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 56
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "gallery",
+      "viewport": "phone",
+      "scheme": "light",
+      "path": "/gallery",
+      "shots": [
+        "docs/team/shots/critic/baseline/gallery--phone-light.png"
+      ],
+      "status": 200,
+      "loadMs": 908,
+      "finalUrl": "/gallery",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(246, 246, 249)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 56
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "not-found",
+      "viewport": "desktop",
+      "scheme": "dark",
+      "path": "/this-page-does-not-exist",
+      "shots": [
+        "docs/team/shots/critic/baseline/not-found--desktop-dark.png",
+        "docs/team/shots/critic/baseline/not-found--desktop-dark-full.png"
+      ],
+      "status": 200,
+      "loadMs": 865,
+      "finalUrl": "/this-page-does-not-exist",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(12, 12, 17)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 56
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "not-found",
+      "viewport": "desktop",
+      "scheme": "light",
+      "path": "/this-page-does-not-exist",
+      "shots": [
+        "docs/team/shots/critic/baseline/not-found--desktop-light.png"
+      ],
+      "status": 200,
+      "loadMs": 865,
+      "finalUrl": "/this-page-does-not-exist",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 1440,
+        "viewport": 1440,
+        "bg": "rgb(246, 246, 249)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 56
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "not-found",
+      "viewport": "phone",
+      "scheme": "dark",
+      "path": "/this-page-does-not-exist",
+      "shots": [
+        "docs/team/shots/critic/baseline/not-found--phone-dark.png"
+      ],
+      "status": 200,
+      "loadMs": 876,
+      "finalUrl": "/this-page-does-not-exist",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(12, 12, 17)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 56
+      },
+      "apiRequests": []
+    },
+    {
+      "id": "not-found",
+      "viewport": "phone",
+      "scheme": "light",
+      "path": "/this-page-does-not-exist",
+      "shots": [
+        "docs/team/shots/critic/baseline/not-found--phone-light.png"
+      ],
+      "status": 200,
+      "loadMs": 925,
+      "finalUrl": "/this-page-does-not-exist",
+      "audit": {
+        "title": "Degamed: describe a game, play it, share it",
+        "lang": "en",
+        "h1": 1,
+        "interactive": 1,
+        "unnamedControls": [],
+        "unnamedCount": 0,
+        "unlabelledInputs": [],
+        "imgsNoAlt": 0,
+        "smallTapTargets": 0,
+        "tinyText": 0,
+        "fontFamilies": [
+          "\"JetBrains Mono\"",
+          "\"Bricolage Grotesque\"",
+          "\"Plus Jakarta Sans\""
+        ],
+        "fontSizes": [
+          "15px",
+          "36px"
+        ],
+        "horizontalOverflow": false,
+        "scrollWidth": 390,
+        "viewport": 390,
+        "bg": "rgb(246, 246, 249)",
+        "hasMetaDescription": true,
+        "hasOgImage": false,
+        "hasThemeColor": true
+      },
+      "looksLike404": true,
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 56
+      },
+      "apiRequests": []
+    }
+  ],
+  "journey": [
+    {
+      "viewport": "desktop",
+      "reachedPlay": true,
+      "seconds": 2.6,
+      "clicks": 0,
+      "typed": false,
+      "finalUrl": "/",
+      "steps": [
+        {
+          "at": 0,
+          "what": "landing",
+          "shot": "docs/team/shots/critic/baseline/journey--desktop-00-landing.png"
+        }
+      ],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 56
+      },
+      "apiRequests": [],
+      "finalShot": "docs/team/shots/critic/baseline/journey--desktop-01-playing.png"
+    },
+    {
+      "viewport": "phone",
+      "reachedPlay": true,
+      "seconds": 1.8,
+      "clicks": 0,
+      "typed": false,
+      "finalUrl": "/",
+      "steps": [
+        {
+          "at": 0,
+          "what": "landing",
+          "shot": "docs/team/shots/critic/baseline/journey--phone-00-landing.png"
+        }
+      ],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 56
+      },
+      "apiRequests": [],
+      "finalShot": "docs/team/shots/critic/baseline/journey--phone-01-playing.png"
+    }
+  ],
+  "bundles": null,
+  "budget": {
+    "consoleErrors": 0,
+    "journeySeconds": 60,
+    "journeyClicks": 3,
+    "fpsMedian": 55,
+    "fpsMedianHeadless": 30,
+    "initialJsGzip": 174080,
+    "largestChunkGzip": 409600,
+    "cssGzip": 35840,
+    "playerJsGzip": 256000,
+    "pageLoadMs": 2500
+  },
+  "fails": [],
+  "warns": [
+    "Some pages ignore prefers-color-scheme (light theme missing)."
+  ]
+}

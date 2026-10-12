@@ -75,6 +75,18 @@ export class InputState {
     this.down.delete(code);
   }
 
+  /** Adds an extra code to an action (touch buttons use virtual codes like "Touch:jump"). */
+  addBinding(action: string, code: string) {
+    const list = this.actions[action] ?? [action];
+    if (!list.includes(code)) this.actions[action] = [...list, code];
+  }
+
+  /** Releases everything (used on restart so a held touch button can't stick). */
+  releaseAll() {
+    this.down.clear();
+    this.justPressed.clear();
+  }
+
   private codes(name: string): string[] {
     return this.actions[name] ?? [name];
   }

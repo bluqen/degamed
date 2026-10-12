@@ -10,6 +10,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@degamed/ai':
+        specifier: workspace:*
+        version: link:../../packages/ai
       hono:
         specifier: ^4.13.13
         version: 4.13.13
@@ -124,6 +127,25 @@ importers:
       vite:
         specifier: ^8.3.3
         version: 8.3.3(esbuild@0.28.1)(jiti@2.7.0)
+      vitest:
+        specifier: ^5.0.3
+        version: 5.0.3(vite@8.3.3(esbuild@0.28.1)(jiti@2.7.0))
+
+  packages/ai:
+    dependencies:
+      '@degamed/engine':
+        specifier: workspace:*
+        version: link:../engine
+      '@degamed/shared':
+        specifier: workspace:*
+        version: link:../shared
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.5
+    devDependencies:
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
       vitest:
         specifier: ^5.0.3
         version: 5.0.3(vite@8.3.3(esbuild@0.28.1)(jiti@2.7.0))

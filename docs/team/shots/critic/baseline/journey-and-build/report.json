@@ -1,0 +1,188 @@
+{
+  "round": "0",
+  "startedAt": "2026-10-12T01:02:57.044Z",
+  "base": "http://localhost:5173",
+  "pages": [],
+  "journey": [
+    {
+      "viewport": "desktop",
+      "reachedPlay": true,
+      "seconds": 5.4,
+      "clicks": 2,
+      "typed": true,
+      "finalUrl": "/login",
+      "steps": [
+        {
+          "at": 0,
+          "what": "landing",
+          "shot": "docs/team/shots/critic/baseline/journey-and-build/journey--desktop-00-landing.png"
+        },
+        {
+          "at": 3161,
+          "what": "typed prompt",
+          "shot": "docs/team/shots/critic/baseline/journey-and-build/journey--desktop-01-typed.png"
+        },
+        {
+          "at": 4654,
+          "what": "clicked \"Start creating\"",
+          "url": "/login",
+          "shot": "docs/team/shots/critic/baseline/journey-and-build/journey--desktop-03-step.png"
+        }
+      ],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 56
+      },
+      "apiRequests": [],
+      "finalShot": "docs/team/shots/critic/baseline/journey-and-build/journey--desktop-03-playing.png"
+    },
+    {
+      "viewport": "phone",
+      "reachedPlay": true,
+      "seconds": 3,
+      "clicks": 2,
+      "typed": true,
+      "finalUrl": "/login",
+      "steps": [
+        {
+          "at": 0,
+          "what": "landing",
+          "shot": "docs/team/shots/critic/baseline/journey-and-build/journey--phone-00-landing.png"
+        },
+        {
+          "at": 2015,
+          "what": "typed prompt",
+          "shot": "docs/team/shots/critic/baseline/journey-and-build/journey--phone-01-typed.png"
+        },
+        {
+          "at": 2577,
+          "what": "clicked \"Start creating\"",
+          "url": "/login",
+          "shot": "docs/team/shots/critic/baseline/journey-and-build/journey--phone-03-step.png"
+        }
+      ],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 56
+      },
+      "apiRequests": [],
+      "finalShot": "docs/team/shots/critic/baseline/journey-and-build/journey--phone-03-playing.png"
+    }
+  ],
+  "bundles": {
+    "web": {
+      "pkg": "@degamed/web",
+      "ok": true,
+      "ms": 2700,
+      "totalBytes": 1634536,
+      "jsGzip": 443213,
+      "cssGzip": 11678,
+      "initialGzip": 218797,
+      "initialFiles": [
+        "assets/index-BW9J1nmW.js",
+        "assets/index-zqtXP9py.css"
+      ],
+      "largest": [
+        {
+          "file": "assets/Editor-Dlqiw7Js.js",
+          "bytes": 723205,
+          "gzip": 236094
+        },
+        {
+          "file": "assets/index-BW9J1nmW.js",
+          "bytes": 710681,
+          "gzip": 207119
+        },
+        {
+          "file": "fonts/bricolage-grotesque-latin-wght-normal.woff2",
+          "bytes": 41344,
+          "gzip": 41344
+        },
+        {
+          "file": "fonts/jetbrains-mono-latin-wght-normal.woff2",
+          "bytes": 40404,
+          "gzip": 40404
+        },
+        {
+          "file": "fonts/plus-jakarta-sans-latin-wght-normal.woff2",
+          "bytes": 27348,
+          "gzip": 27348
+        },
+        {
+          "file": "fonts/plus-jakarta-sans-latin-ext-wght-normal.woff2",
+          "bytes": 21728,
+          "gzip": 21728
+        },
+        {
+          "file": "assets/index-zqtXP9py.css",
+          "bytes": 54402,
+          "gzip": 11678
+        },
+        {
+          "file": "fonts/OFL-plus-jakarta-sans.txt",
+          "bytes": 4534,
+          "gzip": 2005
+        }
+      ],
+      "fileCount": 12,
+      "warnings": [
+        "(!) Some chunks are larger than 500 kB after minification. Consider:",
+        "- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit."
+      ]
+    },
+    "play": {
+      "pkg": "@degamed/play",
+      "ok": true,
+      "ms": 1420,
+      "totalBytes": 1499937,
+      "jsGzip": 391001,
+      "cssGzip": 0,
+      "initialGzip": 391001,
+      "initialFiles": [
+        "assets/index-Dgo7i_9C.js"
+      ],
+      "largest": [
+        {
+          "file": "assets/index-Dgo7i_9C.js",
+          "bytes": 1498435,
+          "gzip": 391001
+        },
+        {
+          "file": "_headers",
+          "bytes": 774,
+          "gzip": 774
+        },
+        {
+          "file": "index.html",
+          "bytes": 728,
+          "gzip": 471
+        }
+      ],
+      "fileCount": 3,
+      "warnings": []
+    }
+  },
+  "budget": {
+    "consoleErrors": 0,
+    "journeySeconds": 60,
+    "journeyClicks": 3,
+    "fpsMedian": 55,
+    "fpsMedianHeadless": 30,
+    "initialJsGzip": 174080,
+    "largestChunkGzip": 409600,
+    "cssGzip": 35840,
+    "playerJsGzip": 256000,
+    "pageLoadMs": 2500
+  },
+  "fails": [
+    "web initial 213.7 kB > 170.0 kB",
+    "player JS 381.8 kB > 250.0 kB"
+  ],
+  "warns": []
+}

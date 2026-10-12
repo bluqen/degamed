@@ -1,14 +1,16 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { Link, useParams } from 'react-router';
-import { Code2, Gamepad2, LayoutTemplate, Palette, Pause, Play, Plus, Square, Star, X, Clapperboard, Upload } from 'lucide-react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { Link, useNavigate, useParams } from 'react-router';
+import { ArrowLeft, Code2, Gamepad2, LayoutTemplate, Palette, Pause, Play, Plus, Square, Star, X, Clapperboard, Upload } from 'lucide-react';
 import type { ProjectFiles } from '@degamed/shared';
-import { LogoMark } from '../components/Logo';
 import { getProject, type ProjectRow } from '../lib/projects';
 import { isAuthConfigured } from '../lib/env';
 import { loadDraft, starterProject } from '../lib/project-files';
+import { demoGame } from '../lib/game';
+import { getGame } from '../lib/library';
+import { ThemeToggle } from '../ui';
 import { EdProvider, useEd, useEditorState, type Workspace } from './state';
 import { buildCommands, handleShortcut, keyLabel, type Command } from './commands';
-import { ContextMenuProvider, MenuBar, Splitter, useContextMenu, type MenuItem } from './ui';
+import { ContextMenuProvider, MenuButton, Splitter, TabStrip, useContextMenu, type MenuItem } from './ui';
 import { SceneView } from './SceneView';
 import { HierarchyDock } from './HierarchyDock';
 import { FilesDock } from './FilesDock';
@@ -18,11 +20,7 @@ import { CodeWorkspace } from './CodeWorkspace';
 import { ArtWorkspace } from './ArtWorkspace';
 import { GameView } from './GameView';
 import { Dialogs } from './dialogs';
-import { SimpleMode } from './SimpleMode';
 import { displayName } from './file-tree';
-
-type Mode = 'simple' | 'pro';
-const MODE_KEY = 'degamed.editor.mode';
 
 export function EditorPage() {
   const { id = 'demo' } = useParams();
@@ -31,23 +29,25 @@ export function EditorPage() {
   const [initial, setInitial] = useState<ProjectFiles | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
+  const local = isDemo ? null : getGame(id);
   useEffect(() => {
-    if (isDemo || !isAuthConfigured) return;
+    if (isDemo || local || !isAuthConfigured) return;
     getProject(id)
       .then(setProject)
       .catch((e: unknown) => setLoadError(e instanceof Error ? e.message : 'Could not load project'));
   }, [id, isDemo]);
 
   useEffect(() => {
-    if (project === undefined && !isDemo && isAuthConfigured) return;
-    setInitial(loadDraft(id) ?? starterProject(project?.title ?? 'Starter Platformer'));
+    if (project === undefined && !isDemo && !local && isAuthConfigured) return;
+    setInitial(loadDraft(id) ?? (isDemo ? demoGame() : starterProject(project?.title ?? local?.title ?? 'Starter Platformer')));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, isDemo, project]);
 
-  const title = isDemo ? 'Demo: Starter Platformer' : (project?.title ?? 'Loading…');
-  if (!initial) return <div className="flex h-screen items-center justify-center bg-bg text-muted">Opening {title}…</div>;
+  const title = isDemo ? 'Demo game' : (local?.title ?? project?.title ?? 'Loading…');
+  if (!initial) return <div className="flex h-dvh items-center justify-center bg-bg text-body text-muted">Opening {title}…</div>;
   return (
     <ContextMenuProvider>
-      <Shell key={id} projectId={id} initial={initial} title={title} isDemo={isDemo} banner={loadError ?? (project === null && !isDemo ? 'This project doesn’t exist or you don’t have access.' : null)} />
+      <Shell key={id} projectId={id} initial={initial} title={title} isDemo={isDemo} banner={loadError ?? (project === null && !isDemo && !local && isAuthConfigured ? 'This project doesn’t exist or you don’t have access.' : null)} />
     </ContextMenuProvider>
   );
 }
@@ -66,45 +66,40 @@ function useNarrow() {
 function Shell({ projectId, initial, title, isDemo, banner }: { projectId: string; initial: ProjectFiles; title: string; isDemo: boolean; banner: string | null }) {
   const ed = useEditorState(projectId, initial);
   const narrow = useNarrow();
-  const [modePref, setModePref] = useState<Mode>(() => {
-    try {
-      return localStorage.getItem(MODE_KEY) === 'simple' ? 'simple' : 'pro';
-    } catch {
-      return 'pro';
-    }
-  });
-  const mode: Mode = narrow ? 'simple' : modePref;
-  const setMode = (m: Mode) => {
-    setModePref(m);
-    try {
-      localStorage.setItem(MODE_KEY, m);
-    } catch {
-      // Storage blocked.
-    }
-  };
-
   const commands = useMemo(() => buildCommands(ed), [ed]);
 
   // Keyboard shortcuts (not while a dialog is open; dialogs handle their own keys).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (ed.dialog || mode !== 'pro') return;
+      if (ed.dialog || narrow) return;
       handleShortcut(e, commands, ed);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [commands, ed, mode]);
+  }, [commands, ed, narrow]);
 
   useEffect(() => {
-    document.title = `${title} · Degamed`;
+    document.title = `${title} · Advanced · Degamed`;
   }, [title]);
+
+  if (narrow) {
+    return (
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-4 bg-bg p-6 text-center">
+        <h1 className="text-title font-bold">Advanced needs a bigger screen</h1>
+        <p className="max-w-sm text-body text-muted">The scene editor and code tools are made for a computer. On a phone, change your game in the Studio by chatting or with Tune.</p>
+        <Link to={`/editor/${projectId}`} className="inline-flex h-10 items-center gap-2 rounded-md bg-brand px-4 text-body font-semibold text-on-brand hover:bg-brand-hover">
+          <ArrowLeft size={16} aria-hidden="true" /> Back to the Studio
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <EdProvider value={ed}>
-      <div className="flex h-screen flex-col overflow-hidden bg-bg text-[12.5px] text-ink select-none">
-        <TopBar title={title} isDemo={isDemo} mode={mode} setMode={setMode} narrow={narrow} commands={commands} />
-        {banner && <p className="bg-[#2A1215] px-4 py-1.5 text-bad">{banner}</p>}
-        {mode === 'simple' ? <SimpleMode title={title} onOpenPro={() => setMode('pro')} /> : <ProLayout />}
+      <div className="flex h-dvh flex-col overflow-hidden bg-bg text-[13px] text-ink select-none">
+        <TopBar title={title} projectId={projectId} isDemo={isDemo} commands={commands} />
+        {banner && <p className="bg-bad-tint px-4 py-1.5 text-bad">{banner}</p>}
+        <ProLayout />
       </div>
       <Dialogs />
     </EdProvider>
@@ -120,8 +115,9 @@ const WORKSPACES: { id: Workspace; label: string; icon: ReactNode; key: string }
   { id: 'art', label: 'Art', icon: <Palette size={14} />, key: 'Ctrl+4' },
 ];
 
-function TopBar({ title, isDemo, mode, setMode, narrow, commands }: { title: string; isDemo: boolean; mode: Mode; setMode: (m: Mode) => void; narrow: boolean; commands: Command[] }) {
+function TopBar({ title, projectId, isDemo, commands }: { title: string; projectId: string; isDemo: boolean; commands: Command[] }) {
   const ed = useEd();
+  const navigate = useNavigate();
   const byId = new Map(commands.map((c) => [c.id, c]));
   const item = (id: string, label?: string): MenuItem => {
     const c = byId.get(id)!;
@@ -150,7 +146,7 @@ function TopBar({ title, isDemo, mode, setMode, narrow, commands }: { title: str
         sep,
         { label: 'Export…', disabled: true, onSelect: () => {} },
         sep,
-        { label: isDemo ? 'Back to Home' : 'Back to Dashboard', onSelect: () => (window.location.href = isDemo ? '/' : '/dashboard') },
+        { label: 'Back to the Studio', onSelect: () => navigate(`/editor/${projectId}`) },
       ],
     },
     {
@@ -224,74 +220,63 @@ function TopBar({ title, isDemo, mode, setMode, narrow, commands }: { title: str
     },
   ];
 
-  const runBtn = 'flex h-7 items-center justify-center rounded text-[#A3A9B8] hover:bg-[#232734] hover:text-white disabled:opacity-35';
+  const runBtn = 'flex h-8 w-8 items-center justify-center rounded-sm text-ink-2 hover:bg-surface-3 hover:text-ink disabled:opacity-35';
+  void isDemo;
 
   return (
-    <header className="flex h-10 shrink-0 items-center gap-2 border-b border-[#1F222B] bg-[#121419] px-2">
-      <Link to={isDemo ? '/' : '/dashboard'} aria-label={isDemo ? 'Back to home' : 'Back to dashboard'} className="flex shrink-0 rounded p-1 hover:bg-[#1C1F28]">
-        <LogoMark size={20} hole="#121419" />
+    <header className="flex h-12 shrink-0 items-center gap-2 border-b border-line bg-surface px-2">
+      <Link
+        to={`/editor/${projectId}`}
+        className="flex h-8 shrink-0 items-center gap-1.5 rounded-sm px-2 text-[13px] font-semibold text-ink-2 hover:bg-surface-2 hover:text-ink"
+      >
+        <ArrowLeft size={16} aria-hidden="true" />
+        Studio
       </Link>
-      {mode === 'pro' && <MenuBar menus={menus} />}
-      <span className="mx-1 hidden h-5 w-px bg-[#262A35] lg:block" />
-      <span className="hidden min-w-0 truncate text-[12.5px] font-semibold lg:block" title={title}>
+      <span className="h-5 w-px bg-line" aria-hidden="true" />
+      <MenuButton
+        label="Menu"
+        items={menus.map((m) => ({ type: 'submenu' as const, label: m.label, items: m.items }))}
+        className="flex h-8 items-center gap-1 rounded-sm px-2.5 text-[13px] font-medium text-ink-2 hover:bg-surface-2 hover:text-ink"
+      >
+        Menu
+      </MenuButton>
+      <span className="min-w-0 truncate px-1 text-[13px] font-semibold" title={title}>
         {title}
       </span>
+      <span className="rounded-full bg-surface-2 px-2 py-0.5 text-[11px] font-semibold text-muted">Advanced</span>
 
-      {mode === 'pro' && (
-        <nav aria-label="Workspaces" className="mx-auto flex items-center gap-0.5 rounded-md bg-[#0B0C10] p-0.5">
-          {WORKSPACES.map((w) => (
-            <button
-              key={w.id}
-              type="button"
-              aria-pressed={ed.workspace === w.id}
-              title={`${w.label} (${keyLabel(w.key)})`}
-              onClick={() => ed.setWorkspace(w.id)}
-              className={`flex h-7 items-center gap-1.5 rounded px-3 text-[12.5px] ${ed.workspace === w.id ? 'bg-[#232734] text-white shadow-[inset_0_-2px_0_#7C5CFF]' : 'text-[#8C93A5] hover:text-white'}`}
-            >
-              {w.icon}
-              <span className="hidden xl:inline">{w.label}</span>
-              {w.id === 'game' && ed.running === 'running' && <span className="size-1.5 rounded-full bg-ok" aria-label="running" />}
-            </button>
-          ))}
-        </nav>
-      )}
-      {mode === 'simple' && <span className="mx-auto" />}
+      <nav aria-label="Workspaces" className="mx-auto flex items-center gap-0.5 rounded-md bg-surface-2 p-0.5 shadow-[inset_0_0_0_1px_var(--c-line)]">
+        {WORKSPACES.map((w) => (
+          <button
+            key={w.id}
+            type="button"
+            aria-pressed={ed.workspace === w.id}
+            title={`${w.label} (${keyLabel(w.key)})`}
+            onClick={() => ed.setWorkspace(w.id)}
+            className={`flex h-8 items-center gap-1.5 rounded-[8px] px-3 text-[13px] font-medium transition-colors ${ed.workspace === w.id ? 'bg-surface text-ink shadow-1' : 'text-muted hover:text-ink'}`}
+          >
+            {w.icon}
+            <span className="hidden xl:inline">{w.label}</span>
+            {w.id === 'game' && ed.running === 'running' && <span className="size-1.5 rounded-full bg-ok" aria-label="running" />}
+          </button>
+        ))}
+      </nav>
 
-      {mode === 'pro' && (
-        <div className="flex items-center gap-0.5 rounded-md bg-[#0B0C10] p-0.5" role="group" aria-label="Run controls">
-          <button type="button" title={`Run game (${keyLabel('F5')})`} aria-label="Run game" disabled={!ed.play.ready} onClick={() => ed.run('project')} className={`${runBtn} w-8 text-ok`}>
-            <Play size={15} fill="currentColor" />
-          </button>
-          <button type="button" title={`Run this scene (${keyLabel('F6')})`} aria-label="Run this scene" disabled={!ed.play.ready} onClick={() => ed.run('scene')} className={`${runBtn} w-8`}>
-            <Clapperboard size={14} />
-          </button>
-          <button type="button" title={`${ed.running === 'paused' ? 'Resume' : 'Pause'} (F7)`} aria-label={ed.running === 'paused' ? 'Resume' : 'Pause'} disabled={ed.running === 'stopped'} onClick={ed.togglePause} className={`${runBtn} w-8 ${ed.running === 'paused' ? 'text-warn' : ''}`}>
-            <Pause size={14} />
-          </button>
-          <button type="button" title="Stop (F8)" aria-label="Stop" disabled={ed.running === 'stopped'} onClick={ed.stop} className={`${runBtn} w-8`}>
-            <Square size={13} />
-          </button>
-        </div>
-      )}
-
-      {!narrow && (
-        <div role="group" aria-label="Editor mode" className="flex rounded-md bg-[#0B0C10] p-0.5">
-          {(['simple', 'pro'] as const).map((m) => (
-            <button
-              key={m}
-              type="button"
-              aria-pressed={mode === m}
-              onClick={() => setMode(m)}
-              className={`h-7 rounded px-2.5 text-[12px] ${mode === m ? 'bg-[#6B4EFF] font-semibold text-white' : 'text-[#8C93A5] hover:text-white'}`}
-            >
-              {m === 'simple' ? 'Simple' : 'Pro'}
-            </button>
-          ))}
-        </div>
-      )}
-      <button type="button" disabled title="Export to web, Windows, Android: coming soon" className="h-7 rounded border border-[#2E3342] px-2.5 text-[12px] text-muted">
-        Export
-      </button>
+      <div className="flex items-center gap-0.5 rounded-md bg-surface-2 p-0.5 shadow-[inset_0_0_0_1px_var(--c-line)]" role="group" aria-label="Run controls">
+        <button type="button" title={`Run game (${keyLabel('F5')})`} aria-label="Run game" disabled={!ed.play.ready} onClick={() => ed.run('project')} className={`${runBtn} !text-ok`}>
+          <Play size={15} fill="currentColor" />
+        </button>
+        <button type="button" title={`Run this scene (${keyLabel('F6')})`} aria-label="Run this scene" disabled={!ed.play.ready} onClick={() => ed.run('scene')} className={runBtn}>
+          <Clapperboard size={14} />
+        </button>
+        <button type="button" title={`${ed.running === 'paused' ? 'Resume' : 'Pause'} (F7)`} aria-label={ed.running === 'paused' ? 'Resume' : 'Pause'} disabled={ed.running === 'stopped'} onClick={ed.togglePause} className={`${runBtn} ${ed.running === 'paused' ? '!text-warn' : ''}`}>
+          <Pause size={14} />
+        </button>
+        <button type="button" title="Stop (F8)" aria-label="Stop" disabled={ed.running === 'stopped'} onClick={ed.stop} className={runBtn}>
+          <Square size={13} />
+        </button>
+      </div>
+      <ThemeToggle size="sm" />
     </header>
   );
 }
@@ -304,25 +289,25 @@ function ProLayout() {
   const showLeft = layout.showLeft && !focusMode;
   const showRight = layout.showRight && !focusMode && ed.workspace !== 'art';
   const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
-  const [leftHeight, setLeftHeight] = useState(0);
-  const leftRef = useCallback((el: HTMLElement | null) => {
-    if (!el) return;
-    const ro = new ResizeObserver(() => setLeftHeight(el.clientHeight));
-    ro.observe(el);
-  }, []);
+  const [leftTab, setLeftTab] = useState<'scene' | 'files'>('scene');
 
   return (
     <div className="flex min-h-0 flex-1">
       {showLeft && (
         <>
-          <aside ref={leftRef} style={{ width: layout.left }} className="flex shrink-0 flex-col bg-[#121419]" aria-label="Scene and files">
-            <DockTitle>Hierarchy</DockTitle>
-            <div style={{ flex: `${layout.leftSplit} 1 0` }} className="flex min-h-0 flex-col">
+          <aside style={{ width: layout.left }} className="flex shrink-0 flex-col bg-surface" aria-label="Scene and files">
+            <TabStrip
+              tabs={[
+                { id: 'scene', label: 'Objects' },
+                { id: 'files', label: 'Files' },
+              ]}
+              active={leftTab}
+              onChange={setLeftTab}
+            />
+            <div className={`min-h-0 flex-1 flex-col ${leftTab === 'scene' ? 'flex' : 'hidden'}`}>
               <HierarchyDock />
             </div>
-            <Splitter axis="y" label="Resize hierarchy and files" onDrag={(d) => leftHeight && setLayout({ leftSplit: clamp(layout.leftSplit + d / leftHeight, 0.15, 0.85) })} />
-            <DockTitle>Files</DockTitle>
-            <div style={{ flex: `${1 - layout.leftSplit} 1 0` }} className="flex min-h-0 flex-col">
+            <div className={`min-h-0 flex-1 flex-col ${leftTab === 'files' ? 'flex' : 'hidden'}`}>
               <FilesDock />
             </div>
           </aside>
@@ -353,7 +338,7 @@ function ProLayout() {
       {showRight && (
         <>
           <Splitter axis="x" label="Resize properties panel" onDrag={(d) => setLayout({ right: clamp(layout.right - d, 220, 560) })} />
-          <aside style={{ width: layout.right }} className="flex shrink-0 flex-col bg-[#121419]" aria-label="Properties">
+          <aside style={{ width: layout.right }} className="flex shrink-0 flex-col bg-surface" aria-label="Properties">
             <RightDock />
           </aside>
         </>
@@ -362,15 +347,11 @@ function ProLayout() {
   );
 }
 
-function DockTitle({ children }: { children: ReactNode }) {
-  return <div className="flex h-7 shrink-0 items-center border-b border-[#1F222B] bg-[#13151B] px-2.5 text-[11.5px] font-semibold text-[#9AA1B2]">{children}</div>;
-}
-
 function SceneTabs() {
   const ed = useEd();
   const show = useContextMenu();
   return (
-    <div role="tablist" aria-label="Open scenes" className="flex h-8 shrink-0 items-end gap-0.5 border-b border-[#1F222B] bg-[#0F1015] px-1.5">
+    <div role="tablist" aria-label="Open scenes" className="flex h-8 shrink-0 items-end gap-0.5 border-b border-line bg-sunken px-1.5">
       {ed.openScenes.map((p) => {
         const active = p === ed.scenePath;
         return (
@@ -396,7 +377,7 @@ function SceneTabs() {
               );
             }}
             className={`group flex h-7 max-w-52 cursor-default items-center gap-1.5 rounded-t-md border border-b-0 px-2.5 text-[12px] ${
-              active ? 'border-[#262A35] bg-[#0B0C10] text-white' : 'border-transparent text-[#8C93A5] hover:bg-[#16181F] hover:text-white'
+              active ? 'border-line bg-sunken text-ink' : 'border-transparent text-muted hover:bg-surface hover:text-ink'
             }`}
           >
             {p === ed.startScene && <Star size={10} className="shrink-0 text-warn" fill="currentColor" aria-label="Start scene" />}
@@ -409,7 +390,7 @@ function SceneTabs() {
                   e.stopPropagation();
                   ed.closeScene(p);
                 }}
-                className={`rounded p-0.5 hover:bg-[#232734] ${active ? '' : 'opacity-0 group-hover:opacity-100'}`}
+                className={`rounded p-0.5 hover:bg-surface-3 ${active ? '' : 'opacity-0 group-hover:opacity-100'}`}
               >
                 <X size={11} />
               </button>
@@ -417,7 +398,7 @@ function SceneTabs() {
           </div>
         );
       })}
-      <button type="button" title="New scene" aria-label="New scene" onClick={() => ed.setDialog({ type: 'new-scene' })} className="mb-0.5 flex size-6 items-center justify-center rounded text-muted hover:bg-[#1C1F28] hover:text-white">
+      <button type="button" title="New scene" aria-label="New scene" onClick={() => ed.setDialog({ type: 'new-scene' })} className="mb-0.5 flex size-6 items-center justify-center rounded text-muted hover:bg-surface-2 hover:text-ink">
         <Plus size={13} />
       </button>
     </div>

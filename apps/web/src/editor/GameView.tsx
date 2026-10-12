@@ -12,8 +12,8 @@ export function GameView({ visible }: { visible: boolean }) {
   const stage = useRef<HTMLDivElement>(null);
   const { play, running } = ed;
   return (
-    <div className={`min-h-0 flex-1 flex-col bg-[#08090C] ${visible ? 'flex' : 'hidden'}`}>
-      <div className="flex h-9 shrink-0 items-center gap-1 border-b border-[#1F222B] bg-[#13151B] px-2 text-[12px]">
+    <div className={`min-h-0 flex-1 flex-col bg-stage ${visible ? 'flex' : 'hidden'}`}>
+      <div className="flex h-9 shrink-0 items-center gap-1 border-b border-line bg-surface px-2 text-[12px]">
         <IconButton label="Restart" shortcut="Ctrl+R" onClick={() => (running === 'stopped' ? ed.run('project') : play.restart())}>
           <RotateCcw size={14} />
         </IconButton>
@@ -50,7 +50,7 @@ export function GameView({ visible }: { visible: boolean }) {
             onClick={() => ed.run('project')}
             className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/70 text-ink"
           >
-            <span className="flex size-16 items-center justify-center rounded-full bg-[#6B4EFF] shadow-[0_0_40px_rgba(107,78,255,.5)]">
+            <span className="flex size-16 items-center justify-center rounded-full bg-brand shadow-[0_0_40px_rgba(107,78,255,.5)]">
               <Play size={26} fill="currentColor" />
             </span>
             <span className="text-[13px]">Run the game (F5)</span>

@@ -127,7 +127,7 @@ function AddEntityDialog({ parentId, afterId, at, onClose }: { parentId: string 
       aria-selected={current === p}
       onClick={() => setPick(p)}
       onDoubleClick={() => create(p)}
-      className={`flex w-full items-center gap-2 px-3 py-1 text-left ${current === p ? 'bg-[#2B2550] text-white' : 'text-ink-2 hover:bg-[#1C1F28]'}`}
+      className={`flex w-full items-center gap-2 px-3 py-1 text-left ${current === p ? 'bg-brand-tint text-ink' : 'text-ink-2 hover:bg-surface-2'}`}
     >
       <PresetIcon p={p} />
       <span className="flex-1 truncate">{p.name}</span>
@@ -153,9 +153,9 @@ function AddEntityDialog({ parentId, afterId, at, onClose }: { parentId: string 
       }
     >
       <div className="flex min-h-0 flex-1">
-        <div className="flex w-[300px] shrink-0 flex-col border-r border-[#252935]">
+        <div className="flex w-[300px] shrink-0 flex-col border-r border-surface-3">
           <div className="p-2">
-            <label className="flex h-7 items-center gap-1.5 rounded border border-[#2A2E3A] bg-[#0F1015] px-2 focus-within:border-[#6B4EFF]">
+            <label className="flex h-7 items-center gap-1.5 rounded border border-line bg-sunken px-2 focus-within:border-brand">
               <Search size={13} className="text-muted" aria-hidden="true" />
               <input
                 data-autofocus
@@ -208,17 +208,17 @@ function AddEntityDialog({ parentId, afterId, at, onClose }: { parentId: string 
                 aria-pressed={favs.includes(current.id)}
                 aria-label={favs.includes(current.id) ? 'Remove from favourites' : 'Add to favourites'}
                 onClick={() => toggleFav(current.id)}
-                className={`ml-auto rounded p-1 ${favs.includes(current.id) ? 'text-warn' : 'text-muted hover:text-white'}`}
+                className={`ml-auto rounded p-1 ${favs.includes(current.id) ? 'text-warn' : 'text-muted hover:text-ink'}`}
               >
                 <Star size={15} fill={favs.includes(current.id) ? 'currentColor' : 'none'} />
               </button>
             </div>
             <p className="leading-relaxed text-ink-2">{current.description}</p>
             <div>
-              <div className="mb-1.5 text-[10.5px] font-semibold tracking-wide text-[#6E7587] uppercase">Comes with</div>
+              <div className="mb-1.5 text-[10.5px] font-semibold tracking-wide text-muted uppercase">Comes with</div>
               <ul className="flex flex-col gap-1">
                 {(Object.keys(preview) as ComponentName[]).map((name) => (
-                  <li key={name} className="flex items-center gap-2 rounded bg-[#121419] px-2 py-1.5">
+                  <li key={name} className="flex items-center gap-2 rounded bg-surface px-2 py-1.5">
                     <span style={{ color: COMPONENTS[name].color }} className="flex">
                       {COMPONENTS[name].icon}
                     </span>
@@ -230,7 +230,7 @@ function AddEntityDialog({ parentId, afterId, at, onClose }: { parentId: string 
             </div>
             {current.tags?.length ? (
               <p className="text-[12px] text-muted">
-                Tags: {current.tags.map((t) => <code key={t} className="mr-1 rounded bg-[#232734] px-1 text-ink-2">{t}</code>)}
+                Tags: {current.tags.map((t) => <code key={t} className="mr-1 rounded bg-surface-3 px-1 text-ink-2">{t}</code>)}
               </p>
             ) : null}
           </div>
@@ -254,7 +254,7 @@ function PresetIcon({ p, big }: { p: Preset; big?: boolean }) {
   const comps = p.components(presetContext(ed.files, { x: 0, y: 0 }));
   const main = (['Camera', 'Text', 'AnimatedSprite', 'Sprite', 'MusicPlayer', 'Body', 'Transform'] as ComponentName[]).find((c) => comps[c]) ?? 'Transform';
   return (
-    <span className={`flex shrink-0 items-center justify-center rounded ${big ? 'size-7 bg-[#1C1F28]' : ''}`} style={{ color: COMPONENTS[main].color }}>
+    <span className={`flex shrink-0 items-center justify-center rounded ${big ? 'size-7 bg-surface-2' : ''}`} style={{ color: COMPONENTS[main].color }}>
       {COMPONENTS[main].icon}
     </span>
   );
@@ -262,7 +262,7 @@ function PresetIcon({ p, big }: { p: Preset; big?: boolean }) {
 
 function Heading({ children, icon }: { children: ReactNode; icon?: ReactNode }) {
   return (
-    <div className="flex items-center gap-1 px-3 pt-2.5 pb-1 text-[10.5px] font-semibold tracking-wide text-[#6E7587] uppercase">
+    <div className="flex items-center gap-1 px-3 pt-2.5 pb-1 text-[10.5px] font-semibold tracking-wide text-muted uppercase">
       {icon}
       {children}
     </div>
@@ -299,14 +299,14 @@ function SettingsDialog({ section, onClose }: { section?: string; onClose: () =>
   return (
     <Dialog title="Game Settings" onClose={onClose} width={760} height={540} footer={<Btn primary onClick={onClose}>Done</Btn>}>
       <div className="flex min-h-0 flex-1">
-        <nav aria-label="Settings sections" className="flex w-44 shrink-0 flex-col gap-0.5 border-r border-[#252935] p-2">
+        <nav aria-label="Settings sections" className="flex w-44 shrink-0 flex-col gap-0.5 border-r border-surface-3 p-2">
           {sections.map((s) => (
             <button
               key={s.id}
               type="button"
               aria-current={tab === s.id ? 'page' : undefined}
               onClick={() => setTab(s.id)}
-              className={`flex items-center gap-2 rounded px-2.5 py-1.5 text-left ${tab === s.id ? 'bg-[#2B2550] text-white' : 'text-ink-2 hover:bg-[#1C1F28]'}`}
+              className={`flex items-center gap-2 rounded px-2.5 py-1.5 text-left ${tab === s.id ? 'bg-brand-tint text-ink' : 'text-ink-2 hover:bg-surface-2'}`}
             >
               {s.icon}
               {s.label}
@@ -365,7 +365,7 @@ function SettingsDialog({ section, onClose }: { section?: string; onClose: () =>
                       key={label}
                       type="button"
                       onClick={() => save({ resolution: { width: w as number, height: h as number } }, 'Change screen size')}
-                      className={`rounded border px-2 py-1 text-[12px] ${m.resolution.width === w && m.resolution.height === h ? 'border-[#6B4EFF] bg-[#1E1A3A] text-white' : 'border-[#2E3342] text-ink-2 hover:text-white'}`}
+                      className={`rounded border px-2 py-1 text-[12px] ${m.resolution.width === w && m.resolution.height === h ? 'border-brand bg-brand-tint text-ink' : 'border-line-strong text-ink-2 hover:text-ink'}`}
                     >
                       {label} <span className="text-muted">{w}×{h}</span>
                     </button>
@@ -381,7 +381,7 @@ function SettingsDialog({ section, onClose }: { section?: string; onClose: () =>
                       value={c}
                       aria-label={`Palette colour ${i + 1}`}
                       onChange={(e) => save({ palette: m.palette.map((x, j) => (j === i ? e.target.value.toUpperCase() : x)) }, 'Change palette', 'palette')}
-                      className="h-7 w-7 cursor-pointer rounded border border-[#2A2E3A] bg-transparent p-0.5"
+                      className="h-7 w-7 cursor-pointer rounded border border-line bg-transparent p-0.5"
                     />
                   ))}
                 </div>
@@ -449,7 +449,7 @@ function InputMap({ input, onChange }: { input: Record<string, string[]>; onChan
       </p>
       <table className="w-full text-[12.5px]">
         <thead>
-          <tr className="text-left text-[11px] tracking-wide text-[#6E7587] uppercase">
+          <tr className="text-left text-[11px] tracking-wide text-muted uppercase">
             <th className="w-36 py-1 font-semibold">Action</th>
             <th className="py-1 font-semibold">Keys</th>
             <th className="w-8" />
@@ -457,12 +457,12 @@ function InputMap({ input, onChange }: { input: Record<string, string[]>; onChan
         </thead>
         <tbody>
           {Object.entries(input).map(([action, keys]) => (
-            <tr key={action} className="border-t border-[#1F222B]">
+            <tr key={action} className="border-t border-line">
               <td className="py-1.5 font-mono">{action}</td>
               <td className="py-1.5">
                 <div className="flex flex-wrap items-center gap-1">
                   {keys.map((k) => (
-                    <span key={k} className="inline-flex items-center gap-1 rounded border border-[#2E3342] bg-[#0F1015] py-0.5 pr-1 pl-1.5 text-[11.5px]">
+                    <span key={k} className="inline-flex items-center gap-1 rounded border border-line-strong bg-sunken py-0.5 pr-1 pl-1.5 text-[11.5px]">
                       <Keyboard size={11} className="text-muted" />
                       {prettyKey(k)}
                       <button type="button" aria-label={`Remove ${prettyKey(k)}`} onClick={() => onChange({ ...input, [action]: keys.filter((x) => x !== k) }, `Remove key from ${action}`)} className="text-muted hover:text-bad">
@@ -473,7 +473,7 @@ function InputMap({ input, onChange }: { input: Record<string, string[]>; onChan
                   <button
                     type="button"
                     onClick={() => setListening(action)}
-                    className={`rounded px-1.5 py-0.5 text-[11.5px] ${listening === action ? 'animate-pulse bg-[#2B2550] text-white' : 'text-brand-soft hover:underline'}`}
+                    className={`rounded px-1.5 py-0.5 text-[11.5px] ${listening === action ? 'animate-pulse bg-brand-tint text-ink' : 'text-brand-soft hover:underline'}`}
                   >
                     {listening === action ? 'Press a key… (Esc cancels)' : '+ key'}
                   </button>
@@ -526,8 +526,8 @@ function CommandPalette({ onClose }: { onClose: () => void }) {
   const words = q.toLowerCase().split(/\s+/).filter(Boolean);
   const hits = commands.filter((c) => words.every((w) => `${c.group} ${c.label}`.toLowerCase().includes(w)));
   const items: { key: string; label: ReactNode; hint?: string; run: () => void; disabled?: boolean }[] = [
-    ...hits.map((c) => ({ key: c.id, label: <><span className="text-[#6E7587]">{c.group}: </span>{c.label}</>, hint: c.shortcut, run: c.run, disabled: c.enabled === false })),
-    ...fileHits.map((p) => ({ key: `file:${p}`, label: <><span className="text-[#6E7587]">Open file: </span><span className="font-mono">{p}</span></>, run: () => ed.openFile(p) })),
+    ...hits.map((c) => ({ key: c.id, label: <><span className="text-muted">{c.group}: </span>{c.label}</>, hint: c.shortcut, run: c.run, disabled: c.enabled === false })),
+    ...fileHits.map((p) => ({ key: `file:${p}`, label: <><span className="text-muted">Open file: </span><span className="font-mono">{p}</span></>, run: () => ed.openFile(p) })),
   ];
   const sel = Math.min(i, Math.max(0, items.length - 1));
   const go = (n: number) => {
@@ -566,10 +566,10 @@ function CommandPalette({ onClose }: { onClose: () => void }) {
               disabled={it.disabled}
               onMouseMove={() => setI(n)}
               onClick={() => go(n)}
-              className={`flex w-full items-center px-3 py-1.5 text-left disabled:opacity-40 ${n === sel ? 'bg-[#2B2550] text-white' : 'text-ink-2'}`}
+              className={`flex w-full items-center px-3 py-1.5 text-left disabled:opacity-40 ${n === sel ? 'bg-brand-tint text-ink' : 'text-ink-2'}`}
             >
               <span className="flex-1 truncate">{it.label}</span>
-              {it.hint && <kbd className="font-sans text-[11px] text-[#7D8496]">{keyLabel(it.hint)}</kbd>}
+              {it.hint && <kbd className="font-sans text-[11px] text-muted">{keyLabel(it.hint)}</kbd>}
             </button>
           </li>
         ))}
@@ -596,7 +596,7 @@ function ShortcutsDialog({ onClose }: { onClose: () => void }) {
       <div className="grid grid-cols-2 gap-x-6 gap-y-4 p-4">
         {[...groups].map(([g, list]) => (
           <section key={g}>
-            <h3 className="mb-1.5 text-[10.5px] font-semibold tracking-wide text-[#6E7587] uppercase">{g}</h3>
+            <h3 className="mb-1.5 text-[10.5px] font-semibold tracking-wide text-muted uppercase">{g}</h3>
             <ul className="flex flex-col gap-1">
               {list.map((c) => (
                 <li key={c.id} className="flex items-center justify-between gap-2 text-[12.5px]">
@@ -608,7 +608,7 @@ function ShortcutsDialog({ onClose }: { onClose: () => void }) {
           </section>
         ))}
         <section>
-          <h3 className="mb-1.5 text-[10.5px] font-semibold tracking-wide text-[#6E7587] uppercase">Scene view</h3>
+          <h3 className="mb-1.5 text-[10.5px] font-semibold tracking-wide text-muted uppercase">Scene view</h3>
           <ul className="flex flex-col gap-1">
             {extra.map(([a, b]) => (
               <li key={a} className="flex items-center justify-between gap-2 text-[12.5px]">
@@ -729,7 +729,7 @@ function NewScriptDialog({ attachTo, onClose }: { attachTo?: string[]; onClose: 
         }}
       >
         {attachTo?.length ? (
-          <div role="radiogroup" className="flex gap-1 rounded bg-[#0F1015] p-0.5">
+          <div role="radiogroup" className="flex gap-1 rounded bg-sunken p-0.5">
             {(['new', 'existing'] as const).map((m) => (
               <button
                 key={m}
@@ -738,7 +738,7 @@ function NewScriptDialog({ attachTo, onClose }: { attachTo?: string[]; onClose: 
                 aria-checked={mode === m}
                 disabled={m === 'existing' && !scripts.length}
                 onClick={() => setMode(m)}
-                className={`flex-1 rounded py-1 text-[12px] disabled:opacity-40 ${mode === m ? 'bg-[#2B2550] text-white' : 'text-ink-2'}`}
+                className={`flex-1 rounded py-1 text-[12px] disabled:opacity-40 ${mode === m ? 'bg-brand-tint text-ink' : 'text-ink-2'}`}
               >
                 {m === 'new' ? 'New script' : 'Existing script'}
               </button>

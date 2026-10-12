@@ -45,7 +45,7 @@ export function MenuList({ items, x, y, onClose, minWidth = 220 }: { items: Menu
       ref={ref}
       role="menu"
       style={{ left: pos.x, top: pos.y, minWidth }}
-      className="fixed z-[100] flex flex-col rounded-md border border-[#2E3342] bg-[#1A1D25] py-1 text-[12.5px] shadow-[0_12px_32px_rgba(0,0,0,.55)]"
+      className="fixed z-[100] flex flex-col rounded-md border border-line-strong bg-surface-2 py-1 text-[12.5px] shadow-[0_12px_32px_rgba(0,0,0,.55)]"
       onKeyDown={(e) => {
         const list = focusable();
         const i = list.indexOf(document.activeElement as HTMLButtonElement);
@@ -62,10 +62,10 @@ export function MenuList({ items, x, y, onClose, minWidth = 220 }: { items: Menu
       }}
     >
       {items.map((item, i) => {
-        if (item.type === 'separator') return <div key={i} role="separator" className="my-1 border-t border-[#2A2E3A]" />;
+        if (item.type === 'separator') return <div key={i} role="separator" className="my-1 border-t border-line" />;
         if (item.type === 'heading')
           return (
-            <div key={i} className="px-3 pt-1.5 pb-1 text-[11px] font-semibold tracking-wide text-[#7D8496] uppercase">
+            <div key={i} className="px-3 pt-1.5 pb-1 text-[11px] font-semibold tracking-wide text-muted uppercase">
               {item.label}
             </div>
           );
@@ -76,7 +76,7 @@ export function MenuList({ items, x, y, onClose, minWidth = 220 }: { items: Menu
               type="button"
               role="menuitem"
               aria-haspopup="menu"
-              className="flex items-center gap-2 px-3 py-[5px] text-left text-ink-2 hover:bg-[#2B2550] hover:text-white focus:bg-[#2B2550] focus:text-white focus:outline-none focus-visible:outline-none"
+              className="flex items-center gap-2 px-3 py-[5px] text-left text-ink-2 hover:bg-brand-tint hover:text-ink focus:bg-brand-tint focus:text-ink focus:outline-none focus-visible:outline-none"
               onMouseEnter={(e) => {
                 const r = e.currentTarget.getBoundingClientRect();
                 setSub({ index: i, x: r.right - 2, y: r.top - 4 });
@@ -103,13 +103,13 @@ export function MenuList({ items, x, y, onClose, minWidth = 220 }: { items: Menu
               onClose();
               item.onSelect();
             }}
-            className={`flex items-center gap-2 px-3 py-[5px] text-left hover:bg-[#2B2550] focus:bg-[#2B2550] focus:outline-none focus-visible:outline-none disabled:opacity-40 disabled:hover:bg-transparent ${
-              item.danger ? 'text-[#FF9C9C]' : 'text-ink-2 hover:text-white focus:text-white'
+            className={`flex items-center gap-2 px-3 py-[5px] text-left hover:bg-brand-tint focus:bg-brand-tint focus:outline-none focus-visible:outline-none disabled:opacity-40 disabled:hover:bg-transparent ${
+              item.danger ? 'text-bad' : 'text-ink-2 hover:text-ink focus:text-ink'
             }`}
           >
             <span className="flex w-4 justify-center text-muted">{item.checked ? <Check size={13} className="text-cyan" /> : item.icon}</span>
             <span className="flex-1 whitespace-nowrap">{item.label}</span>
-            {item.shortcut && <kbd className="ml-6 font-sans text-[11px] text-[#7D8496]">{item.shortcut}</kbd>}
+            {item.shortcut && <kbd className="ml-6 font-sans text-[11px] text-muted">{item.shortcut}</kbd>}
           </button>
         );
       })}
@@ -167,7 +167,7 @@ export function MenuBar({ menus }: { menus: { label: string; items: MenuItem[] }
           aria-expanded={open === i}
           onClick={(e) => (open === i ? setOpen(null) : openAt(i, e.currentTarget))}
           onMouseEnter={(e) => open !== null && open !== i && openAt(i, e.currentTarget)}
-          className={`rounded px-2.5 py-1 text-[12.5px] ${open === i ? 'bg-[#2B2550] text-white' : 'text-ink-2 hover:bg-[#1E212B] hover:text-white'}`}
+          className={`rounded px-2.5 py-1 text-[12.5px] ${open === i ? 'bg-brand-tint text-ink' : 'text-ink-2 hover:bg-surface-2 hover:text-ink'}`}
         >
           {m.label}
         </button>
@@ -204,7 +204,7 @@ export function MenuButton({ items, children, label, className = '' }: { items: 
       aria-label={label}
       title={label}
       aria-haspopup="menu"
-      className={className || 'flex size-6 items-center justify-center rounded text-muted hover:bg-[#232734] hover:text-white'}
+      className={className || 'flex size-6 items-center justify-center rounded text-muted hover:bg-surface-3 hover:text-ink'}
       onClick={(e) => {
         const r = e.currentTarget.getBoundingClientRect();
         show(items, { clientX: r.left, clientY: r.bottom + 2 });
@@ -231,7 +231,7 @@ export function Splitter({ axis, onDrag, onDone, label }: { axis: 'x' | 'y'; onD
       role="separator"
       aria-orientation={axis === 'x' ? 'vertical' : 'horizontal'}
       aria-label={label}
-      className={`group relative z-10 shrink-0 bg-[#1F222B] ${axis === 'x' ? 'w-px cursor-col-resize' : 'h-px cursor-row-resize'}`}
+      className={`group relative z-10 shrink-0 bg-line ${axis === 'x' ? 'w-px cursor-col-resize' : 'h-px cursor-row-resize'}`}
       onPointerDown={(e) => {
         e.currentTarget.setPointerCapture(e.pointerId);
         start.current = axis === 'x' ? e.clientX : e.clientY;
@@ -242,7 +242,7 @@ export function Splitter({ axis, onDrag, onDone, label }: { axis: 'x' | 'y'; onD
         onDone?.();
       }}
     >
-      <span className={`absolute group-hover:bg-[#6B4EFF]/60 ${axis === 'x' ? '-inset-x-[3px] inset-y-0' : '-inset-y-[3px] inset-x-0'}`} />
+      <span className={`absolute group-hover:bg-brand/60 ${axis === 'x' ? '-inset-x-[3px] inset-y-0' : '-inset-y-[3px] inset-x-0'}`} />
     </div>
   );
 }
@@ -262,7 +262,7 @@ export function TabStrip<T extends string>({
   dense?: boolean;
 }) {
   return (
-    <div role="tablist" className={`flex shrink-0 items-center gap-0.5 border-b border-[#1F222B] bg-[#13151B] px-1 ${dense ? 'h-7' : 'h-8'}`}>
+    <div role="tablist" className={`flex shrink-0 items-center gap-0.5 border-b border-line bg-surface px-1 ${dense ? 'h-7' : 'h-8'}`}>
       {tabs.map((t) => (
         <button
           key={t.id}
@@ -271,7 +271,7 @@ export function TabStrip<T extends string>({
           aria-selected={active === t.id}
           onClick={() => onChange(t.id)}
           className={`relative flex h-full items-center gap-1.5 px-2.5 text-[12px] ${
-            active === t.id ? 'text-white after:absolute after:inset-x-1.5 after:bottom-0 after:h-[2px] after:rounded-full after:bg-[#7C5CFF]' : 'text-[#8C93A5] hover:text-white'
+            active === t.id ? 'text-on-brand after:absolute after:inset-x-1.5 after:bottom-0 after:h-[2px] after:rounded-full after:bg-brand' : 'text-muted hover:text-on-brand'
           }`}
         >
           {t.label}
@@ -309,7 +309,7 @@ export function IconButton({
       disabled={disabled}
       onClick={onClick}
       className={`flex size-7 shrink-0 items-center justify-center rounded disabled:opacity-35 ${
-        active ? 'bg-[#2B2550] text-white ring-1 ring-[#4B3BA8]' : 'text-[#A3A9B8] hover:bg-[#232734] hover:text-white'
+        active ? 'bg-brand-tint text-ink ring-1 ring-brand-tint-2' : 'text-muted hover:bg-surface-3 hover:text-ink'
       } ${className}`}
     >
       {children}
@@ -350,7 +350,7 @@ export function Dialog({
         aria-modal="true"
         aria-labelledby={id}
         style={{ width, height }}
-        className="flex max-h-[min(88vh,820px)] max-w-full flex-col overflow-hidden rounded-lg border border-[#2E3342] bg-[#16181F] text-[12.5px] shadow-[0_24px_64px_rgba(0,0,0,.6)]"
+        className="flex max-h-[min(88vh,820px)] max-w-full flex-col overflow-hidden rounded-lg border border-line-strong bg-surface text-[12.5px] shadow-[0_24px_64px_rgba(0,0,0,.6)]"
         onKeyDown={(e) => {
           if (e.key === 'Escape') {
             e.stopPropagation();
@@ -371,16 +371,16 @@ export function Dialog({
           }
         }}
       >
-        <div className="flex h-10 shrink-0 items-center border-b border-[#252935] bg-[#1A1D25] px-4">
+        <div className="flex h-10 shrink-0 items-center border-b border-surface-3 bg-surface-2 px-4">
           <h2 id={id} className="text-[13px] font-semibold">
             {title}
           </h2>
-          <button type="button" aria-label="Close" onClick={onClose} className="ml-auto rounded p-1 text-muted hover:bg-[#232734] hover:text-white">
+          <button type="button" aria-label="Close" onClick={onClose} className="ml-auto rounded p-1 text-muted hover:bg-surface-3 hover:text-ink">
             <X size={15} />
           </button>
         </div>
         <div className="flex min-h-0 flex-1 flex-col overflow-auto">{children}</div>
-        {footer && <div className="flex shrink-0 items-center justify-end gap-2 border-t border-[#252935] bg-[#14161C] px-4 py-2.5">{footer}</div>}
+        {footer && <div className="flex shrink-0 items-center justify-end gap-2 border-t border-surface-3 bg-surface px-4 py-2.5">{footer}</div>}
       </div>
     </div>,
     document.body,
@@ -409,10 +409,10 @@ export function Btn({
       disabled={disabled}
       className={`inline-flex h-7 items-center gap-1.5 rounded px-3 text-[12.5px] font-medium disabled:opacity-40 ${
         primary
-          ? 'bg-[#6B4EFF] text-white hover:bg-[#7C61FF]'
+          ? 'bg-brand text-on-brand hover:bg-brand-hover'
           : danger
-            ? 'bg-[#4A1D24] text-[#FFB4B4] hover:bg-[#5C232C]'
-            : 'border border-[#2E3342] bg-[#1C1F28] text-ink-2 hover:border-[#3A4052] hover:text-white'
+            ? 'bg-bad-tint text-bad hover:bg-bad/40'
+            : 'border border-line-strong bg-surface-2 text-ink-2 hover:border-line-strong hover:text-on-brand'
       }`}
     >
       {children}
@@ -423,17 +423,17 @@ export function Btn({
 /* ─── Property fields ───────────────────────────────────────────────────── */
 
 export const fieldInput =
-  'h-6 w-full min-w-0 rounded-[4px] border border-[#2A2E3A] bg-[#0F1015] px-1.5 text-[12px] text-ink outline-none hover:border-[#373C4C] focus:border-[#6B4EFF]';
+  'h-6 w-full min-w-0 rounded-[4px] border border-line bg-sunken px-1.5 text-[12px] text-ink outline-none hover:border-line-strong focus:border-brand';
 
 /** A property row: label on the left, editor on the right, optional revert arrow. */
 export function PropRow({ label, children, onRevert, hint }: { label: string; children: ReactNode; onRevert?: () => void; hint?: string }) {
   return (
     <div className="group flex min-h-[26px] items-center gap-2 px-3" title={hint}>
-      <span className="w-[38%] min-w-[70px] shrink-0 truncate text-[12px] text-[#9AA1B2]">{label}</span>
+      <span className="w-[38%] min-w-[70px] shrink-0 truncate text-[12px] text-muted">{label}</span>
       <div className="flex min-w-0 flex-1 items-center gap-1">{children}</div>
       <span className="flex w-4 justify-center">
         {onRevert && (
-          <button type="button" aria-label={`Reset ${label}`} title="Reset to default" onClick={onRevert} className="text-[#8C7BFF] hover:text-white">
+          <button type="button" aria-label={`Reset ${label}`} title="Reset to default" onClick={onRevert} className="text-brand-ink hover:text-ink">
             <RotateCcw size={11} />
           </button>
         )}
@@ -475,7 +475,7 @@ export function NumberField({
   const round = (v: number) => Number(v.toFixed(decimals));
   const shown = text ?? String(round(value));
   return (
-    <div className="flex h-6 min-w-0 flex-1 items-center rounded-[4px] border border-[#2A2E3A] bg-[#0F1015] hover:border-[#373C4C] focus-within:border-[#6B4EFF]">
+    <div className="flex h-6 min-w-0 flex-1 items-center rounded-[4px] border border-line bg-sunken hover:border-line-strong focus-within:border-brand">
       {prefix && (
         <span
           className="cursor-ew-resize px-1.5 text-[11px] font-semibold select-none"
@@ -560,7 +560,7 @@ export function TextField({ value, onCommit, label, placeholder, mono }: { value
 export function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
     <label className="flex cursor-pointer items-center gap-1.5 text-[12px] text-ink-2">
-      <input type="checkbox" className="size-3.5 accent-[#7C5CFF]" checked={checked} onChange={(e) => onChange(e.target.checked)} aria-label={label} />
+      <input type="checkbox" className="size-3.5 accent-brand" checked={checked} onChange={(e) => onChange(e.target.checked)} aria-label={label} />
       <span>{checked ? 'On' : 'Off'}</span>
     </label>
   );
@@ -596,11 +596,11 @@ export function ColorField({ value, onChange, label, onClear }: { value: string 
         aria-label={label}
         value={value ?? '#ffffff'}
         onChange={(e) => onChange(e.target.value.toUpperCase())}
-        className="h-6 w-9 shrink-0 cursor-pointer rounded-[4px] border border-[#2A2E3A] bg-[#0F1015] p-0.5"
+        className="h-6 w-9 shrink-0 cursor-pointer rounded-[4px] border border-line bg-sunken p-0.5"
       />
-      <span className="truncate font-mono text-[11.5px] text-[#9AA1B2]">{value ?? 'none'}</span>
+      <span className="truncate font-mono text-[11.5px] text-muted">{value ?? 'none'}</span>
       {onClear && value && (
-        <button type="button" onClick={onClear} className="ml-auto text-[11px] text-muted hover:text-white">
+        <button type="button" onClick={onClear} className="ml-auto text-[11px] text-muted hover:text-ink">
           Clear
         </button>
       )}
@@ -626,8 +626,8 @@ export function Section({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <section className="border-b border-[#1F222B]">
-      <div className="flex h-7 items-center gap-1.5 bg-[#191B23] pr-1.5 pl-1.5">
+    <section className="border-b border-line">
+      <div className="flex h-7 items-center gap-1.5 bg-surface-2 pr-1.5 pl-1.5">
         <button type="button" aria-expanded={open} onClick={() => setOpen(!open)} className="flex flex-1 items-center gap-1.5 text-left text-[12px] font-semibold text-ink">
           <ChevronRight size={13} className={`text-muted transition-transform ${open ? 'rotate-90' : ''}`} aria-hidden="true" />
           <span style={{ color: accent }} className="flex">
@@ -643,5 +643,5 @@ export function Section({
 }
 
 export function Kbd({ children }: { children: ReactNode }) {
-  return <kbd className="rounded border border-[#2E3342] bg-[#0F1015] px-1.5 py-px font-sans text-[11px] text-ink-2">{children}</kbd>;
+  return <kbd className="rounded border border-line-strong bg-sunken px-1.5 py-px font-sans text-[11px] text-ink-2">{children}</kbd>;
 }

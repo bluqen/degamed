@@ -25,7 +25,7 @@ export function StylePicker({ value, onChange }: { value: string; onChange: (id:
             role="tab"
             aria-selected={family === f.id}
             onClick={() => setFamily(f.id)}
-            className={`min-h-10 rounded-full px-4 text-sm ${family === f.id ? 'bg-brand font-semibold text-white' : 'border border-line-strong text-ink-2 hover:text-white'}`}
+            className={`min-h-10 rounded-full px-4 text-sm ${family === f.id ? 'bg-brand font-semibold text-on-brand' : 'border border-line-strong text-ink-2 hover:text-on-brand'}`}
           >
             {f.label}
           </button>

@@ -55,7 +55,7 @@ export function StylePreview({ style, idea }: { style: string; idea: string }) {
           type="button"
           onClick={run}
           disabled={busy}
-          className="inline-flex min-h-11 items-center gap-2 self-start rounded-[10px] bg-brand px-4 font-semibold text-white hover:bg-[#5A3DF0] disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-2 self-start rounded-[10px] bg-brand px-4 font-semibold text-on-brand hover:bg-brand-hover disabled:opacity-50"
         >
           <Sparkles size={16} aria-hidden="true" />
           {busy ? 'Drawing…' : shown ? 'Try again' : 'Preview'}

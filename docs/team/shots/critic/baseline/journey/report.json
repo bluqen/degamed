@@ -1,0 +1,120 @@
+{
+  "round": "0",
+  "startedAt": "2026-10-12T01:07:10.471Z",
+  "base": "http://localhost:5173",
+  "pages": [],
+  "journey": [
+    {
+      "viewport": "desktop",
+      "reachedPlay": false,
+      "seconds": null,
+      "clicks": 4,
+      "typed": true,
+      "finalUrl": "/new?idea=a%20moody%20rain-soaked%20platformer%20where%20a%20little%20robot%20looks%20for%20its%20family",
+      "steps": [
+        {
+          "at": 0,
+          "what": "landing",
+          "shot": "docs/team/shots/critic/baseline/journey/journey--desktop-00-landing.png"
+        },
+        {
+          "at": 3283,
+          "what": "typed prompt",
+          "shot": "docs/team/shots/critic/baseline/journey/journey--desktop-01-typed.png"
+        },
+        {
+          "at": 4925,
+          "what": "clicked \"Build my game\"",
+          "url": "/new?idea=a%20moody%20rain-soaked%20platformer%20where%20a%20little%20robot%20looks%20for%20its%20family",
+          "shot": "docs/team/shots/critic/baseline/journey/journey--desktop-03-step.png"
+        },
+        {
+          "at": 35318,
+          "what": "clicked \"Next\"",
+          "url": "/new?idea=a%20moody%20rain-soaked%20platformer%20where%20a%20little%20robot%20looks%20for%20its%20family",
+          "shot": "docs/team/shots/critic/baseline/journey/journey--desktop-04-step.png"
+        },
+        {
+          "at": 65846,
+          "what": "clicked \"Next\"",
+          "url": "/new?idea=a%20moody%20rain-soaked%20platformer%20where%20a%20little%20robot%20looks%20for%20its%20family",
+          "shot": "docs/team/shots/critic/baseline/journey/journey--desktop-05-step.png"
+        }
+      ],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 81
+      },
+      "apiRequests": []
+    },
+    {
+      "viewport": "phone",
+      "reachedPlay": false,
+      "seconds": null,
+      "clicks": 4,
+      "typed": true,
+      "finalUrl": "/create",
+      "steps": [
+        {
+          "at": 0,
+          "what": "landing",
+          "shot": "docs/team/shots/critic/baseline/journey/journey--phone-00-landing.png"
+        },
+        {
+          "at": 1954,
+          "what": "typed prompt",
+          "shot": "docs/team/shots/critic/baseline/journey/journey--phone-01-typed.png"
+        },
+        {
+          "at": 2595,
+          "what": "clicked \"Build my game\"",
+          "url": "/new?idea=a%20moody%20rain-soaked%20platformer%20where%20a%20little%20robot%20looks%20for%20its%20family",
+          "shot": "docs/team/shots/critic/baseline/journey/journey--phone-03-step.png"
+        },
+        {
+          "at": 32956,
+          "what": "clicked \"Next\"",
+          "url": "/new?idea=a%20moody%20rain-soaked%20platformer%20where%20a%20little%20robot%20looks%20for%20its%20family",
+          "shot": "docs/team/shots/critic/baseline/journey/journey--phone-04-step.png"
+        },
+        {
+          "at": 63390,
+          "what": "clicked \"Next\"",
+          "url": "/create",
+          "shot": "docs/team/shots/critic/baseline/journey/journey--phone-05-step.png"
+        }
+      ],
+      "consoleErrors": [
+        "You are calling ReactDOMClient.createRoot() on a container that has already been passed to createRoot() before. Instead, call root.render() on the existing root instead if you want to update it."
+      ],
+      "consoleWarnings": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "hosts": {
+        "localhost:5173": 175
+      },
+      "apiRequests": []
+    }
+  ],
+  "bundles": null,
+  "budget": {
+    "consoleErrors": 0,
+    "journeySeconds": 60,
+    "journeyClicks": 3,
+    "fpsMedian": 55,
+    "fpsMedianHeadless": 30,
+    "initialJsGzip": 174080,
+    "largestChunkGzip": 409600,
+    "cssGzip": 35840,
+    "playerJsGzip": 256000,
+    "pageLoadMs": 2500
+  },
+  "fails": [
+    "journey/desktop: never reached a running game",
+    "journey/phone: never reached a running game"
+  ],
+  "warns": []
+}

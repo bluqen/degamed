@@ -41,8 +41,8 @@ export interface ViewOptions {
   rulers: boolean;
 }
 
-const LAYOUT_KEY = 'degamed.editor.layout.v1';
-const DEFAULT_LAYOUT: Layout = { left: 264, right: 300, bottom: 200, leftSplit: 0.55, showLeft: true, showRight: true, showBottom: true };
+const LAYOUT_KEY = 'degamed.editor.layout.v2';
+const DEFAULT_LAYOUT: Layout = { left: 264, right: 300, bottom: 200, leftSplit: 0.55, showLeft: true, showRight: true, showBottom: false };
 const DEFAULT_VIEW: ViewOptions = { grid: true, snap: false, step: 16, rotateSnap: true, rulers: true };
 
 function readStored<T extends object>(key: string, fallback: T): T {

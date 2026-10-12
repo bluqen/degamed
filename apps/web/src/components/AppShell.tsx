@@ -30,8 +30,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { session, signOut } = useAuth();
   return (
     <div className="flex min-h-screen flex-wrap">
-      <nav aria-label="Main" className="flex max-w-[260px] flex-[1_1_220px] flex-col gap-1 border-r border-[#1F222B] bg-sunken px-3.5 py-5 text-[15px]">
-        <NavLink to="/" className="flex items-center gap-2.5 px-2.5 pb-4 text-white">
+      <nav aria-label="Main" className="flex max-w-[260px] flex-[1_1_220px] flex-col gap-1 border-r border-line bg-sunken px-3.5 py-5 text-[15px]">
+        <NavLink to="/" className="flex items-center gap-2.5 px-2.5 pb-4 text-ink">
           <LogoMark size={24} hole="#121419" />
           <span className="font-display text-xl font-bold">degamed</span>
         </NavLink>
@@ -41,14 +41,14 @@ export function AppShell({ children }: { children: ReactNode }) {
             to={to}
             end
             className={({ isActive }) =>
-              `flex items-center gap-2.5 rounded-lg px-3 py-2.5 ${isActive ? 'bg-[#1F2230] text-white' : 'text-ink-2 hover:text-white'}`
+              `flex items-center gap-2.5 rounded-lg px-3 py-2.5 ${isActive ? 'bg-surface-2 text-ink' : 'text-ink-2 hover:text-ink'}`
             }
           >
             <Icon size={18} aria-hidden="true" />
             {label}
           </NavLink>
         ))}
-        <div className="mt-auto flex flex-col gap-2 rounded-xl border border-[#3A2F80] bg-[#17142A] p-3.5">
+        <div className="mt-auto flex flex-col gap-2 rounded-xl border border-brand bg-brand-tint p-3.5">
           <span className="text-[13px] text-muted">Plan</span>
           <strong>Free</strong>
           <ButtonLink to="/pricing" className="!min-h-9 !py-2 text-sm">
@@ -56,7 +56,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </ButtonLink>
         </div>
         {session && (
-          <button type="button" onClick={signOut} className="mt-2 rounded-lg px-3 py-2 text-left text-sm text-muted hover:text-white">
+          <button type="button" onClick={signOut} className="mt-2 rounded-lg px-3 py-2 text-left text-sm text-muted hover:text-ink">
             Sign out ({session.user.email})
           </button>
         )}

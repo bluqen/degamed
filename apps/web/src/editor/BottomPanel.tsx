@@ -19,7 +19,7 @@ export function BottomPanel() {
           <Terminal size={12} /> Console
         </span>
       ),
-      badge: errors ? <span className="rounded-full bg-[#4A1D24] px-1.5 text-[10.5px] text-[#FFB4B4]">{errors}</span> : undefined,
+      badge: errors ? <span className="rounded-full bg-bad-tint px-1.5 text-[10.5px] text-bad">{errors}</span> : undefined,
     },
     {
       id: 'problems',
@@ -28,7 +28,7 @@ export function BottomPanel() {
           <AlertTriangle size={12} /> Problems
         </span>
       ),
-      badge: problems.length ? <span className="rounded-full bg-[#3A2A10] px-1.5 text-[10.5px] text-warn">{problems.length}</span> : undefined,
+      badge: problems.length ? <span className="rounded-full bg-warn-tint px-1.5 text-[10.5px] text-warn">{problems.length}</span> : undefined,
     },
     {
       id: 'animation',
@@ -40,7 +40,7 @@ export function BottomPanel() {
     },
   ];
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-[#101116]">
+    <div className="flex min-h-0 flex-1 flex-col bg-sunken">
       <TabStrip
         dense
         tabs={tabs}
@@ -55,7 +55,7 @@ export function BottomPanel() {
         }}
         right={
           <>
-            <span className="mr-2 text-[11px] text-[#6E7587]">{ed.saved ? 'Saved on this device' : 'Saving…'}</span>
+            <span className="mr-2 text-[11px] text-muted">{ed.saved ? 'Saved on this device' : 'Saving…'}</span>
             <IconButton label={ed.layout.showBottom ? 'Hide panel' : 'Show panel'} shortcut="Ctrl+J" onClick={() => ed.setLayout({ showBottom: !ed.layout.showBottom })} className="size-6">
               <ChevronDown size={14} className={ed.layout.showBottom ? '' : 'rotate-180'} />
             </IconButton>
@@ -87,7 +87,7 @@ function ConsoleTab() {
       aria-pressed={show[lvl]}
       title={`Show ${lvl === 'info' ? 'messages' : lvl === 'warn' ? 'warnings' : 'errors'}`}
       onClick={() => setShow((s) => ({ ...s, [lvl]: !s[lvl] }))}
-      className={`flex h-6 items-center gap-1 rounded px-1.5 text-[11.5px] tabular-nums ${show[lvl] ? 'bg-[#1C1F28] text-ink' : 'text-[#6E7587]'}`}
+      className={`flex h-6 items-center gap-1 rounded px-1.5 text-[11.5px] tabular-nums ${show[lvl] ? 'bg-surface-2 text-ink' : 'text-muted'}`}
     >
       <span style={{ color: show[lvl] ? color : undefined }} className="flex">
         {icon}
@@ -97,8 +97,8 @@ function ConsoleTab() {
   );
   return (
     <>
-      <div className="flex h-8 shrink-0 items-center gap-1 border-b border-[#1F222B] px-2">
-        <label className="flex h-6 w-56 items-center gap-1.5 rounded border border-[#2A2E3A] bg-[#0F1015] px-1.5 focus-within:border-[#6B4EFF]">
+      <div className="flex h-8 shrink-0 items-center gap-1 border-b border-line px-2">
+        <label className="flex h-6 w-56 items-center gap-1.5 rounded border border-line bg-sunken px-1.5 focus-within:border-brand">
           <Search size={12} className="text-muted" aria-hidden="true" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter messages" aria-label="Filter messages" className="min-w-0 flex-1 bg-transparent text-[12px] outline-none" />
         </label>
@@ -122,13 +122,13 @@ function ConsoleTab() {
         {lines.map((l) => (
           <li
             key={l.id}
-            className={`flex gap-2 border-b border-[#16181F] px-3 py-0.5 ${l.level === 'error' ? 'bg-[#1F1013] text-[#FFB4B4]' : l.level === 'warn' ? 'bg-[#1C170C] text-[#FCD58A]' : 'text-ink-2'}`}
+            className={`flex gap-2 border-b border-surface px-3 py-0.5 ${l.level === 'error' ? 'bg-bad-tint text-bad' : l.level === 'warn' ? 'bg-warn-tint text-warn' : 'text-ink-2'}`}
           >
-            <span className="shrink-0 text-[#5A6072] tabular-nums">{new Date(l.at).toLocaleTimeString([], { hour12: false })}</span>
+            <span className="shrink-0 text-faint tabular-nums">{new Date(l.at).toLocaleTimeString([], { hour12: false })}</span>
             {l.file && (
               <button
                 type="button"
-                className="shrink-0 text-[#9A8CFF] underline decoration-dotted"
+                className="shrink-0 text-brand-ink underline decoration-dotted"
                 onClick={() => ed.files[l.file!] !== undefined && ed.openFile(l.file!)}
               >
                 {l.file}
@@ -159,11 +159,11 @@ function ProblemsTab({ problems }: { problems: Problem[] }) {
                 ed.requestFrame('selection');
               } else ed.openFile(p.file);
             }}
-            className="flex w-full items-center gap-2 px-3 py-1 text-left hover:bg-[#1C1F28]"
+            className="flex w-full items-center gap-2 px-3 py-1 text-left hover:bg-surface-2"
           >
             {p.level === 'error' ? <XCircle size={13} className="shrink-0 text-bad" /> : <AlertTriangle size={13} className="shrink-0 text-warn" />}
             <span className="min-w-0 flex-1 truncate text-ink-2">{p.message}</span>
-            <span className="shrink-0 font-mono text-[11px] text-[#6E7587]">{p.file}</span>
+            <span className="shrink-0 font-mono text-[11px] text-muted">{p.file}</span>
           </button>
         </li>
       ))}
@@ -185,13 +185,13 @@ function AnimationTab() {
   if (!path) return <p className="px-3 py-2 text-[12px] text-muted">No animation files yet. Add an Animated Sprite to an entity to create one.</p>;
   return (
     <div className="flex min-h-0 flex-1">
-      <ul className="w-44 shrink-0 overflow-auto border-r border-[#1F222B] py-1 text-[12px]">
+      <ul className="w-44 shrink-0 overflow-auto border-r border-line py-1 text-[12px]">
         {framesFiles.map((p) => (
           <li key={p}>
             <button
               type="button"
               onClick={() => ed.setFramesFile(p)}
-              className={`flex w-full items-center gap-1.5 px-2.5 py-1 text-left ${p === path ? 'bg-[#2B2550] text-white' : 'text-ink-2 hover:bg-[#1C1F28]'}`}
+              className={`flex w-full items-center gap-1.5 px-2.5 py-1 text-left ${p === path ? 'bg-brand-tint text-ink' : 'text-ink-2 hover:bg-surface-2'}`}
             >
               <Clapperboard size={12} className="shrink-0 text-cyan" />
               <span className="truncate">{p.slice(p.lastIndexOf('/') + 1).replace('.frames.json', '')}</span>

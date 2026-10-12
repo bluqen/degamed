@@ -11,6 +11,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@degamed/ai": "workspace:*",
     "hono": "^4.13.13",
     "zod": "^4.6.5"
   },

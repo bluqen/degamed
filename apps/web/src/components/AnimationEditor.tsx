@@ -97,7 +97,7 @@ export function AnimationEditor({ path, json, images, onChange }: Props) {
   };
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-auto bg-[#0B0C10] p-4 text-[13px]">
+    <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-auto bg-sunken p-4 text-[13px]">
       <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
         <strong className="text-[15px]">Animations</strong>
         <span className="font-mono text-muted">
@@ -132,7 +132,7 @@ export function AnimationEditor({ path, json, images, onChange }: Props) {
           return (
             <div
               key={name}
-              className={`flex flex-wrap items-center gap-4 rounded-xl border p-3 ${name === active ? 'border-[#3A2F80] bg-[#17142A]' : 'border-line bg-panel'}`}
+              className={`flex flex-wrap items-center gap-4 rounded-xl border p-3 ${name === active ? 'border-brand bg-brand-tint' : 'border-line bg-panel'}`}
             >
               <button type="button" onClick={() => setSelected(name)} className="flex items-center gap-3 text-left">
                 <span className="rounded-md p-1" style={{ background: CHECKER }}>

@@ -189,11 +189,11 @@ export function HierarchyDock() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex h-8 shrink-0 items-center gap-1 border-b border-[#1F222B] px-1.5">
+      <div className="flex h-8 shrink-0 items-center gap-1 border-b border-line px-1.5">
         <IconButton label="Add entity" shortcut="Ctrl+A" onClick={() => ed.setDialog({ type: 'add-entity', parentId: null, afterId: selection[selection.length - 1] ?? null })}>
           <Plus size={15} />
         </IconButton>
-        <label className="flex h-6 min-w-0 flex-1 items-center gap-1.5 rounded border border-[#2A2E3A] bg-[#0F1015] px-1.5 focus-within:border-[#6B4EFF]">
+        <label className="flex h-6 min-w-0 flex-1 items-center gap-1.5 rounded border border-line bg-sunken px-1.5 focus-within:border-brand">
           <Search size={12} className="shrink-0 text-muted" aria-hidden="true" />
           <input value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Filter entities" aria-label="Filter entities" className="min-w-0 flex-1 bg-transparent text-[12px] outline-none" />
         </label>
@@ -243,11 +243,11 @@ export function HierarchyDock() {
         <button
           type="button"
           onClick={() => ed.select([])}
-          className={`flex h-6 w-full items-center gap-1.5 px-2 text-left ${selection.length === 0 ? 'bg-[#2B2550]/70 text-white' : 'text-ink hover:bg-[#1C1F28]'}`}
+          className={`flex h-6 w-full items-center gap-1.5 px-2 text-left ${selection.length === 0 ? 'bg-brand-tint/70 text-ink' : 'text-ink hover:bg-surface-2'}`}
         >
-          <Layers size={13} className="text-[#C9BCFF]" aria-hidden="true" />
+          <Layers size={13} className="text-brand-ink" aria-hidden="true" />
           <span className="truncate font-medium">{sceneName}</span>
-          <span className="ml-auto text-[11px] text-[#6E7587]">{rows.length}</span>
+          <span className="ml-auto text-[11px] text-muted">{rows.length}</span>
         </button>
         {rows.map((row) => {
           const { e } = row;
@@ -284,11 +284,11 @@ export function HierarchyDock() {
               }}
               style={{ paddingLeft: 6 + (row.depth + 1) * 14 }}
               className={`group relative flex h-6 cursor-default items-center gap-1.5 pr-1.5 ${
-                selected ? 'bg-[#2B2550] text-white' : 'text-ink-2 hover:bg-[#1C1F28]'
-              } ${d === 'inside' ? 'ring-1 ring-[#7C5CFF] ring-inset' : ''}`}
+                selected ? 'bg-brand-tint text-ink' : 'text-ink-2 hover:bg-surface-2'
+              } ${d === 'inside' ? 'ring-1 ring-brand ring-inset' : ''}`}
             >
-              {d === 'before' && <span className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-[#7C5CFF]" />}
-              {d === 'after' && <span className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] bg-[#7C5CFF]" />}
+              {d === 'before' && <span className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-brand" />}
+              {d === 'after' && <span className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] bg-brand" />}
               <button
                 type="button"
                 aria-label={collapsed.has(e.id) ? 'Expand' : 'Collapse'}
@@ -325,10 +325,10 @@ export function HierarchyDock() {
                     if (ev.key === 'Enter') ev.currentTarget.blur();
                     if (ev.key === 'Escape') setRenaming(null);
                   }}
-                  className="h-5 min-w-0 flex-1 rounded border border-[#6B4EFF] bg-[#0F1015] px-1 text-[12px] text-white outline-none"
+                  className="h-5 min-w-0 flex-1 rounded border border-brand bg-sunken px-1 text-[12px] text-ink outline-none"
                 />
               ) : (
-                <span className={`min-w-0 flex-1 truncate ${e.active ? '' : 'text-[#6E7587] line-through decoration-[#6E7587]/50'}`}>{e.name}</span>
+                <span className={`min-w-0 flex-1 truncate ${e.active ? '' : 'text-muted line-through decoration-muted/50'}`}>{e.name}</span>
               )}
               {problems.length > 0 && (
                 <span title={problems.join('\n')} className="flex text-warn">
@@ -345,7 +345,7 @@ export function HierarchyDock() {
                     ev.stopPropagation();
                     ed.openFile(e.components.Script!.src);
                   }}
-                  className="flex text-[#8C93A5] hover:text-white"
+                  className="flex text-muted hover:text-ink"
                 >
                   <FileCode2 size={12} />
                 </button>
@@ -359,7 +359,7 @@ export function HierarchyDock() {
                   ev.stopPropagation();
                   setEnabled(ed, [e.id], !e.active);
                 }}
-                className={`flex ${e.active ? 'text-[#6E7587] opacity-0 group-hover:opacity-100 hover:text-white' : 'text-[#8C93A5]'}`}
+                className={`flex ${e.active ? 'text-muted opacity-0 group-hover:opacity-100 hover:text-ink' : 'text-muted'}`}
               >
                 {e.active ? <Eye size={12} /> : <EyeOff size={12} />}
               </button>

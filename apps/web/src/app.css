@@ -1,39 +1,387 @@
 @import 'tailwindcss';
 
-/* Degamed design tokens. Keep in sync with the mockups. */
-@theme {
-  --color-bg: #0e0f13;
-  --color-panel: #16181f;
-  --color-panel-2: #1c1f28;
-  --color-sunken: #121419;
-  --color-line: #262a35;
-  --color-line-strong: #2e3342;
-  --color-ink: #e8eaf0;
-  --color-ink-2: #c8ccd8;
-  --color-muted: #a3a9b8;
-  --color-brand: #6b4eff;
-  --color-brand-soft: #c9bcff;
-  --color-violet: #7c5cff;
-  --color-cyan: #22d3ee;
-  --color-pink: #ff5ca8;
-  --color-ok: #34d399;
-  --color-warn: #fbbf24;
-  --color-bad: #f87171;
+/* `dark:` follows our resolved theme (data-theme on <html>), not just the OS setting. */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
-  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
-  --font-display: 'Space Grotesk', 'IBM Plex Sans', sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+/*
+ * Degamed design system: tokens.
+ *
+ * Every colour is a CSS variable with a light and a dark value. Tailwind utilities
+ * (bg-surface, text-ink, border-line…) point at these variables, so a component
+ * written once works in both themes. Never hard-code a hex colour in a component;
+ * add a token here instead. See docs/team/design.md for the full system.
+ */
+
+/* ── Fonts (self-hosted, so they load even when Google Fonts is blocked) ── */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url('/fonts/plus-jakarta-sans-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url('/fonts/plus-jakarta-sans-latin-ext-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url('/fonts/bricolage-grotesque-latin-wght-normal.woff2') format('woff2-variations');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 800;
+  src: url('/fonts/jetbrains-mono-latin-wght-normal.woff2') format('woff2-variations');
 }
 
-html,
-body {
-  background: var(--color-bg);
-  color: var(--color-ink);
+/* ── Colour: light (default) ── */
+:root,
+[data-theme='light'] {
+  color-scheme: light;
+  --c-bg: #f6f6f9; /* page canvas */
+  --c-surface: #ffffff; /* cards, panels */
+  --c-surface-2: #f1f1f6; /* raised inside a surface: inputs, wells, hovered rows */
+  --c-surface-3: #e8e8f0; /* pressed, selected neutral */
+  --c-sunken: #eeeef4; /* recessed areas behind content */
+  --c-stage: #0c0c11; /* behind the game: always dark so art pops */
+  --c-line: #e3e3eb;
+  --c-line-strong: #cfcfdc;
+  --c-ink: #15141d; /* primary text */
+  --c-ink-2: #3a3949; /* secondary text */
+  --c-muted: #676679; /* tertiary text, 5.4:1 on white */
+  --c-faint: #9796a8; /* placeholder, disabled (decorative only) */
+  --c-brand: #6342f0; /* primary actions, 5.9:1 with white */
+  --c-brand-hover: #5533e3;
+  --c-brand-press: #4a29d1;
+  --c-brand-ink: #4f30d6; /* violet text/icons on surfaces */
+  --c-brand-tint: #efebff; /* selected backgrounds, chips */
+  --c-brand-tint-2: #e2dbff;
+  --c-on-brand: #ffffff;
+  --c-accent: #0e7490; /* cyan, used for highlights; 5.2:1 on white */
+  --c-accent-tint: #e0f6fa;
+  --c-ok: #16803c;
+  --c-ok-tint: #e3f6e9;
+  --c-warn: #a35a00;
+  --c-warn-tint: #fdf1dc;
+  --c-bad: #c9282d;
+  --c-bad-tint: #fde8e8;
+  --c-focus: #6342f0;
+  --c-scrim: rgb(16 14 30 / 0.42);
+  --c-glass: rgb(255 255 255 / 0.78);
+
+  --shadow-1: 0 1px 2px rgb(20 18 40 / 0.06), 0 0 0 1px rgb(20 18 40 / 0.04);
+  --shadow-2: 0 2px 6px rgb(20 18 40 / 0.06), 0 8px 24px -6px rgb(20 18 40 / 0.1);
+  --shadow-3: 0 4px 12px rgb(20 18 40 / 0.08), 0 20px 48px -12px rgb(20 18 40 / 0.18);
+  --shadow-4: 0 12px 28px rgb(20 18 40 / 0.12), 0 40px 80px -20px rgb(20 18 40 / 0.28);
+  --shadow-brand: 0 6px 20px -6px rgb(99 66 240 / 0.55);
+}
+
+/* ── Colour: dark ──
+ * index.html resolves the theme (saved choice, else the system setting) before first paint
+ * and sets data-theme on <html>; lib/theme.tsx keeps it in sync after that. */
+[data-theme='dark'] {
+  color-scheme: dark;
+  --c-bg: #0c0c11;
+  --c-surface: #15151c;
+  --c-surface-2: #1c1c25;
+  --c-surface-3: #262631;
+  --c-sunken: #09090d;
+  --c-stage: #050508;
+  --c-line: #25252f;
+  --c-line-strong: #34343f;
+  --c-ink: #f3f3f8;
+  --c-ink-2: #cacad6;
+  --c-muted: #9a9aad;
+  --c-faint: #66667a;
+  --c-brand: #7457ff;
+  --c-brand-hover: #8468ff;
+  --c-brand-press: #6447f0;
+  --c-brand-ink: #b9a9ff;
+  --c-brand-tint: #221c45;
+  --c-brand-tint-2: #2d2560;
+  --c-on-brand: #ffffff;
+  --c-accent: #4fd8ef;
+  --c-accent-tint: #0c2b33;
+  --c-ok: #4ade80;
+  --c-ok-tint: #0f2a1a;
+  --c-warn: #fbbf24;
+  --c-warn-tint: #2c210a;
+  --c-bad: #ff7b7b;
+  --c-bad-tint: #2f1416;
+  --c-focus: #9b85ff;
+  --c-scrim: rgb(0 0 0 / 0.6);
+  --c-glass: rgb(21 21 28 / 0.78);
+
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.4), 0 0 0 1px rgb(255 255 255 / 0.03);
+  --shadow-2: 0 2px 8px rgb(0 0 0 / 0.35), 0 10px 28px -8px rgb(0 0 0 / 0.5);
+  --shadow-3: 0 6px 16px rgb(0 0 0 / 0.4), 0 24px 56px -12px rgb(0 0 0 / 0.6);
+  --shadow-4: 0 16px 32px rgb(0 0 0 / 0.45), 0 48px 96px -24px rgb(0 0 0 / 0.7);
+  --shadow-brand: 0 8px 24px -6px rgb(116 87 255 / 0.6);
+}
+/* ── Tailwind theme: utilities that read the tokens ── */
+@theme inline {
+  --color-bg: var(--c-bg);
+  --color-surface: var(--c-surface);
+  --color-surface-2: var(--c-surface-2);
+  --color-surface-3: var(--c-surface-3);
+  --color-sunken: var(--c-sunken);
+  --color-stage: var(--c-stage);
+  --color-line: var(--c-line);
+  --color-line-strong: var(--c-line-strong);
+  --color-ink: var(--c-ink);
+  --color-ink-2: var(--c-ink-2);
+  --color-muted: var(--c-muted);
+  --color-faint: var(--c-faint);
+  --color-brand: var(--c-brand);
+  --color-brand-hover: var(--c-brand-hover);
+  --color-brand-press: var(--c-brand-press);
+  --color-brand-ink: var(--c-brand-ink);
+  --color-brand-tint: var(--c-brand-tint);
+  --color-brand-tint-2: var(--c-brand-tint-2);
+  --color-on-brand: var(--c-on-brand);
+  --color-accent: var(--c-accent);
+  --color-accent-tint: var(--c-accent-tint);
+  --color-ok: var(--c-ok);
+  --color-ok-tint: var(--c-ok-tint);
+  --color-warn: var(--c-warn);
+  --color-warn-tint: var(--c-warn-tint);
+  --color-bad: var(--c-bad);
+  --color-bad-tint: var(--c-bad-tint);
+  --color-scrim: var(--c-scrim);
+  --color-glass: var(--c-glass);
+
+  /* Legacy names kept so older screens follow the theme too. */
+  --color-panel: var(--c-surface);
+  --color-panel-2: var(--c-surface-2);
+  --color-brand-soft: var(--c-brand-ink);
+  --color-violet: var(--c-brand);
+  --color-cyan: var(--c-accent);
+  --color-pink: #e9488f;
+
+  --shadow-1: var(--shadow-1);
+  --shadow-2: var(--shadow-2);
+  --shadow-3: var(--shadow-3);
+  --shadow-4: var(--shadow-4);
+  --shadow-brand: var(--shadow-brand);
+}
+
+@theme {
+  /* Type: a friendly geometric sans for UI, a characterful grotesque for big headlines. */
+  --font-sans: 'Plus Jakarta Sans', 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Roboto, Arial, sans-serif;
+  --font-display: 'Bricolage Grotesque', 'Plus Jakarta Sans', 'Segoe UI Variable Display', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, Consolas, monospace;
+
+  /* Type ramp (size / line height). Use these, not arbitrary sizes. */
+  --text-caption: 0.75rem; /* 12 */
+  --text-caption--line-height: 1rem;
+  --text-body-sm: 0.8125rem; /* 13 */
+  --text-body-sm--line-height: 1.25rem;
+  --text-body: 0.9375rem; /* 15 */
+  --text-body--line-height: 1.5rem;
+  --text-body-lg: 1.0625rem; /* 17 */
+  --text-body-lg--line-height: 1.625rem;
+  --text-subtitle: 1.125rem; /* 18 */
+  --text-subtitle--line-height: 1.5rem;
+  --text-title: 1.375rem; /* 22 */
+  --text-title--line-height: 1.75rem;
+  --text-title-lg: 1.875rem; /* 30 */
+  --text-title-lg--line-height: 2.25rem;
+  --text-display: 2.75rem; /* 44 */
+  --text-display--line-height: 3rem;
+  --text-hero: 4.5rem; /* 72 */
+  --text-hero--line-height: 4.5rem;
+
+  /* Radius */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+
+  /* Motion */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.3, 0, 0, 1.12);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --default-transition-duration: 160ms;
+  --default-transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+
+  --animate-fade-in: fade-in 200ms var(--ease-standard) both;
+  --animate-rise: rise 240ms var(--ease-standard) both;
+  --animate-pop: pop 220ms var(--ease-emphasized) both;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-pulse-soft: pulse-soft 1.8s ease-in-out infinite;
+  --animate-spin-slow: spin 1.2s linear infinite;
+}
+
+/* Spacing uses Tailwind's 4px grid. The rhythm we stick to: 4, 8, 12, 16, 24, 32, 48, 64, 96. */
+:root {
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 250ms;
+  --header-h: 56px;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+@keyframes pulse-soft {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* ── Base (layered so utilities can override it) ── */
+@layer base {
+html {
+  background: var(--c-bg);
+  color: var(--c-ink);
   font-family: var(--font-sans);
+  font-size: 100%;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: transparent;
+}
+body {
+  background: var(--c-bg);
+  color: var(--c-ink);
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+}
+::selection {
+  background: var(--c-brand-tint-2);
+  color: var(--c-ink);
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-cyan);
+  outline: 2px solid var(--c-focus);
   outline-offset: 2px;
+}
+
+/* Theme changes shouldn't animate every surface. */
+.theme-switching,
+.theme-switching * {
+  transition: none !important;
+}
+
+/* Skeleton shimmer, shared by <Skeleton/>. */
+.skeleton {
+  background: linear-gradient(90deg, var(--c-surface-2) 0%, var(--c-surface-3) 40%, var(--c-surface-2) 80%);
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
+}
+
+/* Native range input styled as our Slider. */
+.ui-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 20px;
+  background: transparent;
+  cursor: pointer;
+  --fill: 50%;
+}
+.ui-slider::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--c-brand) var(--fill), var(--c-surface-3) var(--fill));
+}
+.ui-slider::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--c-brand) var(--fill), var(--c-surface-3) var(--fill));
+}
+.ui-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -7px;
+  border-radius: 999px;
+  background: #fff;
+  border: 0;
+  box-shadow: 0 0 0 1px rgb(20 18 40 / 0.12), 0 1px 4px rgb(20 18 40 / 0.25);
+  transition: transform 150ms var(--ease-standard);
+}
+.ui-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #fff;
+  border: 0;
+  box-shadow: 0 0 0 1px rgb(20 18 40 / 0.12), 0 1px 4px rgb(20 18 40 / 0.25);
+}
+.ui-slider:hover::-webkit-slider-thumb {
+  transform: scale(1.1);
+}
+.ui-slider:active::-webkit-slider-thumb {
+  transform: scale(1.18);
+}
+.ui-slider:focus-visible {
+  outline: none;
+}
+.ui-slider:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 2px var(--c-surface), 0 0 0 4px var(--c-focus);
+}
+
+/* Crisp pixel art wherever game art is shown. */
+.pixelated {
+  image-rendering: pixelated;
+}
+
+/* Thin, quiet scrollbars. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-line-strong) transparent;
+}
+
+/* Native <dialog> backdrop. */
+dialog::backdrop {
+  background: var(--c-scrim);
+  backdrop-filter: blur(2px);
+  animation: fade-in 200ms var(--ease-standard);
+}
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
 }

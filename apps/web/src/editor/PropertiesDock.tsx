@@ -21,8 +21,7 @@ import {
   SlidersHorizontal,
   Trash2,
   Type,
-  X,
-} from 'lucide-react';
+  X, Lightbulb, Grid3x3 } from 'lucide-react';
 import { useEd, type Ed } from './state';
 import { getFrames } from './scene-render';
 import { locate, setComponent, updateEntities, type ComponentName } from './scene-ops';
@@ -84,8 +83,10 @@ export const COMPONENTS: Record<ComponentName, ComponentMeta> = {
     description: 'Behaviour written in JavaScript (Python coming).',
     make: (ed) => ({ src: Object.keys(ed.files).find((p) => fileType(p) === 'script') ?? 'scripts/new.js', props: {} }),
   },
-  Camera: { label: 'Camera', icon: <Camera size={13} />, color: '#C9BCFF', description: 'What the player sees.', make: () => ({ zoom: 1 }) },
-  Text: { label: 'Text', icon: <Type size={13} />, color: '#7DD3FC', description: 'Words on screen.', make: () => ({ text: 'Text', size: 10, color: '#FFFFFF' }) },
+  Camera: { label: 'Camera', icon: <Camera size={13} />, color: '#C9BCFF', description: 'What the player sees.', make: () => ({ zoom: 1, smoothing: 0.12, lookAhead: 0 }) },
+  Text: { label: 'Text', icon: <Type size={13} />, color: '#7DD3FC', description: 'Words on screen.', make: () => ({ text: 'Text', size: 10, color: '#FFFFFF', align: 'left' }) },
+  Light: { label: 'Light', icon: <Lightbulb size={13} />, color: '#FFE7B0', description: 'A soft glow that lights up the dark.', make: () => ({ color: '#FFE7B0', radius: 64, intensity: 1, flicker: 0, offset: { x: 0, y: 0 } }) },
+  Tilemap: { label: 'Tile Map', icon: <Grid3x3 size={13} />, color: '#A7F070', description: 'A grid of tiles: ground, walls and platforms.', make: () => ({ tileSize: 16, tiles: { ground: 'assets/tiles/grass.png', fill: 'assets/tiles/dirt.png' }, rows: ['................', '################'], depth: 0 }) },
   MusicPlayer: { label: 'Music Player', icon: <Music size={13} />, color: '#FF5CA8', description: 'Plays a song.', make: () => ({ song: 'audio/songs/theme.song.json', autoplay: true }) },
 };
 
@@ -135,8 +136,8 @@ function PropertiesPanel() {
 
   return (
     <FilterCtx.Provider value={filter.trim().toLowerCase()}>
-      <div className="flex h-8 shrink-0 items-center gap-1 border-b border-[#1F222B] px-1.5">
-        <label className="flex h-6 min-w-0 flex-1 items-center gap-1.5 rounded border border-[#2A2E3A] bg-[#0F1015] px-1.5 focus-within:border-[#6B4EFF]">
+      <div className="flex h-8 shrink-0 items-center gap-1 border-b border-line px-1.5">
+        <label className="flex h-6 min-w-0 flex-1 items-center gap-1.5 rounded border border-line bg-sunken px-1.5 focus-within:border-brand">
           <Search size={12} className="shrink-0 text-muted" aria-hidden="true" />
           <input value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Filter properties" aria-label="Filter properties" className="min-w-0 flex-1 bg-transparent text-[12px] outline-none" />
         </label>
@@ -176,7 +177,7 @@ function EntityInspector({ entities }: { entities: Entity[] }) {
 
   return (
     <>
-      <div className="flex flex-col gap-1.5 border-b border-[#1F222B] px-3 py-2.5">
+      <div className="flex flex-col gap-1.5 border-b border-line px-3 py-2.5">
         {multi ? (
           <div className="flex items-center gap-2 text-[12.5px]">
             <strong>{entities.length} entities</strong>
@@ -190,7 +191,7 @@ function EntityInspector({ entities }: { entities: Entity[] }) {
               title="Enabled"
               checked={first.active}
               onChange={(e) => setEnabled(ed, ids, e.target.checked)}
-              className="size-3.5 accent-[#7C5CFF]"
+              className="size-3.5 accent-brand"
             />
             <div className="min-w-0 flex-1">
               <TextField value={first.name} label="Name" onCommit={(v) => rename(ed, first.id, v)} />
@@ -201,7 +202,7 @@ function EntityInspector({ entities }: { entities: Entity[] }) {
           <div className="flex items-center gap-1.5 text-[11.5px] text-muted">
             <span>id</span>
             <code className="truncate font-mono text-ink-2">{first.id}</code>
-            <button type="button" aria-label="Copy id" title="Copy id (scripts find entities by it)" onClick={() => void navigator.clipboard?.writeText(first.id)} className="hover:text-white">
+            <button type="button" aria-label="Copy id" title="Copy id (scripts find entities by it)" onClick={() => void navigator.clipboard?.writeText(first.id)} className="hover:text-ink">
               <Copy size={11} />
             </button>
           </div>
@@ -240,7 +241,7 @@ function EntityInspector({ entities }: { entities: Entity[] }) {
           <MenuButton
             label="Add component"
             items={addMenu}
-            className="flex h-7 w-full items-center justify-center gap-1.5 rounded border border-dashed border-[#3A3F4E] text-[12px] text-ink-2 hover:border-[#6B4EFF] hover:text-white"
+            className="flex h-7 w-full items-center justify-center gap-1.5 rounded border border-dashed border-line-strong text-[12px] text-ink-2 hover:border-brand hover:text-ink"
           >
             <Plus size={13} /> Add Component
           </MenuButton>
@@ -266,9 +267,9 @@ function TagEditor({ entities }: { entities: Entity[] }) {
   return (
     <div className="flex flex-wrap items-center gap-1">
       {tags.map((t) => (
-        <span key={t} className="inline-flex h-5 items-center gap-1 rounded bg-[#232734] pr-1 pl-1.5 text-[11px] text-ink-2">
+        <span key={t} className="inline-flex h-5 items-center gap-1 rounded bg-surface-3 pr-1 pl-1.5 text-[11px] text-ink-2">
           {t}
-          <button type="button" aria-label={`Remove tag ${t}`} onClick={() => setTags((l) => l.filter((x) => x !== t), `Remove tag ${t}`)} className="text-muted hover:text-white">
+          <button type="button" aria-label={`Remove tag ${t}`} onClick={() => setTags((l) => l.filter((x) => x !== t), `Remove tag ${t}`)} className="text-muted hover:text-ink">
             <X size={10} />
           </button>
         </span>
@@ -281,7 +282,7 @@ function TagEditor({ entities }: { entities: Entity[] }) {
         onBlur={() => text && add(text)}
         placeholder="+ tag"
         aria-label="Add a tag"
-        className="h-5 w-16 rounded bg-transparent px-1 text-[11px] outline-none placeholder:text-[#6E7587] focus:w-24 focus:bg-[#0F1015]"
+        className="h-5 w-16 rounded bg-transparent px-1 text-[11px] outline-none placeholder:text-muted focus:w-24 focus:bg-sunken"
       />
       <datalist id="degamed-tags">
         {COMMON_TAGS.map((t) => (
@@ -360,7 +361,7 @@ function ComponentFields({ name, entities, write }: { name: ComponentName; entit
               title="Edit frames in the Animation panel"
               aria-label="Edit animations"
               onClick={() => ed.openFile(a.frames)}
-              className="flex size-6 shrink-0 items-center justify-center rounded text-muted hover:bg-[#232734] hover:text-white"
+              className="flex size-6 shrink-0 items-center justify-center rounded text-muted hover:bg-surface-3 hover:text-ink"
             >
               <ExternalLink size={12} />
             </button>
@@ -418,7 +419,7 @@ function ComponentFields({ name, entities, write }: { name: ComponentName; entit
               aria-label="Bounce"
               onChange={(e) => set({ bounce: Number(e.target.value) }, 'bounce', true)}
               onPointerUp={ed.seal}
-              className="min-w-0 flex-1 accent-[#7C5CFF]"
+              className="min-w-0 flex-1 accent-brand"
             />
             <span className="w-8 text-right text-[11.5px] text-ink-2 tabular-nums">{b.bounce.toFixed(2)}</span>
           </Row>
@@ -493,7 +494,7 @@ function OptionalNumber({ label, value, auto, onChange, onCommit }: { label: str
   return (
     <Row label={label} onRevert={value !== undefined ? () => onChange(undefined) : undefined}>
       {value === undefined ? (
-        <button type="button" onClick={() => onChange(16)} className={`${fieldInput} text-left text-[#7D8496] hover:text-white`}>
+        <button type="button" onClick={() => onChange(16)} className={`${fieldInput} text-left text-muted hover:text-ink`}>
           Auto ({auto})
         </button>
       ) : (
@@ -530,12 +531,12 @@ function ScriptFields({ entities, write }: { entities: Entity[]; write: Write })
           title="Open in the code editor"
           aria-label="Open script"
           onClick={() => ed.openFile(s.src)}
-          className="flex size-6 shrink-0 items-center justify-center rounded text-muted hover:bg-[#232734] hover:text-white"
+          className="flex size-6 shrink-0 items-center justify-center rounded text-muted hover:bg-surface-3 hover:text-ink"
         >
           <ExternalLink size={12} />
         </button>
       </Row>
-      {keys.length > 0 && <div className="mt-1 px-3 text-[11px] font-semibold tracking-wide text-[#6E7587] uppercase">Script values</div>}
+      {keys.length > 0 && <div className="mt-1 px-3 text-[11px] font-semibold tracking-wide text-muted uppercase">Script values</div>}
       {keys.map((k) => {
         const own = s.props[k];
         const value = own ?? defaults[k];
@@ -562,7 +563,7 @@ function ScriptFields({ entities, write }: { entities: Entity[]; write: Write })
         }}
       >
         <input value={newKey} onChange={(e) => setNewKey(e.target.value)} placeholder="Add a value (name)" aria-label="New script value name" className={fieldInput} />
-        <button type="submit" disabled={!newKey.trim()} className="h-6 rounded border border-[#2E3342] px-2 text-[11.5px] text-ink-2 hover:text-white disabled:opacity-40">
+        <button type="submit" disabled={!newKey.trim()} className="h-6 rounded border border-line-strong px-2 text-[11.5px] text-ink-2 hover:text-ink disabled:opacity-40">
           Add
         </button>
       </form>
@@ -580,7 +581,7 @@ export function AssetField({ value, types, onChange }: { value: string; types: F
   const thumb = types.includes('image') && ed.files[value]?.startsWith('data:image/') ? ed.files[value] : null;
   return (
     <div
-      className={`flex min-w-0 flex-1 items-center gap-1 rounded ${over ? 'ring-1 ring-[#7C5CFF]' : ''}`}
+      className={`flex min-w-0 flex-1 items-center gap-1 rounded ${over ? 'ring-1 ring-brand' : ''}`}
       onDragOver={(e) => {
         if (!e.dataTransfer.types.includes('application/x-degamed-file')) return;
         e.preventDefault();
@@ -596,7 +597,7 @@ export function AssetField({ value, types, onChange }: { value: string; types: F
         }
       }}
     >
-      {thumb && <img src={thumb} alt="" className="size-6 shrink-0 rounded-[3px] border border-[#2A2E3A] bg-[#0F1015] object-contain [image-rendering:pixelated]" />}
+      {thumb && <img src={thumb} alt="" className="size-6 shrink-0 rounded-[3px] border border-line bg-sunken object-contain [image-rendering:pixelated]" />}
       <select aria-label="File" value={value} onChange={(e) => onChange(e.target.value)} className={`${fieldInput} font-mono text-[11.5px] ${ed.files[value] === undefined ? 'text-bad' : ''}`}>
         {!options.includes(value) && <option value={value}>{value || '(choose a file)'} — missing</option>}
         {options.map((p) => (
@@ -620,11 +621,11 @@ function SceneInspector({ scene }: { scene: Scene }) {
   const isStart = ed.scenePath === ed.startScene;
   return (
     <>
-      <div className="flex items-center gap-2 border-b border-[#1F222B] px-3 py-2.5">
-        <Layers size={14} className="text-[#C9BCFF]" aria-hidden="true" />
+      <div className="flex items-center gap-2 border-b border-line px-3 py-2.5">
+        <Layers size={14} className="text-brand-ink" aria-hidden="true" />
         <strong className="text-[12.5px]">Scene</strong>
         <code className="truncate font-mono text-[11px] text-muted">{ed.scenePath}</code>
-        {isStart && <span className="ml-auto rounded bg-[#2B2550] px-1.5 text-[10.5px] text-[#C9BCFF]">start scene</span>}
+        {isStart && <span className="ml-auto rounded bg-brand-tint px-1.5 text-[10.5px] text-brand-ink">start scene</span>}
       </div>
       <Section title="Scene" icon={<Box size={13} />} accent="#C9BCFF">
         <Row label="Name">
@@ -670,14 +671,14 @@ function SceneInspector({ scene }: { scene: Scene }) {
               return { ...s, parallax: list };
             }, 'Reorder layers');
           return (
-            <div key={i} className="mx-2 mb-1.5 rounded border border-[#232734] bg-[#121419] py-1">
+            <div key={i} className="mx-2 mb-1.5 rounded border border-surface-3 bg-surface py-1">
               <div className="flex items-center gap-1 px-2 pb-1 text-[11px] text-muted">
                 Layer {i + 1}
                 <span className="ml-auto flex gap-0.5">
-                  <button type="button" aria-label="Move layer back" disabled={i === 0} onClick={() => move(-1)} className="p-0.5 hover:text-white disabled:opacity-30">
+                  <button type="button" aria-label="Move layer back" disabled={i === 0} onClick={() => move(-1)} className="p-0.5 hover:text-ink disabled:opacity-30">
                     <ArrowUp size={11} />
                   </button>
-                  <button type="button" aria-label="Move layer forward" disabled={i === scene.parallax.length - 1} onClick={() => move(1)} className="p-0.5 hover:text-white disabled:opacity-30">
+                  <button type="button" aria-label="Move layer forward" disabled={i === scene.parallax.length - 1} onClick={() => move(1)} className="p-0.5 hover:text-ink disabled:opacity-30">
                     <ArrowDown size={11} />
                   </button>
                   <button
@@ -702,7 +703,7 @@ function SceneInspector({ scene }: { scene: Scene }) {
                   value={layer.factor}
                   aria-label="Scroll speed"
                   onChange={(e) => patch({ factor: Number(e.target.value) }, 'Change scroll speed', `layer-${i}-factor`)}
-                  className="min-w-0 flex-1 accent-[#7C5CFF]"
+                  className="min-w-0 flex-1 accent-brand"
                 />
                 <span className="w-8 text-right text-[11.5px] tabular-nums">{layer.factor.toFixed(2)}</span>
               </Row>
@@ -722,7 +723,7 @@ function SceneInspector({ scene }: { scene: Scene }) {
               const asset = Object.keys(ed.files).find((p) => fileType(p) === 'image') ?? '';
               set((s) => ({ ...s, parallax: [...s.parallax, { asset, factor: 0.5, y: 0, tiled: true }] }), 'Add layer');
             }}
-            className="flex h-6 w-full items-center justify-center gap-1 rounded border border-dashed border-[#3A3F4E] text-[11.5px] text-ink-2 hover:border-[#6B4EFF] hover:text-white"
+            className="flex h-6 w-full items-center justify-center gap-1 rounded border border-dashed border-line-strong text-[11.5px] text-ink-2 hover:border-brand hover:text-ink"
           >
             <Plus size={12} /> Add Layer
           </button>
@@ -745,14 +746,14 @@ function FileInfo() {
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-auto p-3 text-[12px]">
       <div>
-        <div className="text-[11px] font-semibold tracking-wide text-[#6E7587] uppercase">File</div>
+        <div className="text-[11px] font-semibold tracking-wide text-muted uppercase">File</div>
         <code className="font-mono break-all text-ink">{path}</code>
       </div>
       <div className="text-muted">
         {fileType(path)} · {size > 1024 ? `${(size / 1024).toFixed(1)} KB` : `${size} B`}
       </div>
       <div>
-        <div className="text-[11px] font-semibold tracking-wide text-[#6E7587] uppercase">Used by</div>
+        <div className="text-[11px] font-semibold tracking-wide text-muted uppercase">Used by</div>
         {users.length ? (
           <ul className="mt-1 flex flex-col gap-0.5">
             {users.map((u) => (
@@ -787,12 +788,12 @@ function HistoryPanel() {
             onClick={() => ed.jumpTo(i)}
             aria-current={i === current ? 'step' : undefined}
             className={`flex w-full items-center gap-2 px-3 py-1 text-left ${
-              i === current ? 'bg-[#2B2550] text-white' : i > current ? 'text-[#6E7587] hover:bg-[#1C1F28]' : 'text-ink-2 hover:bg-[#1C1F28]'
+              i === current ? 'bg-brand-tint text-ink' : i > current ? 'text-muted hover:bg-surface-2' : 'text-ink-2 hover:bg-surface-2'
             }`}
           >
-            <span className="w-5 text-right text-[10.5px] text-[#6E7587] tabular-nums">{i}</span>
+            <span className="w-5 text-right text-[10.5px] text-muted tabular-nums">{i}</span>
             <span className="flex-1 truncate">{h.label}</span>
-            <span className="text-[10.5px] text-[#6E7587] tabular-nums">{new Date(h.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            <span className="text-[10.5px] text-muted tabular-nums">{new Date(h.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
           </button>
         </li>
       ))}

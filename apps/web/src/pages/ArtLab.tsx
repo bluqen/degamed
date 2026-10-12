@@ -73,7 +73,7 @@ export function ArtLab() {
       </div>
 
       {providers.length === 0 && (
-        <div className="rounded-xl border border-[#4D3A12] bg-[#241C0E] p-4 text-sm text-[#F5DFA8]">
+        <div className="rounded-xl border border-warn/40 bg-warn-tint p-4 text-sm text-warn">
           No image generator is connected. Add a free Google Gemini key in{' '}
           <Link to="/settings" className="underline">
             Settings
@@ -97,7 +97,7 @@ export function ArtLab() {
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 maxLength={300}
-                className="rounded-[10px] border border-line-strong bg-panel px-3.5 py-2.5 text-white outline-none"
+                className="rounded-[10px] border border-line-strong bg-panel px-3.5 py-2.5 text-ink outline-none"
               />
             </label>
             <label className="flex flex-[1_1_140px] flex-col gap-1.5">
@@ -144,7 +144,7 @@ export function ArtLab() {
             <button
               type="submit"
               disabled={busy || !providers.length || !subject.trim()}
-              className="inline-flex min-h-11 items-center gap-2 rounded-[10px] bg-brand px-5 font-semibold text-white hover:bg-[#5A3DF0] disabled:opacity-50"
+              className="inline-flex min-h-11 items-center gap-2 rounded-[10px] bg-brand px-5 font-semibold text-on-brand hover:bg-brand-hover disabled:opacity-50"
             >
               <Sparkles size={18} aria-hidden="true" />
               {busy ? 'Generating…' : 'Generate'}

@@ -73,7 +73,7 @@ export const PRESETS: Preset[] = [
     name: 'Camera',
     category: 'Basics',
     description: 'Decides what the player sees. Make it follow an entity and set its zoom.',
-    components: (ctx) => ({ Transform: T(ctx), Camera: { follow: 'player', zoom: 1 } }),
+    components: (ctx) => ({ Transform: T(ctx), Camera: { follow: 'player', zoom: 1, smoothing: 0.12, lookAhead: 0 } }),
   },
   {
     id: 'solid',
@@ -179,14 +179,14 @@ export const PRESETS: Preset[] = [
     category: 'Interface',
     description: 'Text on screen: scores, timers, hints. Tagged “ui” so it stays put when the camera moves.',
     tags: ['ui'],
-    components: (ctx) => ({ Transform: T(ctx), Text: { text: 'Hello', size: 10, color: '#FFFFFF' } }),
+    components: (ctx) => ({ Transform: T(ctx), Text: { text: 'Hello', size: 10, color: '#FFFFFF', align: 'left' } }),
   },
   {
     id: 'world-text',
     name: 'World Text',
     category: 'Interface',
     description: 'Text that sits in the level and scrolls with it, like a sign.',
-    components: (ctx) => ({ Transform: T(ctx), Text: { text: 'Sign', size: 8, color: '#FFFFFF' } }),
+    components: (ctx) => ({ Transform: T(ctx), Text: { text: 'Sign', size: 8, color: '#FFFFFF', align: 'center' } }),
   },
   {
     id: 'music',

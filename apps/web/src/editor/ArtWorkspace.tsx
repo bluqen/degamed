@@ -47,8 +47,8 @@ export function ArtWorkspace() {
   return (
     <div className="flex min-h-0 flex-1">
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="flex h-9 shrink-0 items-center gap-2 border-b border-[#1F222B] bg-[#13151B] px-2">
-          <label className="flex h-6 w-56 items-center gap-1.5 rounded border border-[#2A2E3A] bg-[#0F1015] px-1.5 focus-within:border-[#6B4EFF]">
+        <div className="flex h-9 shrink-0 items-center gap-2 border-b border-line bg-surface px-2">
+          <label className="flex h-6 w-56 items-center gap-1.5 rounded border border-line bg-sunken px-1.5 focus-within:border-brand">
             <Search size={12} className="text-muted" aria-hidden="true" />
             <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Find art or sound" aria-label="Find art or sound" className="min-w-0 flex-1 bg-transparent text-[12px] outline-none" />
           </label>
@@ -56,12 +56,12 @@ export function ArtWorkspace() {
           <Btn onClick={doImport}>
             <Upload size={13} /> Import
           </Btn>
-          <Link to="/art" className="inline-flex h-7 items-center gap-1.5 rounded bg-[#6B4EFF] px-3 text-[12.5px] font-medium text-white hover:bg-[#7C61FF]">
+          <Link to="/art" className="inline-flex h-7 items-center gap-1.5 rounded bg-brand px-3 text-[12.5px] font-medium text-on-brand hover:bg-brand-hover">
             <Sparkles size={13} /> Generate with AI
           </Link>
         </div>
         {notice.length > 0 && (
-          <div role="alert" className="border-b border-[#3A2A10] bg-[#241C0E] px-3 py-1.5 text-[12px] text-warn">
+          <div role="alert" className="border-b border-warn/40 bg-warn-tint px-3 py-1.5 text-[12px] text-warn">
             {notice.join(' · ')}
           </div>
         )}
@@ -76,7 +76,7 @@ export function ArtWorkspace() {
         >
           {[...groups].map(([dir, list]) => (
             <section key={dir} className="mb-4">
-              <h3 className="mb-2 font-mono text-[11px] text-[#6E7587]">{dir}/</h3>
+              <h3 className="mb-2 font-mono text-[11px] text-muted">{dir}/</h3>
               <ul className="grid grid-cols-[repeat(auto-fill,minmax(104px,1fr))] gap-2">
                 {list.map((p) => (
                   <li key={p}>
@@ -86,7 +86,7 @@ export function ArtWorkspace() {
                       onDragStart={(e) => e.dataTransfer.setData('application/x-degamed-file', p)}
                       onClick={() => ed.setSelectedFile(p)}
                       onDoubleClick={() => fileType(p) === 'image' && (addFromFile(ed, p, ed.viewCenter.current), ed.setWorkspace('scene'))}
-                      className={`flex w-full flex-col items-center gap-1.5 rounded-md border p-2 ${p === selected ? 'border-[#6B4EFF] bg-[#1E1A3A]' : 'border-[#232734] bg-[#121419] hover:border-[#3A3F4E]'}`}
+                      className={`flex w-full flex-col items-center gap-1.5 rounded-md border p-2 ${p === selected ? 'border-brand bg-brand-tint' : 'border-surface-3 bg-surface hover:border-line-strong'}`}
                     >
                       <span className="flex h-16 w-full items-center justify-center rounded" style={{ background: 'repeating-conic-gradient(#1C1F27 0% 25%, #15171D 0% 50%) 50% / 10px 10px' }}>
                         {fileType(p) === 'image' ? (
@@ -112,8 +112,8 @@ export function ArtWorkspace() {
       </div>
 
       {selected && (
-        <aside className="flex w-[340px] shrink-0 flex-col border-l border-[#1F222B] bg-[#121419]">
-          <div className="flex h-9 shrink-0 items-center gap-1 border-b border-[#1F222B] px-2 text-[12px]">
+        <aside className="flex w-[340px] shrink-0 flex-col border-l border-line bg-surface">
+          <div className="flex h-9 shrink-0 items-center gap-1 border-b border-line px-2 text-[12px]">
             <strong className="min-w-0 flex-1 truncate font-mono text-[12px]">{selected.slice(selected.lastIndexOf('/') + 1)}</strong>
             {isImage &&
               (['fit', 1, 2, 4, 8] as const).map((z) => (
@@ -122,7 +122,7 @@ export function ArtWorkspace() {
                   type="button"
                   aria-pressed={zoom === z}
                   onClick={() => setZoom(z)}
-                  className={`rounded px-1.5 py-0.5 text-[11px] ${zoom === z ? 'bg-[#2B2550] text-white' : 'text-muted hover:text-white'}`}
+                  className={`rounded px-1.5 py-0.5 text-[11px] ${zoom === z ? 'bg-brand-tint text-ink' : 'text-muted hover:text-ink'}`}
                 >
                   {z === 'fit' ? 'Fit' : `${z}×`}
                 </button>
@@ -143,7 +143,7 @@ export function ArtWorkspace() {
               src && <audio controls src={src} className="w-full" />
             )}
           </div>
-          <div className="flex flex-col gap-3 border-t border-[#1F222B] p-3 text-[12px]">
+          <div className="flex flex-col gap-3 border-t border-line p-3 text-[12px]">
             <dl className="grid grid-cols-[90px_1fr] gap-y-1">
               <dt className="text-muted">Path</dt>
               <dd className="truncate font-mono text-[11.5px]">{selected}</dd>

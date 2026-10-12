@@ -117,10 +117,10 @@ export function FilesDock() {
               setNotice(await importFiles(ed, e.dataTransfer.files, node.path));
             }}
             style={{ paddingLeft: 6 + depth * 14 }}
-            className="flex h-6 cursor-default items-center gap-1.5 pr-2 text-ink-2 hover:bg-[#1C1F28]"
+            className="flex h-6 cursor-default items-center gap-1.5 pr-2 text-ink-2 hover:bg-surface-2"
           >
             <ChevronRight size={12} className={`text-muted ${open ? 'rotate-90' : ''}`} aria-hidden="true" />
-            <span className="flex text-[#8C93A5]">{open ? <FolderOpen size={13} /> : <Folder size={13} />}</span>
+            <span className="flex text-muted">{open ? <FolderOpen size={13} /> : <Folder size={13} />}</span>
             <span className="truncate">{node.name}</span>
           </div>
           {open && node.children.map((c) => render(c, depth + 1))}
@@ -157,27 +157,27 @@ export function FilesDock() {
         }}
         title={`${node.path}${type === 'image' || type === 'frames' ? ' · drag onto the scene to place it' : type === 'script' ? ' · drag onto an entity to attach it' : ''}`}
         style={{ paddingLeft: 6 + depth * 14 + 14 }}
-        className={`flex h-6 cursor-default items-center gap-1.5 pr-2 outline-none ${selected ? 'bg-[#2B2550] text-white' : 'text-ink-2 hover:bg-[#1C1F28]'}`}
+        className={`flex h-6 cursor-default items-center gap-1.5 pr-2 outline-none ${selected ? 'bg-brand-tint text-ink' : 'text-ink-2 hover:bg-surface-2'}`}
       >
         {isImage ? (
-          <img src={files[node.path]} alt="" className="size-4 shrink-0 rounded-[2px] bg-[#0F1015] object-contain [image-rendering:pixelated]" />
+          <img src={files[node.path]} alt="" className="size-4 shrink-0 rounded-[2px] bg-sunken object-contain [image-rendering:pixelated]" />
         ) : (
           <span className="flex shrink-0" style={{ color: icon.color }}>
             {icon.icon}
           </span>
         )}
         <span className="truncate">{node.name}</span>
-        {isStart && <span className="ml-auto shrink-0 rounded bg-[#2B2550] px-1 text-[10px] text-[#C9BCFF]">start</span>}
+        {isStart && <span className="ml-auto shrink-0 rounded bg-brand-tint px-1 text-[10px] text-brand-ink">start</span>}
       </div>
     );
   };
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex h-8 shrink-0 items-center gap-1 border-b border-[#1F222B] px-1.5">
+      <div className="flex h-8 shrink-0 items-center gap-1 border-b border-line px-1.5">
         <MenuButton
           label="New"
-          className="flex size-7 items-center justify-center rounded text-[#A3A9B8] hover:bg-[#232734] hover:text-white"
+          className="flex size-7 items-center justify-center rounded text-muted hover:bg-surface-3 hover:text-ink"
           items={[
             { label: 'New Script…', icon: <FileCode2 size={13} />, onSelect: () => ed.setDialog({ type: 'new-script' }) },
             { label: 'New Scene…', icon: <Layers size={13} />, shortcut: 'Ctrl+N', onSelect: () => ed.setDialog({ type: 'new-scene' }) },
@@ -187,7 +187,7 @@ export function FilesDock() {
         >
           <FilePlus2 size={14} />
         </MenuButton>
-        <label className="flex h-6 min-w-0 flex-1 items-center gap-1.5 rounded border border-[#2A2E3A] bg-[#0F1015] px-1.5 focus-within:border-[#6B4EFF]">
+        <label className="flex h-6 min-w-0 flex-1 items-center gap-1.5 rounded border border-line bg-sunken px-1.5 focus-within:border-brand">
           <Search size={12} className="shrink-0 text-muted" aria-hidden="true" />
           <input value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Filter files" aria-label="Filter files" className="min-w-0 flex-1 bg-transparent text-[12px] outline-none" />
         </label>
@@ -199,7 +199,7 @@ export function FilesDock() {
         </MenuButton>
       </div>
       {notice.length > 0 && (
-        <div role="alert" className="border-b border-[#3A2A10] bg-[#241C0E] px-2 py-1.5 text-[11.5px] text-warn">
+        <div role="alert" className="border-b border-warn/40 bg-warn-tint px-2 py-1.5 text-[11.5px] text-warn">
           {notice.map((n) => (
             <p key={n}>{n}</p>
           ))}

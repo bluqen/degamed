@@ -37,7 +37,7 @@ export function Login() {
           {isGoogleConfigured ? (
             <div ref={buttonRef} className="flex min-h-11 w-full justify-center" />
           ) : (
-            <div className="w-full rounded-xl border border-[#4D3A12] bg-[#241C0E] p-4 text-left text-sm text-[#F5DFA8]">
+            <div className="w-full rounded-xl border border-warn/40 bg-warn-tint p-4 text-left text-sm text-warn">
               <strong className="block text-warn">Sign-in isn’t set up yet</strong>
               Add your Supabase and Google keys to <code className="font-mono">apps/web/.env.local</code>. The
               steps are in <code className="font-mono">docs/SETUP.md</code>.

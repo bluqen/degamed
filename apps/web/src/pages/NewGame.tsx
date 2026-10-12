@@ -35,8 +35,8 @@ export function NewGame() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="flex flex-wrap items-center gap-5 border-b border-[#1F222B] px-7 py-4">
-        <Link to="/dashboard" className="text-ink-2 hover:text-white">
+      <header className="flex flex-wrap items-center gap-5 border-b border-line px-7 py-4">
+        <Link to="/dashboard" className="text-ink-2 hover:text-ink">
           ← Back
         </Link>
         <strong className="font-display text-lg">New game</strong>
@@ -45,7 +45,7 @@ export function NewGame() {
             <li
               key={label}
               aria-current={i === step ? 'step' : undefined}
-              className={`rounded-full px-3 py-1.5 ${i === step ? 'bg-brand text-white' : i < step ? 'bg-[#1F2230] text-brand-soft' : 'border border-line-strong text-muted'}`}
+              className={`rounded-full px-3 py-1.5 ${i === step ? 'bg-brand text-on-brand' : i < step ? 'bg-surface-2 text-brand-soft' : 'border border-line-strong text-muted'}`}
             >
               {i + 1} {label}
             </li>
@@ -66,7 +66,7 @@ export function NewGame() {
               value={idea}
               onChange={(e) => setIdea(e.target.value)}
               placeholder="A neon cyberpunk platformer where a cat hacks drones to steal data cores…"
-              className="resize-y rounded-[14px] border border-line-strong bg-panel p-4 text-[17px] leading-normal text-white outline-none placeholder:text-muted"
+              className="resize-y rounded-[14px] border border-line-strong bg-panel p-4 text-[17px] leading-normal text-ink outline-none placeholder:text-muted"
             />
           </div>
         )}
@@ -94,7 +94,7 @@ export function NewGame() {
               <span className="text-[13px] text-muted">You can mix both in one game later.</span>
             </fieldset>
             {!isAuthConfigured && (
-              <p className="rounded-xl border border-[#4D3A12] bg-[#241C0E] p-4 text-sm text-[#F5DFA8]">
+              <p className="rounded-xl border border-warn/40 bg-warn-tint p-4 text-sm text-warn">
                 Saving projects needs Supabase. See <code className="font-mono">docs/SETUP.md</code>.
               </p>
             )}
@@ -106,7 +106,7 @@ export function NewGame() {
           </div>
         )}
 
-        <div className="mt-auto flex justify-end gap-2.5 border-t border-[#1F222B] pt-3">
+        <div className="mt-auto flex justify-end gap-2.5 border-t border-line pt-3">
           <Button variant="outline" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}>
             Back
           </Button>

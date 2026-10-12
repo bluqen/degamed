@@ -52,16 +52,16 @@ export function Dashboard() {
             value={idea}
             onChange={(e) => setIdea(e.target.value)}
             placeholder="Describe a game… e.g. a cozy fishing game on a floating island"
-            className="min-w-0 flex-1 bg-transparent px-3 py-2.5 text-white outline-none placeholder:text-muted"
+            className="min-w-0 flex-1 bg-transparent px-3 py-2.5 text-ink outline-none placeholder:text-muted"
           />
-          <button type="submit" className="min-h-11 rounded-[10px] bg-brand px-5 font-semibold text-white hover:bg-[#5A3DF0]">
+          <button type="submit" className="min-h-11 rounded-[10px] bg-brand px-5 font-semibold text-on-brand hover:bg-brand-hover">
             Create
           </button>
         </form>
       </section>
 
       {!isAuthConfigured && (
-        <div className="rounded-xl border border-[#4D3A12] bg-[#241C0E] p-4 text-sm text-[#F5DFA8]">
+        <div className="rounded-xl border border-warn/40 bg-warn-tint p-4 text-sm text-warn">
           Projects are saved to Supabase, which isn’t connected yet. Follow <code className="font-mono">docs/SETUP.md</code>{' '}
           step 1.
         </div>
@@ -93,7 +93,7 @@ export function Dashboard() {
           ))}
           <Link
             to="/new"
-            className="flex min-h-[190px] flex-col items-center justify-center gap-2 rounded-[14px] border border-dashed border-[#3A3F50] text-muted hover:text-white"
+            className="flex min-h-[190px] flex-col items-center justify-center gap-2 rounded-[14px] border border-dashed border-line-strong text-muted hover:text-ink"
           >
             <Plus size={28} aria-hidden="true" />
             New game

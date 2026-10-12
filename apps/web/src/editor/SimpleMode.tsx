@@ -57,8 +57,8 @@ export function SimpleMode({ onOpenPro, title }: { onOpenPro: () => void; title:
       <div className="flex h-[62vw] min-h-[240px] shrink-0 flex-col md:h-auto md:min-w-0 md:flex-1">
         <GameView visible />
       </div>
-      <aside className="flex shrink-0 flex-col gap-3 border-[#1F222B] bg-[#121419] p-3 text-[13px] md:w-[360px] md:overflow-auto md:border-r">
-        <div className="flex flex-col gap-2 rounded-lg border border-[#3A2F80] bg-[#17142A] p-3.5">
+      <aside className="flex shrink-0 flex-col gap-3 border-line bg-surface p-3 text-[13px] md:w-[360px] md:overflow-auto md:border-r">
+        <div className="flex flex-col gap-2 rounded-lg border border-brand bg-brand-tint p-3.5">
           <strong className="flex items-center gap-2">
             <Sparkles size={15} className="text-cyan" aria-hidden="true" /> AI Copilot
           </strong>
@@ -70,7 +70,7 @@ export function SimpleMode({ onOpenPro, title }: { onOpenPro: () => void; title:
             to be ready.
           </p>
         </div>
-        <div className="flex flex-col gap-3 rounded-lg border border-[#232734] bg-[#16181F] p-3.5">
+        <div className="flex flex-col gap-3 rounded-lg border border-surface-3 bg-surface p-3.5">
           <strong>Quick edit</strong>
           {QUICK_EDITS.map((q) => {
             const value = scriptProp(files, startScene, 'scripts/player.js', q.prop) ?? q.fallback;
@@ -85,7 +85,7 @@ export function SimpleMode({ onOpenPro, title }: { onOpenPro: () => void; title:
                   min={q.min}
                   max={q.max}
                   value={value}
-                  className="accent-[#7C5CFF]"
+                  className="accent-brand"
                   onChange={(e) => ed.commit(withScriptProp(files, startScene, 'scripts/player.js', q.prop, Number(e.target.value)), `Change ${q.label}`, `quick:${q.prop}`)}
                 />
               </label>
@@ -94,13 +94,13 @@ export function SimpleMode({ onOpenPro, title }: { onOpenPro: () => void; title:
           <button
             type="button"
             onClick={() => ed.commit(starterProject(title), 'Reset to starter template')}
-            className="self-start text-[12.5px] text-muted underline hover:text-white"
+            className="self-start text-[12.5px] text-muted underline hover:text-ink"
           >
             Reset to the starter template
           </button>
         </div>
         {animations.length > 0 && (
-          <div className="flex flex-col gap-1 rounded-lg border border-[#232734] bg-[#16181F] p-3.5">
+          <div className="flex flex-col gap-1 rounded-lg border border-surface-3 bg-surface p-3.5">
             <strong className="mb-1">Animations</strong>
             {animations.map((p) => (
               <button
@@ -110,7 +110,7 @@ export function SimpleMode({ onOpenPro, title }: { onOpenPro: () => void; title:
                   onOpenPro();
                   ed.openFile(p);
                 }}
-                className="flex items-center gap-2 rounded px-2 py-1.5 text-left hover:bg-[#1C1F28]"
+                className="flex items-center gap-2 rounded px-2 py-1.5 text-left hover:bg-surface-2"
               >
                 <Clapperboard size={14} className="text-cyan" aria-hidden="true" />
                 {p.slice(p.lastIndexOf('/') + 1).replace('.frames.json', '')}
@@ -118,10 +118,10 @@ export function SimpleMode({ onOpenPro, title }: { onOpenPro: () => void; title:
             ))}
           </div>
         )}
-        <div className="flex flex-col gap-2 rounded-lg border border-[#232734] bg-[#16181F] p-3.5">
+        <div className="flex flex-col gap-2 rounded-lg border border-surface-3 bg-surface p-3.5">
           <strong>Want full control?</strong>
           <p className="text-muted">Pro mode has the scene editor, hierarchy, properties, code editor and animation tools.</p>
-          <button type="button" onClick={onOpenPro} className="self-start rounded bg-[#6B4EFF] px-3 py-1.5 font-medium text-white hover:bg-[#7C61FF]">
+          <button type="button" onClick={onOpenPro} className="self-start rounded bg-brand px-3 py-1.5 font-medium text-on-brand hover:bg-brand-hover">
             Switch to Pro
           </button>
         </div>

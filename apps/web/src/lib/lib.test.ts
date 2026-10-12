@@ -3,12 +3,17 @@ import { titleFromIdea } from './titles';
 import { timeAgo } from './projects';
 
 describe('titleFromIdea', () => {
-  it('takes the first few words and drops a leading article', () => {
-    expect(titleFromIdea('A neon cyberpunk platformer where a cat hacks drones')).toBe('Neon cyberpunk platformer where a');
+  it('keeps the part before the first clause, drops a leading article, title-cases it', () => {
+    expect(titleFromIdea('A neon cyberpunk platformer where a cat hacks drones')).toBe('Neon Cyberpunk Platformer');
+    expect(titleFromIdea('A moody rain-soaked platformer where a little robot looks for its family')).toBe('Moody Rain-soaked Platformer');
+  });
+
+  it('caps the length and keeps small words lower case', () => {
+    expect(titleFromIdea('the legend of the tiny brave knight of the north')).toBe('Legend of the Tiny Brave');
   });
 
   it('trims trailing punctuation and whitespace', () => {
-    expect(titleFromIdea('  space  shooter!  ')).toBe('Space shooter');
+    expect(titleFromIdea('  space  shooter!  ')).toBe('Space Shooter');
   });
 
   it('falls back for empty ideas', () => {

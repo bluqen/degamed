@@ -21,6 +21,14 @@ const RECIPES: Record<string, Recipe> = {
   hurt: { wave: 'sawtooth', from: 400, to: 60, duration: 0.3, volume: 0.15, noise: true },
   win: { wave: 'triangle', from: 523, to: 523, duration: 0.6, volume: 0.18, then: { at: 0.15, from: 784, to: 1046 } },
   click: { wave: 'square', from: 1200, to: 900, duration: 0.05, volume: 0.06 },
+  land: { wave: 'triangle', from: 140, to: 60, duration: 0.07, volume: 0.08, noise: true },
+  sparkle: { wave: 'sine', from: 1568, to: 1568, duration: 0.22, volume: 0.07, then: { at: 0.07, from: 2093, to: 2349 } },
+  checkpoint: { wave: 'triangle', from: 392, to: 392, duration: 0.45, volume: 0.14, then: { at: 0.12, from: 587, to: 784 } },
+  swing: { wave: 'sawtooth', from: 900, to: 200, duration: 0.09, volume: 0.05, noise: true },
+  hit: { wave: 'square', from: 220, to: 90, duration: 0.12, volume: 0.13, noise: true },
+  slide: { wave: 'sawtooth', from: 160, to: 110, duration: 0.18, volume: 0.04, noise: true },
+  powerup: { wave: 'square', from: 330, to: 990, duration: 0.35, volume: 0.1, then: { at: 0.12, from: 660, to: 1320 } },
+  die: { wave: 'sawtooth', from: 520, to: 40, duration: 0.55, volume: 0.15, noise: true },
 };
 
 export const SFX_NAMES = Object.keys(RECIPES);

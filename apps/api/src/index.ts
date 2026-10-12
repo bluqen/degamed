@@ -2,10 +2,17 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { createMiddleware } from 'hono/factory';
 import { z } from 'zod';
+import { AiOutputError, runTask, TaskRequestSchema, type ModelCall, type TaskRequest } from '@degamed/ai/protocol';
 
 export interface Env {
   ALLOWED_ORIGINS: string;
   ART_DAILY_LIMIT?: string;
+  /** Hosted AI game-building requests per user per day (default 30). */
+  AI_DAILY_LIMIT?: string;
+  /** Workers AI model for spec tasks (create, spec edits). Cheap and fast. */
+  AI_TEXT_MODEL?: string;
+  /** Workers AI model for tasks that write code (edits with scripts, repairs). */
+  AI_CODE_MODEL?: string;
   /** Local dev only (.dev.vars): generate art without sign-in. Ignored once Supabase is configured. */
   DEV_ANON_ART?: string;
   SUPABASE_URL?: string;
@@ -136,6 +143,70 @@ app.post('/art/generate', userOrDevAnon, async (c) => {
       'Access-Control-Expose-Headers': 'X-Degamed-Art-Remaining',
     },
   });
+});
+
+export const AI_TEXT_MODEL = '@cf/meta/llama-3.1-8b-instruct-fast';
+export const AI_CODE_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+
+/** Which Workers AI model runs a task: the small one unless the task writes code. */
+export function modelFor(env: Env, req: TaskRequest): string {
+  const writesCode = req.task === 'repair' || (req.task === 'edit' && Object.keys(req.files).length > 0);
+  return writesCode ? (env.AI_CODE_MODEL ?? AI_CODE_MODEL) : (env.AI_TEXT_MODEL ?? AI_TEXT_MODEL);
+}
+
+/** A ModelCall backed by the Workers AI binding, in JSON mode with a hard max_tokens. */
+export function workersAiModel(env: Env, model: string): ModelCall {
+  return async (i) => {
+    const out = (await env.AI!.run(model, {
+      messages: [{ role: 'system', content: i.system }, ...i.messages],
+      max_tokens: i.maxTokens,
+      temperature: 0.6,
+      response_format: { type: 'json_schema', json_schema: i.jsonSchema },
+    })) as { response?: unknown; usage?: { prompt_tokens?: number; completion_tokens?: number } };
+    const text = typeof out.response === 'string' ? out.response : JSON.stringify(out.response ?? '');
+    const u = out.usage;
+    return { text, usage: u?.prompt_tokens !== undefined ? { inputTokens: u.prompt_tokens, outputTokens: u.completion_tokens ?? 0 } : undefined };
+  };
+}
+
+/**
+ * Hosted game building (the free tier). Not an open proxy: the body must be one of our structured
+ * tasks (create / edit / repair) with hard size limits, the server builds the prompt itself, caps
+ * output tokens, and only returns a validated spec or patch. Metered per user per day.
+ */
+app.post('/ai/generate', userOrDevAnon, async (c) => {
+  if (!c.env.AI) return c.json({ error: 'Degamed AI is not enabled on this server' }, 503);
+  const parsed = TaskRequestSchema.safeParse(await c.req.json().catch(() => null));
+  if (!parsed.success) return c.json({ error: 'That request is too big or not something Degamed AI can do.' }, 400);
+
+  const user = c.get('user');
+  const devAnon = isDevAnon(c.env);
+  const limit = Number(c.env.AI_DAILY_LIMIT ?? 30);
+  const used = devAnon ? 0 : await usageToday(c.env, user.id, 'ai');
+  if (used >= limit) {
+    return c.json({ error: `You've used all ${limit} free AI requests for today. Free instant mode still works, or add your own Gemini key in Settings.` }, 429);
+  }
+
+  const req = parsed.data;
+  const model = modelFor(c.env, req);
+  try {
+    const { value, usage, attempts } = await runTask(req, workersAiModel(c.env, model));
+    console.log(`ai ${req.task} ${model}: ${usage.inputTokens} in / ${usage.outputTokens} out, ${attempts} attempt(s)`);
+    return c.json({ result: value, usage, attempts, remaining: Math.max(0, limit - used - 1) });
+  } catch (err) {
+    if (err instanceof AiOutputError) return c.json({ error: "The AI couldn't make that one. Try rephrasing it." }, 502);
+    console.error('ai model error', err);
+    return c.json({ error: 'Degamed AI is busy right now. Try again in a minute.' }, 502);
+  } finally {
+    // Every request that reaches the model counts, even failed ones, so the cap can't be dodged.
+    if (!devAnon) {
+      await supabaseRest(c.env, 'usage_events', {
+        method: 'POST',
+        headers: { Prefer: 'return=minimal' },
+        body: JSON.stringify({ user_id: user.id, kind: 'ai' }),
+      });
+    }
+  }
 });
 
 app.notFound((c) => c.json({ error: 'Not found' }, 404));

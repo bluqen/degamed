@@ -76,7 +76,7 @@ export function Pricing() {
               type="button"
               aria-pressed={currency === c}
               onClick={() => setCurrency(c)}
-              className={`min-h-10 rounded-lg px-4 ${currency === c ? 'bg-brand font-semibold text-white' : 'text-muted'}`}
+              className={`min-h-10 rounded-lg px-4 ${currency === c ? 'bg-brand font-semibold text-on-brand' : 'text-muted'}`}
             >
               {c === 'ngn' ? '₦ Naira' : '$ USD'}
             </button>
@@ -88,10 +88,10 @@ export function Pricing() {
         {plans.map((p) => (
           <div
             key={p.name}
-            className={`relative flex flex-col gap-4 rounded-[18px] p-7 ${p.featured ? 'border-2 border-brand bg-[#17142A]' : 'border border-line bg-[#13151B]'}`}
+            className={`relative flex flex-col gap-4 rounded-[18px] p-7 ${p.featured ? 'border-2 border-brand bg-brand-tint' : 'border border-line bg-surface'}`}
           >
             {p.featured && (
-              <span className="absolute -top-3 left-7 rounded-full bg-brand px-2.5 py-1 text-xs font-semibold text-white">
+              <span className="absolute -top-3 left-7 rounded-full bg-brand px-2.5 py-1 text-xs font-semibold text-on-brand">
                 Most popular
               </span>
             )}

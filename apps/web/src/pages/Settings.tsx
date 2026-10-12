@@ -65,10 +65,10 @@ export function Settings() {
                     onChange={(e) => setDrafts((d) => ({ ...d, [p.id]: e.target.value }))}
                     className="min-w-0 flex-1 rounded-lg border border-line-strong bg-bg px-3 py-2 font-mono text-sm outline-none"
                   />
-                  <button type="submit" disabled={!drafts[p.id]?.trim()} className="min-h-10 rounded-lg bg-brand px-4 text-sm font-semibold text-white disabled:opacity-50">
+                  <button type="submit" disabled={!drafts[p.id]?.trim()} className="min-h-10 rounded-lg bg-brand px-4 text-sm font-semibold text-on-brand disabled:opacity-50">
                     Save
                   </button>
-                  <a href={p.link} target="_blank" rel="noreferrer" className="self-center text-sm whitespace-nowrap text-brand-soft hover:text-white">
+                  <a href={p.link} target="_blank" rel="noreferrer" className="self-center text-sm whitespace-nowrap text-brand-soft hover:text-ink">
                     Get a key
                   </a>
                 </form>
@@ -76,7 +76,7 @@ export function Settings() {
             </div>
           );
         })}
-        <p className="flex items-start gap-2.5 rounded-xl border border-[#1E4D3D] bg-[#10241D] p-3.5 text-sm text-[#C8E9DB]">
+        <p className="flex items-start gap-2.5 rounded-xl border border-ok/30 bg-ok-tint p-3.5 text-sm text-ok">
           <Lock size={18} className="mt-0.5 shrink-0 text-ok" aria-hidden="true" />
           Keys are stored only in this browser and sent straight to the provider. They never reach Degamed’s servers.
         </p>

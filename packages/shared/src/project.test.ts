@@ -95,3 +95,70 @@ describe('parsePlayMessage', () => {
     ).toBeNull();
   });
 });
+
+describe('Scene environment', () => {
+  const base = { name: 'Night', entities: [] };
+
+  it('is optional, so older scenes still load', () => {
+    expect(Scene.parse(base).environment).toBeUndefined();
+  });
+
+  it('accepts a full atmosphere and fills defaults', () => {
+    const scene = Scene.parse({
+      ...base,
+      environment: {
+        ambient: { color: '#3A4466' },
+        fog: { color: '#8899AA' },
+        bloom: {},
+        vignette: 0.4,
+        grade: { contrast: 1.1, saturation: 0.8, tint: '#FFEEDD' },
+        particles: [{ type: 'rain' }, { type: 'fireflies', density: 0.2, color: '#FFE08A' }],
+      },
+    });
+    const env = scene.environment!;
+    expect(env.ambient?.intensity).toBe(1);
+    expect(env.fog?.density).toBe(0.3);
+    expect(env.bloom?.strength).toBe(0.6);
+    expect(env.particles?.[0]).toEqual({ type: 'rain', density: 0.5 });
+  });
+
+  it('rejects unknown particle types and out-of-range values', () => {
+    expect(Scene.safeParse({ ...base, environment: { particles: [{ type: 'lava', density: 1 }] } }).success).toBe(false);
+    expect(Scene.safeParse({ ...base, environment: { vignette: 2 } }).success).toBe(false);
+    expect(Scene.safeParse({ ...base, environment: { ambient: { color: 'dark', intensity: 0.5 } } }).success).toBe(false);
+  });
+});
+
+describe('Light component and camera feel', () => {
+  it('fills light defaults', () => {
+    const e = Entity.parse({ id: 'lamp', name: 'Lamp', components: { Light: { radius: 90 } } });
+    expect(e.components.Light).toEqual({ color: '#FFE7B0', radius: 90, intensity: 1, flicker: 0, offset: { x: 0, y: 0 } });
+  });
+
+  it('keeps old cameras valid and adds look-ahead defaults', () => {
+    const e = Entity.parse({ id: 'cam', name: 'Camera', components: { Camera: { follow: 'player' } } });
+    expect(e.components.Camera).toMatchObject({ follow: 'player', zoom: 1, smoothing: 0.12, lookAhead: 0 });
+  });
+});
+
+describe('Touch controls', () => {
+  it('is optional and fills a jump button by default', () => {
+    expect(ProjectManifest.parse(manifest).touch).toBeUndefined();
+    const m = ProjectManifest.parse({ ...manifest, touch: {} });
+    expect(m.touch).toEqual({ move: 'horizontal', buttons: [{ action: 'jump', label: 'A' }] });
+  });
+});
+
+describe('Tilemap component', () => {
+  it('accepts rows of terrain and needs ground and fill tiles', () => {
+    const ok = Entity.safeParse({
+      id: 'map',
+      name: 'Level',
+      components: { Tilemap: { tiles: { ground: 'a.png', fill: 'b.png' }, rows: ['....', '#==#', '####'] } },
+    });
+    expect(ok.success).toBe(true);
+    if (ok.success) expect(ok.data.components.Tilemap?.tileSize).toBe(16);
+    const bad = Entity.safeParse({ id: 'map', name: 'Level', components: { Tilemap: { tiles: { ground: 'a.png' }, rows: ['#'] } } });
+    expect(bad.success).toBe(false);
+  });
+});
