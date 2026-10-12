@@ -11,6 +11,10 @@ ALLOWED_ORIGINS = "http://localhost:5173,https://degamed.pages.dev"
 ART_DAILY_LIMIT = "25"
 # Free hosted AI game-building requests (create / edit / fix) per user per day.
 AI_DAILY_LIMIT = "30"
+# Ceiling across all users per day (0 = off). A typical mix (80% spec tasks at ~6 neurons, 20% code
+# edits at ~100) averages ~25 neurons, so 400 requests ≈ 10,000 neurons = the free allowance.
+# See docs/team/ai.md before raising it.
+AI_GLOBAL_DAILY_LIMIT = "400"
 # Workers AI text models (JSON mode). Spec tasks use the small model; code edits and repairs the big one.
 # Costs and the free allowance are in docs/team/ai.md.
 AI_TEXT_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast"

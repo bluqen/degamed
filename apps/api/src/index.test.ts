@@ -254,3 +254,59 @@ describe('/ai/generate', () => {
     expect(((await res.json()) as { error: string }).error).toMatch(/busy/);
   });
 });
+
+describe('/ai/generate global ceiling', () => {
+  const catalog = { kits: [{ id: 'platformer', name: 'Platformer', description: 'Run and jump.', params: [] }], themes: [{ id: 'rain-ruins', name: 'Rain Ruins', description: 'Rain.' }] };
+  const task = { task: 'create', prompt: 'a rainy game', catalog };
+  const spec = { kit: 'platformer', theme: 'rain-ruins', title: 'Drizzle' };
+
+  /** usage count: per-user queries (with user_id) → `mine`, global queries → `all`. */
+  function fakeSupabase(mine: number, all: number) {
+    const queries: string[] = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string, init?: RequestInit) => {
+        if (url.endsWith('/auth/v1/user')) return Response.json({ id: 'user-1' });
+        if (init?.method === 'POST') return new Response(null, { status: 201 });
+        queries.push(url);
+        const n = url.includes('user_id=') ? mine : all;
+        return new Response('[]', { headers: { 'Content-Range': `0-0/${n}` } });
+      }),
+    );
+    return queries;
+  }
+  const post = (env: Env) =>
+    app.request('/ai/generate', { method: 'POST', headers: { Authorization: 'Bearer good' }, body: JSON.stringify(task) }, env);
+  const env = (ceiling?: string): Env => ({
+    ...configured,
+    ...(ceiling !== undefined ? { AI_GLOBAL_DAILY_LIMIT: ceiling } : {}),
+    AI: { run: vi.fn(async () => ({ response: spec })) },
+  });
+
+  it('returns a clear 429 with a code once everyone together hits the ceiling', async () => {
+    const queries = fakeSupabase(2, 400);
+    const e = env('400');
+    const res = await post(e);
+    expect(res.status).toBe(429);
+    const body = (await res.json()) as { error: string; code: string };
+    expect(body.code).toBe('ai_global_limit');
+    expect(body.error).toMatch(/instant mode still works/);
+    expect(e.AI!.run).not.toHaveBeenCalled();
+    expect(queries.some((q) => !q.includes('user_id=') && q.includes('kind=eq.ai'))).toBe(true);
+  });
+
+  it('lets requests through under the ceiling, and skips the global query when it is off', async () => {
+    fakeSupabase(2, 399);
+    expect((await post(env('400'))).status).toBe(200);
+    const queries = fakeSupabase(2, 99999);
+    expect((await post(env())).status).toBe(200);
+    expect((await post(env('0'))).status).toBe(200);
+    expect(queries.every((q) => q.includes('user_id='))).toBe(true);
+  });
+
+  it('the per-user limit carries its own code', async () => {
+    fakeSupabase(30, 0);
+    const res = await post(env('400'));
+    expect(((await res.json()) as { code: string }).code).toBe('ai_user_limit');
+  });
+});

@@ -8,6 +8,7 @@
 import type { ArtTheme } from './types';
 import { rainRuins } from './themes/rain-ruins';
 import { hollowCaverns } from './themes/hollow-caverns';
+import { sunlitMeadow } from './themes/sunlit-meadow';
 
 export type { Raster } from '../pixel';
 export type { ArtTheme, SheetAnim, SpriteSheet, Environment, Light, ParallaxLayer, PropInfo } from './types';
@@ -21,6 +22,7 @@ interface ThemeEntry {
 const ENTRIES: ThemeEntry[] = [
   { id: 'rain-ruins', build: rainRuins },
   { id: 'hollow-caverns', build: hollowCaverns },
+  { id: 'sunlit-meadow', build: sunlitMeadow },
 ];
 
 const cache = new Map<string, ArtTheme>();

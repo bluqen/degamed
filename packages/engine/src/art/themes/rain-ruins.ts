@@ -10,6 +10,7 @@ import { crack, derive, pickRamp, px01, tileNoise, TILE } from '../tiles';
 import { sheetOf, type Raster } from '../../pixel';
 import type { ArtTheme, ParallaxLayer, PropInfo, SpriteSheet } from '../types';
 import { rainHeroCostume } from './rain-hero';
+import { checkpointSheet, flyerSheet, spikeStrip } from '../extras';
 
 const W = 480;
 const H = 270;
@@ -393,6 +394,7 @@ function rainTiles(): ArtTheme['tiles'] {
     platform: t(platform),
     platformLeft: t(platformLeft),
     platformRight: t(platformRight),
+    spike: spikeStrip([C.rust[0]!, C.rust[1]!, C.steel[3]!, C.steel[4]!], '#0b1213', C.concrete[2]),
   };
 }
 
@@ -734,7 +736,14 @@ export function rainRuins(): ArtTheme {
     background: C.skyTop,
     layers: layers(),
     tiles: rainTiles(),
-    sprites: { hero: heroSheet(rainHeroCostume()), enemy: lizardSheet(), pickup: pearlSheet(), goal: gateSheet() },
+    sprites: {
+      hero: heroSheet(rainHeroCostume()),
+      enemy: lizardSheet(),
+      pickup: pearlSheet(),
+      goal: gateSheet(),
+      flyer: flyerSheet({ body: ['#1b2224', '#2e3a3a', '#4a5856'], wing: ['#3e4c4a', '#8fa59c', '#c4d4cb'], eye: '#e8f06a', outline: '#070b0c', glowEye: true }),
+      checkpoint: checkpointSheet({ post: C.steel.slice(0, 3), cage: C.steel[3]!, glow: C.lamp, core: '#fff6d8', outline: '#0b1213' }),
+    },
     props: p,
     propInfo: info,
     tileSize: TILE,
@@ -744,11 +753,11 @@ export function rainRuins(): ArtTheme {
       goal: { color: '#bff5dc', radius: 72, intensity: 0.8, flicker: 0.04 },
     },
     environment: {
-      ambient: { color: '#9fc4bd', intensity: 0.78 },
-      fog: { color: C.haze, density: 0.35, height: 0.3 },
+      ambient: { color: '#d6ece6', intensity: 0.86 },
+      fog: { color: C.haze, density: 0.3, height: 0.45 },
       bloom: { strength: 0.45, threshold: 0.72 },
       vignette: 0.5,
-      grade: { contrast: 1.08, saturation: 0.82, tint: '#a8c8c0' },
+      grade: { contrast: 1.08, saturation: 0.85, tint: '#eaf6f2' },
       particles: [
         { type: 'rain', density: 0.75, color: '#b4cdc6' },
         { type: 'dust', density: 0.15, color: '#cfe0d6' },

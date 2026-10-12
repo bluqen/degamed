@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Check } from 'lucide-react';
 import { SiteFooter, SiteHeader } from '../components/SiteHeader';
-import { ButtonLink } from '../components/Button';
+import { ButtonLink } from '../ui';
 
 // Final prices are not decided yet. Edit these when they are.
 const PRICES = {
@@ -103,7 +103,7 @@ export function Pricing() {
               {p.price(currency)}
               {p.name !== 'Free' && <span className="text-lg text-muted">/month</span>}
             </div>
-            <ButtonLink to="/login" variant={p.featured ? 'primary' : 'outline'}>
+            <ButtonLink to="/login" variant={p.featured ? 'primary' : 'secondary'}>
               {p.cta}
             </ButtonLink>
             <ul className="flex flex-col gap-2.5 text-[15px] text-ink-2">

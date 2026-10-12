@@ -13,6 +13,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { loadPlaywright, LAUNCH_ARGS, parseArgs, ensureDir, sizeTree, kb, INIT_SCRIPT, AUDIT_FN } from './lib.mjs';
 import { PAGES, VIEWPORTS, SCHEMES, JOURNEY_PROMPT } from './pages.mjs';
+import { checkContracts, runChecks } from './contracts.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -351,6 +352,11 @@ if (args.build && (!args.only || args.only.includes('build'))) {
   const play = buildAndMeasure('@degamed/play', 'play');
   report.bundles = { web, play };
 }
+report.contracts = checkContracts();
+if (args.build && !args.only) {
+  log('pnpm typecheck + test…');
+  report.checks = runChecks();
+}
 
 /* ─── Summary ──────────────────────────────────────────────────────────── */
 
@@ -417,6 +423,18 @@ if (report.bundles) {
     if (w.cssGzip > BUDGET.cssGzip) warns.push(`web CSS ${kb(w.cssGzip)} > ${kb(BUDGET.cssGzip)}`);
   }
   if (p?.ok && p.jsGzip > BUDGET.playerJsGzip) fails.push(`player JS ${kb(p.jsGzip)} > ${kb(BUDGET.playerJsGzip)}`);
+}
+
+lines.push('', '## Contracts between agents', '');
+for (const c of report.contracts) {
+  lines.push(`- ${c.ok ? (c.info ? 'info' : 'ok') : '**FAIL**'} [${c.owner}] ${c.what}`);
+  if (!c.ok) fails.push(`contract [${c.owner}]: ${c.what}`);
+}
+if (report.checks) {
+  for (const [k, v] of Object.entries(report.checks)) {
+    lines.push(`- pnpm ${k}: ${v.ok ? 'ok' : `**FAIL** ${v.failing.join(', ')}`}`);
+    if (!v.ok) fails.push(`pnpm ${k} failing${v.failing.length ? ` in ${v.failing.join(', ')}` : ''}`);
+  }
 }
 
 // External hosts contacted (cost + privacy + offline).

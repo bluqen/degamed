@@ -1,21 +1,8 @@
 import type { ReactNode } from 'react';
 import { Navigate, NavLink, useLocation } from 'react-router';
-import { Compass, Download, Gamepad2, Home, Music, Palette, Settings, Store } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 import { isAuthConfigured } from '../lib/env';
-import { LogoMark } from './Logo';
-import { ButtonLink } from './Button';
-
-const nav = [
-  { to: '/dashboard', label: 'Home', icon: Home },
-  { to: '/dashboard/games', label: 'My games', icon: Gamepad2 },
-  { to: '/art', label: 'Art Lab', icon: Palette },
-  { to: '/dashboard/music', label: 'Music', icon: Music },
-  { to: '/dashboard/exports', label: 'Exports', icon: Download },
-  { to: '/explore', label: 'Explore', icon: Compass },
-  { to: '/market', label: 'Marketplace', icon: Store },
-  { to: '/settings', label: 'Settings', icon: Settings },
-];
+import { AppHeader } from './AppHeader';
 
 export function RequireAuth({ children }: { children: ReactNode }) {
   const { session, loading } = useAuth();
@@ -29,39 +16,22 @@ export function RequireAuth({ children }: { children: ReactNode }) {
 export function AppShell({ children }: { children: ReactNode }) {
   const { session, signOut } = useAuth();
   return (
-    <div className="flex min-h-screen flex-wrap">
-      <nav aria-label="Main" className="flex max-w-[260px] flex-[1_1_220px] flex-col gap-1 border-r border-line bg-sunken px-3.5 py-5 text-[15px]">
-        <NavLink to="/" className="flex items-center gap-2.5 px-2.5 pb-4 text-ink">
-          <LogoMark size={24} hole="#121419" />
-          <span className="font-display text-xl font-bold">degamed</span>
-        </NavLink>
-        {nav.map(({ to, label, icon: Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end
-            className={({ isActive }) =>
-              `flex items-center gap-2.5 rounded-lg px-3 py-2.5 ${isActive ? 'bg-surface-2 text-ink' : 'text-ink-2 hover:text-ink'}`
-            }
-          >
-            <Icon size={18} aria-hidden="true" />
-            {label}
-          </NavLink>
-        ))}
-        <div className="mt-auto flex flex-col gap-2 rounded-xl border border-brand bg-brand-tint p-3.5">
-          <span className="text-[13px] text-muted">Plan</span>
-          <strong>Free</strong>
-          <ButtonLink to="/pricing" className="!min-h-9 !py-2 text-sm">
-            Upgrade
-          </ButtonLink>
-        </div>
-        {session && (
-          <button type="button" onClick={signOut} className="mt-2 rounded-lg px-3 py-2 text-left text-sm text-muted hover:text-ink">
-            Sign out ({session.user.email})
-          </button>
-        )}
-      </nav>
-      <main className="flex min-w-0 flex-[999_1_560px] flex-col gap-7 px-8 py-7">{children}</main>
+    <div className="flex min-h-dvh flex-col">
+      <AppHeader
+        right={
+          <>
+            <NavLink to="/create" className={({ isActive }) => `hidden h-10 items-center rounded-md px-3 text-body font-semibold sm:inline-flex ${isActive ? 'text-ink' : 'text-ink-2 hover:bg-surface-2 hover:text-ink'}`}>
+              My games
+            </NavLink>
+            {session && (
+              <button type="button" onClick={signOut} className="hidden h-10 items-center rounded-md px-3 text-body font-semibold text-ink-2 hover:bg-surface-2 hover:text-ink sm:inline-flex">
+                Sign out
+              </button>
+            )}
+          </>
+        }
+      />
+      <main className="mx-auto flex w-full max-w-[880px] min-w-0 flex-1 flex-col gap-7 px-4 py-10 sm:px-6">{children}</main>
     </div>
   );
 }

@@ -27,7 +27,7 @@ export function words(text: string): string[] {
 const CONCEPTS: Record<string, string[]> = {
   dark: ['night', 'midnight', 'spooky', 'creepy', 'haunted', 'scary', 'horror', 'eerie', 'ghost', 'ghosts', 'gloomy', 'dark', 'darkness', 'shadow', 'shadows', 'cave', 'caves', 'cavern', 'caverns', 'underground', 'crypt', 'tomb', 'bones', 'skeleton', 'bug', 'bugs', 'insect', 'hollow', 'abyss', 'mysterious', 'gothic', 'halloween', 'spider', 'mine', 'mines'],
   rain: ['rain', 'rainy', 'raining', 'storm', 'stormy', 'wet', 'soaked', 'moody', 'melancholy', 'melancholic', 'sad', 'lonely', 'ruins', 'ruin', 'ruined', 'abandoned', 'overgrown', 'drizzle', 'flood', 'flooded', 'grey', 'gray', 'puddles', 'atmospheric', 'apocalypse', 'post-apocalyptic'],
-  sunny: ['happy', 'cheerful', 'sunny', 'sunlit', 'bright', 'cute', 'cozy', 'cosy', 'wholesome', 'meadow', 'meadows', 'field', 'fields', 'grass', 'grassy', 'flower', 'flowers', 'spring', 'summer', 'farm', 'kid', 'kids', 'colorful', 'colourful', 'sweet', 'joyful', 'fun', 'hills', 'countryside', 'village', 'garden'],
+  sunny: ['happy', 'cheerful', 'sunny', 'sunlit', 'bright', 'cute', 'cozy', 'cosy', 'wholesome', 'meadow', 'meadows', 'field', 'fields', 'grass', 'grassy', 'flower', 'flowers', 'spring', 'summer', 'farm', 'kid', 'kids', 'colorful', 'colourful', 'sweet', 'joyful', 'fun', 'hills', 'countryside', 'village', 'garden', 'bunny', 'bunnies', 'rabbit', 'puppy', 'kitten', 'duckling', 'butterfly', 'butterflies', 'bee', 'bees', 'easy', 'gentle', 'sister', 'brother', 'daughter', 'son', 'toddler', 'picnic', 'rainbow'],
   snow: ['snow', 'snowy', 'ice', 'icy', 'frozen', 'winter', 'cold', 'frost', 'frosty', 'arctic', 'mountain', 'mountains', 'christmas', 'penguin', 'glacier', 'blizzard'],
   fire: ['fire', 'lava', 'volcano', 'volcanic', 'hell', 'inferno', 'forge', 'molten', 'dragon', 'ember', 'embers', 'burning', 'hot', 'flames', 'magma', 'demon'],
   tech: ['neon', 'cyber', 'cyberpunk', 'city', 'robot', 'robots', 'futuristic', 'future', 'sci-fi', 'scifi', 'factory', 'machine', 'machines', 'android', 'laser', 'lasers', 'synth', 'synthwave', 'hacker', 'mech'],
@@ -45,6 +45,7 @@ const MOOD_THEME: Record<string, string> = { dark: 'hollow-caverns', rain: 'rain
 const KIT_WORDS: Record<string, string[]> = {
   platformer: ['platformer', 'platforming', 'platform', 'platforms', 'jump', 'jumping', 'mario', 'celeste', 'side-scroller', 'sidescroller', 'scroller', 'metroidvania', 'hop', 'precision'],
   runner: ['runner', 'endless', 'auto-runner', 'autorunner', 'infinite', 'dash', 'escape', 'chase', 'flappy'],
+  cave: ['cave', 'caves', 'cavern', 'caverns', 'underground', 'metroidvania', 'hollow-knight', 'hollowknight', 'sword', 'slash', 'attack', 'combat', 'fight', 'fighting', 'souls-like', 'soulslike', 'spelunk', 'spelunking', 'mine', 'mines', 'depths', 'delve', 'crypt', 'catacombs'],
   topdown: ['top-down', 'topdown', 'zelda', 'dungeon', 'crawler', 'rpg', 'explore', 'exploring', 'exploration', 'maze', 'overhead', 'roguelike', 'twin-stick', 'adventure'],
   shooter: ['shooter', 'shmup', 'shoot', 'shooting', 'shoot-em-up', 'spaceship', 'bullet', 'bullets', 'blaster', 'gun', 'guns', 'asteroids', 'invaders', 'galaga'],
   puzzle: ['puzzle', 'puzzles', 'sokoban', 'block', 'blocks', 'brain', 'logic'],

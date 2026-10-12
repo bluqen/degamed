@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { backendFromKits, getBackend, setBackend, SPEC_FILE, stubBackend } from './catalog';
-import { checkProject } from './check';
+import { checkPlayable, checkProject } from './check';
 import { createGame, editGame, repairFromErrors, setAiLogger, type Progress } from './game';
 import { applyEdits, EditError, mergeRebuild, MODS_FILE, readMods } from './patch';
 import { LIMITS, type GameSpec } from './protocol';
@@ -88,6 +88,22 @@ describe('createGame', () => {
     const r3 = await createGame({ prompt: 'a game', settings: { provider: 'openai' }, encode });
     expect(r3.notice).toMatch(/Add your OpenAI key/);
     expect(r3.provider).toBe('instant');
+  });
+
+  it('turns the hosted daily limits into a friendly instant-mode fallback', async () => {
+    const degamed = { provider: 'degamed' as const, apiUrl: 'https://api.example', authToken: 'jwt' };
+    mockFetch(() => Response.json({ error: 'Degamed AI … free daily limit.', code: 'ai_global_limit' }, { status: 429 }));
+    const r = await createGame({ prompt: 'a spooky cave', settings: degamed, encode });
+    expect(r.provider).toBe('instant');
+    expect(r.spec.theme).toBe('hollow-caverns');
+    expect(r.notice).toMatch(/very busy today.*free instant mode/);
+    expect(checkProject(r.files)).toEqual([]);
+    mockFetch(() => Response.json({ error: 'used all 30', code: 'ai_user_limit' }, { status: 429 }));
+    const r2 = await createGame({ prompt: 'a game', settings: degamed, encode });
+    expect(r2.notice).toMatch(/today’s free AI requests/);
+    const e = await editGame({ files: r2.files, request: 'please make the whole thing a lot harder for my friends', settings: degamed, encode });
+    expect(e.provider).toBe('instant');
+    expect(e.notice).toMatch(/today’s free AI requests.*instant mode instead/);
   });
 
   it('does not fall back when the player cancels', async () => {
@@ -307,5 +323,22 @@ describe('patches', () => {
     const ours = { 'a.js': 'A-mine', 'b.js': 'B', 'c.png': 'img1', 'notes.md': 'hi' };
     const theirs = { 'a.js': 'A', 'b.js': 'B2', 'c.png': 'img2', 'd.js': 'D' };
     expect(mergeRebuild(base, ours, theirs).files).toEqual({ 'a.js': 'A-mine', 'b.js': 'B2', 'c.png': 'img2', 'd.js': 'D', 'notes.md': 'hi' });
+  });
+});
+
+describe('checkPlayable (the player’s own pre-flight checks)', () => {
+  it('passes a built game and catches what would stop the player', async () => {
+    const { files } = await makeGame();
+    expect(checkPlayable(files)).toEqual([]);
+    const noSheet = { ...files };
+    delete noSheet['assets/sprites/knight-sheet.png'];
+    expect(checkPlayable(noSheet).map((p) => p.message).join()).toMatch(/sprite sheet .* is missing/);
+    const badImport = { ...files, 'scripts/coin.js': `import x from 'lodash';\n${files['scripts/coin.js']}` };
+    expect(checkPlayable(badImport)[0]!.message).toMatch(/Can't import "lodash"/);
+    const relImport = { ...files, 'scripts/coin.js': `import { y } from './util.js';\n${files['scripts/coin.js']}` };
+    expect(checkPlayable(relImport)[0]!.message).toMatch(/Cannot find scripts\/util.js/);
+    expect(checkPlayable({ ...relImport, 'scripts/util.js': 'export const y = 1;' })).toEqual([]);
+    const badScene = { ...files, 'scenes/main.scene.json': '{"name":"x"}' };
+    expect(checkPlayable(badScene)[0]!.path).toBe('scenes/main.scene.json');
   });
 });

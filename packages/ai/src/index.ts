@@ -17,6 +17,7 @@ export {
   anthropicModel,
   degamedRunner,
   ProviderError,
+  type LimitCode,
   DEFAULT_MODELS,
   PROVIDER_LABELS,
   type ProviderId,
@@ -36,4 +37,4 @@ export {
 export { getBackend, setBackend, stubBackend, backendFromKits, catalogFor, SPEC_FILE, type GameBackend, type KitInfo, type ThemeInfo, type KitsModule } from './catalog';
 export { instantSpec, instantEdit } from './instant';
 export { applyEdits, MODS_FILE } from './patch';
-export { checkProject } from './check';
+export { checkProject, checkPlayable } from './check';

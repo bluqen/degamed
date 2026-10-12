@@ -59,6 +59,9 @@ export interface ThemeArt {
   tiles: { ground: Raster; fill: Raster; platform: Raster; [k: string]: Raster };
   sprites: { hero: SpriteSheet; enemy: SpriteSheet; pickup: SpriteSheet; goal: SpriteSheet; [k: string]: SpriteSheet };
   props?: Record<string, Raster>;
+  /** Lighting, fog, particles and grade (rendered by the engine). */
+  environment?: Record<string, unknown>;
+  tileSize?: number;
 }
 
 // ai → design

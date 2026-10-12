@@ -2,6 +2,7 @@
  * Composes a still "key art" frame for a theme from its own layers, tiles and sprites,
  * so theme cards always show real game art.
  */
+import { renderPreview, type ArtTheme } from '@degamed/engine/art';
 import type { Raster, SpriteSheet, ThemeArt } from './types';
 
 const cache = new Map<string, string>();
@@ -38,6 +39,16 @@ export function themePreview(theme: ThemeArt, width = 320, height = 180): string
   const key = `${theme.id}:${width}x${height}`;
   const hit = cache.get(key);
   if (hit) return hit;
+  // Real themes have an environment: use the art package's renderer (lighting, fog, particles).
+  if (theme.environment) {
+    try {
+      const url = toCanvas(renderPreview(theme as unknown as ArtTheme, { width, height })).toDataURL('image/png');
+      cache.set(key, url);
+      return url;
+    } catch {
+      // Fall through to the simple compositor.
+    }
+  }
   const c = document.createElement('canvas');
   c.width = width;
   c.height = height;

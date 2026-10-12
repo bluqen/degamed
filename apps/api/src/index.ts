@@ -9,6 +9,11 @@ export interface Env {
   ART_DAILY_LIMIT?: string;
   /** Hosted AI game-building requests per user per day (default 30). */
   AI_DAILY_LIMIT?: string;
+  /**
+   * Optional ceiling on hosted AI requests per day across ALL users, so a viral spike can't run
+   * past the Workers AI free allowance. Unset or 0 = no ceiling.
+   */
+  AI_GLOBAL_DAILY_LIMIT?: string;
   /** Workers AI model for spec tasks (create, spec edits). Cheap and fast. */
   AI_TEXT_MODEL?: string;
   /** Workers AI model for tasks that write code (edits with scripts, repairs). */
@@ -76,12 +81,13 @@ function supabaseRest(env: Env, path: string, init: RequestInit = {}) {
   });
 }
 
-/** How many metered events of `kind` the user has today (UTC). */
-export async function usageToday(env: Env, userId: string, kind: 'art' | 'ai', now = new Date()): Promise<number> {
+/** How many metered events of `kind` the user (or, with `null`, everyone) has today (UTC). */
+export async function usageToday(env: Env, userId: string | null, kind: 'art' | 'ai', now = new Date()): Promise<number> {
   const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())).toISOString();
+  const who = userId === null ? '' : `&user_id=eq.${encodeURIComponent(userId)}`;
   const res = await supabaseRest(
     env,
-    `usage_events?select=id&user_id=eq.${encodeURIComponent(userId)}&kind=eq.${kind}&created_at=gte.${encodeURIComponent(start)}`,
+    `usage_events?select=id${who}&kind=eq.${kind}&created_at=gte.${encodeURIComponent(start)}`,
     { headers: { Prefer: 'count=exact', Range: '0-0' } },
   );
   if (!res.ok) throw new Error(`usage lookup failed: ${res.status}`);
@@ -184,7 +190,17 @@ app.post('/ai/generate', userOrDevAnon, async (c) => {
   const limit = Number(c.env.AI_DAILY_LIMIT ?? 30);
   const used = devAnon ? 0 : await usageToday(c.env, user.id, 'ai');
   if (used >= limit) {
-    return c.json({ error: `You've used all ${limit} free AI requests for today. Free instant mode still works, or add your own Gemini key in Settings.` }, 429);
+    return c.json(
+      { error: `You've used all ${limit} free AI requests for today. Free instant mode still works, or add your own Gemini key in Settings.`, code: 'ai_user_limit' },
+      429,
+    );
+  }
+  const ceiling = Number(c.env.AI_GLOBAL_DAILY_LIMIT ?? 0);
+  if (!devAnon && ceiling > 0 && (await usageToday(c.env, null, 'ai')) >= ceiling) {
+    return c.json(
+      { error: 'Degamed AI is very popular today and has reached its free daily limit. Free instant mode still works, or add your own Gemini key in Settings.', code: 'ai_global_limit' },
+      429,
+    );
   }
 
   const req = parsed.data;

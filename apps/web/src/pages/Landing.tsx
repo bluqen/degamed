@@ -4,7 +4,7 @@ import { ArrowRight, Check, Gamepad2, KeyRound, Link2, MessageCircle, Smartphone
 import { SiteFooter, SiteHeader } from '../components/SiteHeader';
 import { Stage } from '../components/Stage';
 import { ThemeArtImage } from '../components/ThemeCard';
-import { demoGame, themes } from '../lib/game';
+import { demoGame, demoTheme as pickDemoTheme, themes } from '../lib/game';
 import { themePreview } from '../lib/game/preview';
 import { Button, ButtonLink, Card, Segmented, Slider, Switch, cx } from '../ui';
 
@@ -14,7 +14,7 @@ export function Landing() {
   const navigate = useNavigate();
   const [idea, setIdea] = useState('');
   const allThemes = useMemo(themes, []);
-  const demoTheme = allThemes[0]!;
+  const demoTheme = useMemo(pickDemoTheme, []);
   const poster = useMemo(() => themePreview(demoTheme, 480, 270), [demoTheme]);
 
   useEffect(() => {
@@ -56,7 +56,7 @@ export function Landing() {
               id="hero-idea"
               value={idea}
               onChange={(e) => setIdea(e.target.value)}
-              placeholder="A moody platformer about a lost little robot"
+              placeholder="A moody platformer about a lost robot"
               className="h-12 min-w-0 flex-1 bg-transparent px-3 text-body-lg text-ink placeholder:text-faint focus:outline-none focus-visible:outline-none"
             />
             <Button type="submit" size="lg" iconEnd={<ArrowRight size={18} aria-hidden="true" />}>
@@ -120,7 +120,7 @@ export function Landing() {
             </Step>
             <Step n={2} title="Play it" body="In under a minute you’re playing: real pixel art, light, weather and game feel.">
               <div className="relative h-full">
-                <ThemeArtImage theme={allThemes[3] ?? demoTheme} />
+                <ThemeArtImage theme={allThemes[1] ?? demoTheme} />
                 <span className="absolute inset-0 flex items-center justify-center">
                   <span className="flex size-12 items-center justify-center rounded-full bg-white/95 text-[#15141d] shadow-3">
                     <Gamepad2 size={22} aria-hidden="true" />
@@ -150,17 +150,23 @@ export function Landing() {
       <section className="mx-auto max-w-[1200px] px-4 py-20 sm:px-6 sm:py-28">
         <SectionIntro eyebrow="Looks like a real game" title="Hand-made art styles, not clip art" body="Every game is drawn in a crafted pixel-art style with layered backgrounds, light and atmosphere. Switch styles any time." />
         <ul className="mt-12 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-6">
-          {allThemes.slice(0, 5).map((t, i) => (
-            <li key={t.id} className={cx('group overflow-hidden rounded-xl border border-line bg-surface shadow-1', i < 2 ? 'col-span-2 lg:col-span-3' : 'col-span-1 lg:col-span-2', i === 4 && 'max-lg:col-span-2')}>
+          {allThemes.slice(0, 5).map((t, i) => {
+            const n = Math.min(allThemes.length, 5);
+            // 5 → two big + three small; 4 → 2×2; 3 or fewer → equal columns.
+            const big = n === 4 || (n === 5 && i < 2);
+            const span = n === 5 ? (i < 2 ? 'col-span-2 lg:col-span-3' : cx('col-span-1 lg:col-span-2', i === 4 && 'max-lg:col-span-2')) : n === 4 ? 'col-span-2 sm:col-span-1 lg:col-span-3' : 'col-span-2 lg:col-span-2';
+            return (
+            <li key={t.id} className={cx('group overflow-hidden rounded-xl border border-line bg-surface shadow-1', span)}>
               <div className="aspect-video overflow-hidden bg-stage">
-                <ThemeArtImage theme={t} width={i < 2 ? 480 : 320} height={i < 2 ? 270 : 180} className="transition-transform duration-500 ease-standard group-hover:scale-[1.03]" />
+                <ThemeArtImage theme={t} width={big || n <= 3 ? 480 : 320} height={big || n <= 3 ? 270 : 180} className="transition-transform duration-500 ease-standard group-hover:scale-[1.03]" />
               </div>
               <div className="flex flex-col gap-0.5 px-4 py-3">
                 <span className="text-body font-semibold">{t.name}</span>
                 <span className="line-clamp-1 text-body-sm text-muted">{t.description}</span>
               </div>
             </li>
-          ))}
+            );
+          })}
         </ul>
       </section>
 
@@ -198,7 +204,7 @@ export function Landing() {
       <section className="mx-auto max-w-[1200px] px-4 pb-24 sm:px-6">
         <div className="relative flex flex-col items-center gap-6 overflow-hidden rounded-2xl bg-[#15121f] px-6 py-16 text-center text-white sm:py-20">
           <div aria-hidden="true" className="absolute inset-0">
-            <ThemeArtImage theme={allThemes[4] ?? demoTheme} width={640} height={200} />
+            <ThemeArtImage theme={allThemes[0] ?? demoTheme} width={640} height={200} />
           </div>
           <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(60%_80%_at_50%_45%,rgb(21_18_31/0.85),rgb(21_18_31/0.35))]" />
           <h2 className="relative font-display text-[36px] leading-[1.05] font-bold tracking-[-0.03em] text-balance sm:text-[52px]">Your first game is one sentence away</h2>

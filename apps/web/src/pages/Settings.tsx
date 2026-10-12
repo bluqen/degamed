@@ -22,7 +22,7 @@ export function Settings() {
 
   return (
     <AppShell>
-      <h1 className="font-display text-3xl tracking-tight">Settings</h1>
+      <h1 className="font-display text-title-lg font-bold tracking-[-0.02em]">Settings</h1>
       <section className="flex flex-col gap-4 rounded-2xl border border-line bg-panel p-6">
         <div className="flex flex-col gap-1">
           <h2 className="text-lg font-semibold">Your AI keys</h2>

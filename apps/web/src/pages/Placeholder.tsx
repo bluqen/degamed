@@ -1,11 +1,11 @@
 import { AppShell } from '../components/AppShell';
 import { SiteFooter, SiteHeader } from '../components/SiteHeader';
-import { ButtonLink } from '../components/Button';
+import { ButtonLink } from '../ui';
 
 export function ComingSoon({ title, body, shell = 'app' }: { title: string; body: string; shell?: 'app' | 'site' }) {
   const content = (
     <div className="flex flex-col gap-3">
-      <h1 className="font-display text-3xl tracking-tight">{title}</h1>
+      <h1 className="font-display text-title-lg font-bold tracking-[-0.02em]">{title}</h1>
       <p className="max-w-[560px] text-muted">{body}</p>
     </div>
   );

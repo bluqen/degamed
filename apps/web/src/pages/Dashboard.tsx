@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { Plus } from 'lucide-react';
 import { AppShell } from '../components/AppShell';
-import { ButtonLink } from '../components/Button';
+import { ButtonLink } from '../ui';
 import { useAuth } from '../lib/auth';
 import { isAuthConfigured } from '../lib/env';
 import { listMyProjects, timeAgo, type ProjectRow } from '../lib/projects';
@@ -36,7 +36,7 @@ export function Dashboard() {
 
   return (
     <AppShell>
-      <h1 className="font-display text-3xl tracking-tight">
+      <h1 className="font-display text-title-lg font-bold tracking-[-0.02em]">
         {greeting()}
         {firstName ? `, ${firstName}` : ''}
       </h1>
@@ -106,7 +106,7 @@ export function Dashboard() {
         <div className="flex flex-col gap-2.5 rounded-[14px] border border-line bg-panel p-4.5">
           <h2 className="font-semibold">Use your own AI key</h2>
           <p className="text-sm text-muted">Free and unlimited. Your key stays in this browser.</p>
-          <ButtonLink to="/settings" variant="outline" className="self-start">
+          <ButtonLink to="/settings" variant="secondary" className="self-start">
             Add a key
           </ButtonLink>
         </div>

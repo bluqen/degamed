@@ -46,11 +46,15 @@ export const PROVIDER_LABELS: Record<ProviderId, string> = {
   anthropic: 'Anthropic Claude (your key)',
 };
 
+/** Machine-readable reasons from the hosted API. */
+export type LimitCode = 'ai_user_limit' | 'ai_global_limit';
+
 export class ProviderError extends Error {
   constructor(
     message: string,
     readonly status?: number,
     readonly provider?: ProviderId,
+    readonly code?: string,
   ) {
     super(message);
     this.name = 'ProviderError';
@@ -61,15 +65,17 @@ const NAMES: Record<ProviderId, string> = { instant: 'Instant mode', degamed: 'D
 
 async function failure(res: Response, provider: ProviderId): Promise<ProviderError> {
   let detail = '';
+  let code: string | undefined;
   try {
-    const body = (await res.json()) as { error?: { message?: string } | string };
+    const body = (await res.json()) as { error?: { message?: string } | string; code?: string };
     detail = typeof body.error === 'string' ? body.error : (body.error?.message ?? '');
+    code = typeof body.code === 'string' ? body.code : undefined;
   } catch {
     // Non-JSON error body; the status code is enough.
   }
   const name = NAMES[provider];
   if (provider === 'degamed' && detail && (res.status === 429 || res.status === 400 || res.status === 401)) {
-    return new ProviderError(detail, res.status, provider);
+    return new ProviderError(detail, res.status, provider, code);
   }
   if (res.status === 401 || res.status === 403) return new ProviderError(`${name} rejected the API key. Check it in Settings.`, res.status, provider);
   if (res.status === 429) return new ProviderError(`${name} is busy or out of quota right now. Try again in a minute.`, res.status, provider);

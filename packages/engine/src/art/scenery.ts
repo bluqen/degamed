@@ -3,7 +3,7 @@
  * decides how each material is painted (texture, rim light, fog fade). All builders respect the
  * layer's horizontal wrap, so layers tile seamlessly.
  */
-import { Canvas, fbm, bayer, MatLayer, type Rng } from './core';
+import { Canvas, fbm, bayer, hash2, MatLayer, type Rng } from './core';
 
 /** A ruined tower: setbacks, optional broken top, antenna and windows (window material). */
 export function tower(
@@ -226,4 +226,25 @@ export function mistBand(c: Canvas, o: { y: number; h: number; color: string; al
 /** Stamps tiny dots (stars, spores, distant lights) */
 export function speckle(c: Canvas, r: Rng, n: number, color: string, area: [number, number, number, number], alpha = 1): void {
   for (let i = 0; i < n; i++) c.set(Math.floor(r.range(area[0], area[2])), Math.floor(r.range(area[1], area[3])), color, alpha * r.range(0.4, 1));
+}
+
+/**
+ * A cel-shaded blob (tree crown lobe, bush): lit crescent toward the upper right, shadow crescent
+ * toward the lower left. Draw lobes back to front for a clustered, hand-shaded look.
+ */
+export function shadedBlob(L: MatLayer, cx: number, cy: number, r: number, base: number, shadow: number, light: number): void {
+  for (let y = Math.floor(cy - r); y <= cy + r; y++)
+    for (let x = Math.floor(cx - r); x <= cx + r; x++) {
+      const nx = (x + 0.5 - cx) / r;
+      const ny = (y + 0.5 - cy) / r;
+      if (nx * nx + ny * ny > 1) continue;
+      const lit = nx * 0.55 - ny * 0.85;
+      // leafy speckle: a few pixels break the bands so it reads as foliage, not a ball
+      const h = hash2(Math.round(x), Math.round(y), 77);
+      let m = lit > 0.5 ? light : lit < -0.3 ? shadow : base;
+      if (m === base && h > 0.9) m = lit > 0.1 ? light : shadow;
+      else if (m === shadow && h > 0.93) m = base;
+      else if (m === light && h > 0.92) m = base;
+      L.set(x, y, m);
+    }
 }

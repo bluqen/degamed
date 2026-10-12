@@ -55,6 +55,22 @@ export function setAiLogger(l: AiLogger): void {
 
 const isAbort = (e: unknown) => e instanceof DOMException && e.name === 'AbortError';
 
+/** The notice shown when the hosted tier is out of free requests: plain, kind, and never a dead end. */
+const LIMIT_NOTICES: Record<string, { create: string; edit: string }> = {
+  ai_user_limit: {
+    create: 'You’ve used today’s free AI requests, so I made this one with free instant mode. They refill tomorrow, or add your own Gemini key in Settings for more.',
+    edit: 'You’ve used today’s free AI requests. They refill tomorrow, or add your own Gemini key in Settings for more.',
+  },
+  ai_global_limit: {
+    create: 'Degamed AI is very busy today and has used up its free requests, so I made this one with free instant mode. Add your own Gemini key in Settings to keep using AI.',
+    edit: 'Degamed AI is very busy today and has used up its free requests. Add your own Gemini key in Settings to keep using AI.',
+  },
+};
+
+function limitNotice(e: unknown, kind: 'create' | 'edit'): string | undefined {
+  return e instanceof ProviderError && e.code ? LIMIT_NOTICES[e.code]?.[kind] : undefined;
+}
+
 function friendlyFailure(e: unknown, provider: ProviderId): string {
   if (e instanceof ProviderError) return e.message;
   if (e instanceof TypeError) return `Couldn't reach ${PROVIDER_LABELS[provider]}. Check your connection.`;
@@ -114,7 +130,7 @@ export async function createGame(i: {
       usage = r.usage;
     } catch (e) {
       if (isAbort(e) || i.signal?.aborted) throw e;
-      notice = `${friendlyFailure(e, provider)} I used free instant mode instead.`;
+      notice = limitNotice(e, 'create') ?? `${friendlyFailure(e, provider)} I used free instant mode instead.`;
     }
     logger({ task: 'create', provider, usage, ms: Date.now() - started });
   }
@@ -294,7 +310,8 @@ export async function editGame(i: {
   } catch (e) {
     if (isAbort(e) || i.signal?.aborted) throw e;
     logger({ task: 'edit', provider, usage, ms: Date.now() - started });
-    return applyFree(`${friendlyFailure(e, provider)}${free?.understood ? ' I made the change with free instant mode instead.' : ''}`);
+    const why = limitNotice(e, 'edit') ?? friendlyFailure(e, provider);
+    return applyFree(`${why}${free?.understood ? ' I made the change with free instant mode instead.' : ''}`);
   }
   logger({ task: 'edit', provider, usage, ms: Date.now() - started });
   i.signal?.throwIfAborted();

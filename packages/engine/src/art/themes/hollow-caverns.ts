@@ -10,6 +10,7 @@ import { derive, px01, tileCells, tileNoise, TILE } from '../tiles';
 import { sheetOf, type Raster } from '../../pixel';
 import type { ArtTheme, ParallaxLayer, PropInfo, SpriteSheet } from '../types';
 import { hollowHeroCostume } from './hollow-hero';
+import { checkpointSheet, flyerSheet, spikeStrip } from '../extras';
 
 const W = 480;
 const H = 270;
@@ -250,20 +251,19 @@ function layers(): ParallaxLayer[] {
 
 // ── Tiles ───────────────────────────────────────────────────────────────────
 
-function cobbles(seed: number, lift = 0): Canvas {
+function cobbles(seed: number, lift = 0, count = 9): Canvas {
   const S = C.stone;
-  const cell = tileCells(seed, 6);
+  const cell = tileCells(seed, count);
   const n = tileNoise(seed + 3, 4, 2);
   const c = new Canvas(TILE, TILE);
   for (let y = 0; y < TILE; y++)
     for (let x = 0; x < TILE; x++) {
       const k = cell(x, y);
-      const tone = (k.id * 37) % 3 === 0 ? 0 : 1;
+      const tone = (k.id * 37) % 4 === 0 ? 0 : 1;
       let i = 1 + tone + lift;
-      if (k.gap < 1.1) i = 0;
-      else if (k.gap < 2.2 && k.dy < 0) i += 1; // lit upper rim of each stone
-      else if (k.gap < 2.2 && k.dy > 0) i -= 1;
-      if (n(x, y) > 0.68 && i > 0) i += bayer(x, y) > 0.5 ? 1 : 0;
+      if (k.gap < 1) i = lift;
+      else if (k.gap < 2 && k.dy < -0.5) i += 1; // lit upper rim of each stone
+      if (n(x, y) > 0.7 && bayer(x, y) > 0.5) i += 1;
       c.set(x, y, S[Math.max(0, Math.min(S.length - 1, i))]!);
     }
   return c;
@@ -272,17 +272,17 @@ function cobbles(seed: number, lift = 0): Canvas {
 function crust(base: Canvas, seed: number): Canvas {
   const S = C.stone;
   const depth = tileNoise(seed, 2, 2);
-  return derive(base, (x, y, col) => {
-    const d = 2 + Math.round(depth(x, 0) * 2);
+  return derive(base, (x, y) => {
+    const d = 3 + Math.round(depth(x, 0) * 2);
     if (y === 0) {
       const blade = px01(x, 0, seed) > 0.55;
-      return blade ? (px01(x, 1, seed) > 0.85 ? C.blue[2] : C.teal[2]) : 'clear';
+      return blade ? (px01(x, 1, seed) > 0.85 ? C.blue[2] : C.teal[3]) : 'clear';
     }
-    if (y === 1) return px01(x, 2, seed) > 0.2 ? S[7] : S[6];
-    if (y === 2) return S[6];
-    if (y < d + 1) return S[5];
-    if (y === d + 1) return S[4];
-    if (y < d + 6 && bayer(x, y) < (d + 6 - y) / 7) return col[0] < 30 ? S[3] : S[4];
+    if (y === 1) return px01(x, 2, seed) > 0.25 ? S[7] : C.blue[1];
+    if (y === 2) return px01(x, 3, seed) > 0.85 ? C.blue[1] : S[6];
+    if (y < d) return S[5];
+    if (y === d) return S[4];
+    if (y === d + 1) return S[1];
     return null;
   });
 }
@@ -350,6 +350,7 @@ function caveTiles(): ArtTheme['tiles'] {
     platform: t(plat),
     platformLeft: t(platformLeft),
     platformRight: t(platformRight),
+    spike: spikeStrip(['#5c6680', '#9aa4bf', '#d5dbea', '#ffffff'], '#03040a', S[2]),
   };
 }
 
@@ -639,7 +640,14 @@ export function hollowCaverns(): ArtTheme {
     background: C.top,
     layers: layers(),
     tiles: caveTiles(),
-    sprites: { hero: heroSheet(hollowHeroCostume()), enemy: crawlerSheet(), pickup: shardSheet(), goal: archSheet() },
+    sprites: {
+      hero: heroSheet(hollowHeroCostume()),
+      enemy: crawlerSheet(),
+      pickup: shardSheet(),
+      goal: archSheet(),
+      flyer: flyerSheet({ body: ['#1a1830', '#2c2a4a', '#4a4670'], wing: ['#6f80b0', '#c8d4f2', '#ffffff'], eye: '#ff9a4a', outline: '#03040a', glowEye: true }),
+      checkpoint: checkpointSheet({ post: [C.stone[2]!, C.stone[4]!, C.stone[6]!], cage: C.stone[6]!, glow: '#9fe2ff', core: '#e6faff', outline: '#03040a' }),
+    },
     props: p,
     propInfo: info,
     tileSize: TILE,
@@ -650,11 +658,11 @@ export function hollowCaverns(): ArtTheme {
       enemy: { color: C.amber[2]!, radius: 22, intensity: 0.25 },
     },
     environment: {
-      ambient: { color: '#7d9be0', intensity: 0.62 },
-      fog: { color: C.fog, density: 0.4, height: 0.35 },
+      ambient: { color: '#c4d2ff', intensity: 0.74 },
+      fog: { color: C.fog, density: 0.35, height: 0.4 },
       bloom: { strength: 0.7, threshold: 0.6 },
       vignette: 0.6,
-      grade: { contrast: 1.12, saturation: 0.95, tint: '#a8bcff' },
+      grade: { contrast: 1.1, saturation: 0.95, tint: '#e8eeff' },
       particles: [
         { type: 'spores', density: 0.5, color: '#9fe8ff' },
         { type: 'dust', density: 0.25, color: '#6a88c0' },

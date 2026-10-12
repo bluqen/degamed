@@ -472,7 +472,7 @@ export function SceneView() {
               aria-pressed={tool === t.id}
               title={`${t.label} (${t.key})`}
               onClick={() => ed.setTool(t.id)}
-              className={`flex size-7 items-center justify-center rounded ${tool === t.id ? 'bg-brand text-on-brand' : 'text-muted hover:bg-surface-3 hover:text-on-brand'}`}
+              className={`flex size-7 items-center justify-center rounded ${tool === t.id ? 'bg-brand text-on-brand' : 'text-muted hover:bg-surface-3 hover:text-ink'}`}
             >
               {t.icon}
             </button>

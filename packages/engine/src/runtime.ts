@@ -592,7 +592,7 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
         entity.light = light ? { ...LIGHT_DEFAULTS, ...(entity.light ?? {}), ...light } : null;
       },
       /** Big centred text (level complete, game over). Returns an object with destroy(). */
-      banner: (title: string, subtitle = '', opts: { color?: string; ms?: number } = {}) => {
+      banner: (title: string, subtitle = '', opts: { color?: string; ms?: number; hint?: string } = {}) => {
         const s = ctl.scene;
         const objects: Phaser.GameObjects.GameObject[] = [];
         const band = s.add.rectangle(W / 2, H / 2, W, subtitle ? 74 : 54, 0x07080d, 0.62).setDepth(DEPTH.overlay);
@@ -613,6 +613,17 @@ export async function startGame(parent: HTMLElement, files: ProjectFiles, hooks:
             .setDepth(DEPTH.overlay + 1);
           objects.push(sub);
           s.tweens.add({ targets: sub, alpha: { from: 0, to: 1 }, delay: 250, duration: 300 });
+        }
+        if (opts.hint) {
+          const hint = s.add
+            .bitmapText(W / 2, H / 2 + (subtitle ? 52 : 40), FONT_KEY, fontSafe(opts.hint))
+            .setLetterSpacing(FONT_LETTER_SPACING)
+            .setOrigin(0.5)
+            .setTint(0xffffff)
+            .setAlpha(0)
+            .setDepth(DEPTH.overlay + 1);
+          objects.push(hint);
+          s.tweens.add({ targets: hint, alpha: { from: 0, to: 1 }, delay: 900, duration: 400, yoyo: true, hold: 700, repeat: -1 });
         }
         for (const o of objects) ctl.ui(o);
         s.tweens.add({ targets: band, scaleY: { from: 0, to: 1 }, duration: 220, ease: 'Cubic.Out' });

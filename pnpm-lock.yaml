@@ -78,6 +78,9 @@ importers:
       '@codemirror/view':
         specifier: ^6.43.14
         version: 6.43.14
+      '@degamed/ai':
+        specifier: workspace:*
+        version: link:../../packages/ai
       '@degamed/art':
         specifier: workspace:*
         version: link:../../packages/art

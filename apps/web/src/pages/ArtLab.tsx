@@ -68,7 +68,7 @@ export function ArtLab() {
   return (
     <AppShell>
       <div className="flex flex-col gap-1.5">
-        <h1 className="font-display text-3xl tracking-tight">Art Lab</h1>
+        <h1 className="font-display text-title-lg font-bold tracking-[-0.02em]">Art Lab</h1>
         <p className="text-muted">Generate game-ready sprites, tiles and backgrounds in any style.</p>
       </div>
 

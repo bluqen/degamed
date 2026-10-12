@@ -271,7 +271,7 @@ export function TabStrip<T extends string>({
           aria-selected={active === t.id}
           onClick={() => onChange(t.id)}
           className={`relative flex h-full items-center gap-1.5 px-2.5 text-[12px] ${
-            active === t.id ? 'text-on-brand after:absolute after:inset-x-1.5 after:bottom-0 after:h-[2px] after:rounded-full after:bg-brand' : 'text-muted hover:text-on-brand'
+            active === t.id ? 'text-ink after:absolute after:inset-x-1.5 after:bottom-0 after:h-[2px] after:rounded-full after:bg-brand' : 'text-muted hover:text-ink'
           }`}
         >
           {t.label}
@@ -412,7 +412,7 @@ export function Btn({
           ? 'bg-brand text-on-brand hover:bg-brand-hover'
           : danger
             ? 'bg-bad-tint text-bad hover:bg-bad/40'
-            : 'border border-line-strong bg-surface-2 text-ink-2 hover:border-line-strong hover:text-on-brand'
+            : 'border border-line-strong bg-surface-2 text-ink-2 hover:border-line-strong hover:text-ink'
       }`}
     >
       {children}

@@ -64,11 +64,11 @@ export function ChatPanel({ studio, intro }: { studio: Studio; intro: string }) 
         settings: ai.settings,
         encode,
         signal: ctrl.signal,
-        onProgress: (p) => setMessages((m) => m.map((x) => (x.id === pendingId ? { ...x, text: `${p.message}…` } : x))),
+        onProgress: (p) => setMessages((m) => m.map((x) => (x.id === pendingId ? { ...x, text: /[.…!?]$/.test(p.message) ? p.message : `${p.message}…` } : x))),
       });
       const changed = result.changed.length > 0;
       if (changed) studio.apply(result.files, request);
-      setMessages((m) => m.map((x) => (x.id === pendingId ? { ...x, text: result.summary, status: 'done', undoable: changed } : x)));
+      setMessages((m) => m.map((x) => (x.id === pendingId ? { ...x, text: result.notice ? `${result.summary} (${result.notice})` : result.summary, status: 'done', undoable: changed } : x)));
     } catch (e) {
       if (ctrl.signal.aborted) return;
       setMessages((m) =>

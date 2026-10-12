@@ -12,6 +12,8 @@ const STEPS: { stage: Progress['stage']; label: string; hint: string }[] = [
   { stage: 'testing', label: 'Playtesting', hint: 'Making sure it can be finished and feels good.' },
 ];
 
+const withEllipsis = (m: string) => (/[.…!?]$/.test(m) ? m : `${m}…`);
+
 const order = (s: Progress['stage']) => (s === 'fixing' ? 3 : s === 'done' ? 4 : STEPS.findIndex((x) => x.stage === s));
 
 /** The "making your game" screen, driven by createGame's progress stages. */
@@ -68,7 +70,7 @@ export function Generating({ prompt, progress, error, onCancel, onRetry, onEdit 
           <div className="skeleton absolute inset-0 opacity-[0.12] mix-blend-screen" aria-hidden="true" />
           <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 bg-gradient-to-t from-black/70 to-transparent p-5 pt-14">
             <span className="text-body font-semibold text-white" aria-live="polite">
-              {last?.message ?? 'Getting started'}…
+              {withEllipsis(last?.message ?? 'Getting started')}
             </span>
             <div className="h-1.5 overflow-hidden rounded-full bg-white/20" role="progressbar" aria-label="Progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(pct)}>
               <div className="h-full rounded-full bg-white transition-[width] duration-500 ease-standard" style={{ width: `${Math.max(6, pct)}%` }} />

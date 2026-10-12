@@ -52,6 +52,7 @@ Why it's cheap:
 - Daily cap per user: `AI_DAILY_LIMIT` (default **30**) via `usage_events` kind `'ai'`. Every request that reaches the model is counted, including failures, so the cap can't be dodged.
 - Models (vars in `wrangler.toml`): `AI_TEXT_MODEL = @cf/meta/llama-3.1-8b-instruct-fast` for create and spec edits; `AI_CODE_MODEL = @cf/meta/llama-3.3-70b-instruct-fp8-fast` only when code is involved (edits with files, repairs).
 - Response: `{ result, usage, attempts, remaining }`. The client re-validates `result`.
+- **Global ceiling** (round 2): `AI_GLOBAL_DAILY_LIMIT` (default **400**, `0` = off) caps hosted AI requests per day across all users, so a viral spike can't run past the free allowance. 400 × ~25 neurons (typical mix: 80% spec tasks at ~6, 20% code edits at ~100) ≈ 10,000 neurons. Both limits return 429 with a machine-readable `code` (`ai_user_limit` / `ai_global_limit`); the client turns either into an instant-mode game with a kind notice ("Degamed AI is very busy today… so I made this one with free instant mode. Add your own Gemini key in Settings to keep using AI.").
 
 ## Cost table
 

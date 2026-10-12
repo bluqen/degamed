@@ -66,6 +66,7 @@ export function Create() {
       });
       const id = newGameId();
       const ok = saveGame({ id, title: result.title, prompt: idea, kit: result.spec.kit, theme: result.spec.theme }, result.files);
+      if (result.notice) toast({ tone: 'info', title: 'Made with free instant mode', body: result.notice, duration: 7000 });
       if (!ok) toast({ tone: 'error', title: 'This device is out of space', body: 'Your game will play, but delete an old game to keep it.' });
       navigate(`/editor/${id}`, { state: { fresh: true, summary: result.summary } });
     } catch (e) {
@@ -254,7 +255,7 @@ export function Create() {
 
           <section aria-labelledby="looks" className="flex flex-col gap-5">
             <SectionHead id="looks" title="Start from a look" body="Every game is drawn in a hand-made art style. Pick one for ideas." />
-            <ul className={cx('grid grid-cols-1 gap-x-5 gap-y-6 sm:grid-cols-2', allThemes.length % 3 === 0 ? 'lg:grid-cols-3' : allThemes.length === 5 ? 'lg:grid-cols-5' : 'lg:grid-cols-4')}>
+            <ul className={cx('grid grid-cols-2 gap-x-3 gap-y-5 sm:gap-x-5 sm:gap-y-6', allThemes.length % 3 === 0 ? 'lg:grid-cols-3' : allThemes.length === 5 ? 'lg:grid-cols-5' : 'lg:grid-cols-4')}>
               {allThemes.map((t) => (
                 <li key={t.id}>
                   <button
